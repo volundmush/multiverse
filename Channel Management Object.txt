@@ -1,0 +1,19 @@
+
+&MOGORDER`MESSAGE [u(cobj,mop)]=marklar
+&MOGUSE`MESSAGE [u(cobj,mop)]=marklar
+
+&FUN`MESSAGE`MARKLAR [u(cobj,mop)]=case(1,v(MOGCONF`MARKLAR),regeditalli(%0,%\b-%(?:[v(honorifics)]%)%\b,-marklar),%0)
+
+&HONORIFICS [u(cobj,mop)]=chan|san|sama|kun|dono|hime|senpai|sensei|shi|bo|kohai|gakusei|sifu|oneesan|oniichan|onichan|onesan|oneechan|onechan|onisan|oniisan|chwan|kyun|tan|sempai|senpai|sugoi|domo
+
+&MOGTYPES`TITLE [u(cobj,channel)]=TRIM|STAFFTAG|RANKTAG
+
+&MOGORDER`TITLE [u(cobj,mop)]=noansi trim stafftag ranktag
+&MOGUSE`TITLE [u(cobj,mop)]=noansi trim stafftag ranktag
+
+&FUN`TITLE`RANKTAG [u(cobj,mop)]=if(cand(isdbref(u(setr,fac,v(MOGCONF`TITLE`RANKTAG))),strlen(u(setr,tag,switch(u(setr,r,get(%#/D`GROUP`%q<fac>`RANK))[null(if(strmatch(get(%#/D`GROUP`%q<fac>`TITLE),Reserve*),u(setq,rf,1)))],1,ansi(h+xterm81,%qr-CO),2,ansi(+xterm69,%qr-XO),<5,ansi(+xterm149,%qr-[if(%q<rf>,RF,Of)]),5,ansi(+xterm223,%qr-[if(%q<rf>,RF,Of)]),<=8,if(%q<rf>,ansi(+xterm223,%qr-RF),%qr),20,A,21,PA,22,switch(%q<fac>,#1781,W,#1783,LC),23,M)))),\[%q<tag>\][if(strlen(%0),%b%0)],if(strlen(%0),%0))
+
+@@ CONFED: #1781
+@@ UNION: #1783
+
+&INC`CHANNEL`MOGCONF`TITLE`RANKTAG [u(cobj,mop)]=@check isdbref(u(setr,entry,%1))=@attach %!/INC`MSG=ERROR: Ranktags must be pointed at DBREFs. Make sure it's a group DBref!

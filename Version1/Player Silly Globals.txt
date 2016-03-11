@@ -1,0 +1,4 @@
+&CMD`+POUNCE u(pgo)=$+pounce *:@include u(ccs)/INC`CHECKPC=%0,1,SILLY;@assert strmatch(%l,loc(%q<t1>))=@nspemit %#=They're nowhere nearby!;@nsremit %l=[ansi(rh,%n pounces %q<t1name>!)] [ansi(r,<3)] [ansi(rh,<3)] [ansi(mh,<3)]
+
+&CMD`+BREAD [u(cobj,bbs)]=$^\+bread(?\: +(.+?))?$:@break hasflag(%#,dark); @remit %l=The sky grows dark... %n looks up...%r%rAnd is BURIED in falling bread. Pumpernickel, white, whole wheat, bagels, rolls, banana, the whole nine yards.%r%rNext time, use +bbread
+@set [u(cobj,bbs)]/CMD`+BREAD=regexp

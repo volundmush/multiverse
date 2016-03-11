@@ -1,0 +1,9 @@
+&VAR`MODE u(ar)=MCM
+
+&FUN`CONFORMAT`PLAYERS`MCM u(ar)=u(RFN`SEPARATOR,Players)%R[ansi(firstcolor(%#,ROOM`COLNAME,DEFAULT`COLNAME),align(19 22 18 2 7 4,Name,Faction,Desc,PL,Health,Idle))]%R[trim(iter(sort(lvplayers(me),namei),align(19 22 18 2 -7 4,pueblize(ansi(firstcolor(%#,NAME`%i0,ROOM`PLAYERNAME),name(%i0)),look [name(%i0)]),strfirstof(if(isadmin(%i0),Admin),getproperty(%i0,factions,,,1),Unaffiliated),get(%i0/desc_curr),getproperty(%i0,PL),if(lte(getproperty(%i0,CURHP),0),ansi(hr,KO),getproperty(%i0,CURHP)),hideidle(%i0)),%b,%R),%r)]
+
+&FUN`CONFORMAT`THINGS`MCM u(ar)=u(RFN`SEPARATOR,Things)%R[ansi(firstcolor(%#,ROOM`COLNAME,DEFAULT`COLNAME),align(42 26 8,Name,Owner,if(isadmin(%#),DBref,Enter)))]%R[trim(iter(sort(lvthings(me),namei),align(42 26 8,pueblize(name(%i0),look [name(%i0)]),name(owner(%i0)),switch(isadmin(%#)[hasflag(%i0,ENTER_OK)][elock(%i0/enter,%#)],111,pueblize(ansi(g,%i0),enter %i0),1*,ansi(r,%i0),011,pueblize(ansi(g,enter_ok),enter %i0),ansi(r,can't))),%b,%R),%r)]
+
+&FUN`EXITFORMAT`MCM u(ar)=u(RFN`SEPARATOR,Exits)%R[table(iter(sortkey(#lambda/default(\%0/ORDER,0),sort(lvexits(me),namei)),ljust(if(strlen(alias(%i0)),<[ansi(custcolor(%#,ROOM`EXITALIAS),pueblize(ucstr(alias(%i0)),name(%i0)))]>),6)[ansi(custcolor(%#,ROOM`EXITNAME),pueblize(name(%i0),name(%i0)))][@@( to [ansi(custcolor(%#,ROOM`EXITDEST),left(name(loc(%i0)),sub(37,6,4,strlen(name(%i0)))))])],%b,|),37,width(%#),|)]%R[u(RFN`HEADER)]
+
+&FUN`EXITFORMAT`MCM u(ar)=u(RFN`SEPARATOR,Exits)%R[table(iter(sortkey(#lambda/default(\%0/ORDER,0),sort(lvexits(me),namei)),ljust(if(strlen(alias(%i0)),<[ansi(custcolor(%#,ROOM`EXITALIAS),pueblize(ucstr(alias(%i0)),name(%i0)))]>),6)[ansi(custcolor(%#,ROOM`EXITNAME),pueblize(name(%i0),name(%i0)))][if(v(ALTEXITS),,%bto [ansi(custcolor(%#,ROOM`EXITDEST),left(name(loc(%i0)),sub(37,6,4,strlen(name(%i0)))))])],%b,|),37,width(%#),|)]%R[u(RFN`HEADER)]

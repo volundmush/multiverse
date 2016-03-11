@@ -1,0 +1,108 @@
+@switch/inline isdbref(u(conv))=0,{@tel create(MCM Conversion System <CONV>)=config(master_room)}
+&conv u(coi)=locate(config(master_room),MCM Conversion System <CONV>,TXxi)
+@parent u(conv)=u(coi)
+@power u(conv)=queue
+@set u(conv)=WIZARD SAFE !NO_COMMAND
+@lock/command u(conv)=FLAG^WIZARD
+
+@switch/inline isdbref(u(oldbag))=0,{@switch/inline isdbref(u(conv))=1,{@tel create(Old Code Bag <OLDBAG>)=u(conv)}}
+&oldbag u(coi)=locate(u(conv),Old Code Bag <OLDBAG>,TXxi)
+@parent u(oldbag)=u(coi)
+
+&CMD`+CONVERT u(conv)=$^(?s)(?\:\+)?(convert|cleanup|conflict)(?\:/(\S+)?)?(?\: +(.*))?$:@include u(ccs)/INC`PARTIAL=%2,setr(allswitch,setunion(get(u(conv)/VAR`PLAYFLAGS),if(isadmin(%#),get(u(conv)/VAR`ADMINFLAGS)),|,|)),|,CONVERT,switch,switch;@include u(conv)/INC`[setr(mode,%1)]=%3
+@set u(conv)/CMD`+CONVERT=regexp
+
+&VAR`CONVERT u(conv)=ALTS|GROUPS|FACTIONS|LOCKS|CHANNELS|BOARDS|INFO|WF|MISC|THEME|ADMIN|FINGER|GRID
+&VAR`CLEANUP u(conv)=ALTS|GROUPS|FACTIONS|CHANNELS|BOARDS|INFO|WF|MISC|THEME|ADMIN|FINGER
+&VAR`CONFLICT u(conv)=ALTS|GROUPS|FACTIONS|CHANNELS|BOARDS|INFO|WF|MISC|THEME|ADMIN
+
+&RFN`MSGHEAD u(conv)=msghead(strfirstof(%0,%q<mode>))
+
+&INC`CONVERT u(conv)=@assert strlen(%0)=@nspemit %#=msghead(CONVERT) ERROR: Convert type field empty. Your options are: [itemize(v(VAR`CONVERT),|,and,\,)];@include u(ccs)/INC`PARTIAL=%0,v(VAR`CONVERT),|,CONVERT,convert,Convert Mode;@include u(conv)/INC`CONVERT`%q<convert>
+
+&INC`CLEANUP u(conv)=@assert strlen(%0)=@nspemit %#=msghead(CONVERT) ERROR: Cleanup type field empty. Your options are: [itemize(v(VAR`CLEANUP),|,and,\,)];@include u(ccs)/INC`PARTIAL=%0,v(VAR`CLEANUP),|,CONVERT,cleanup,Cleanup Mode;@include u(ccs)/INC`VERIFY={ansi(hr,WARNING:) This will wipe old attributes from players. Only do this if you've already converted! You want to Cleanup %q<cleanup>, correct? Type the same command again within ten seconds to continue.},CLEANUP %q<cleanup>,CONVERT;@include u(conv)/INC`CLEANUP`%q<cleanup>
+
+&INC`CONFLICT u(conv)=@assert strlen(%0)=@nspemit %#=msghead(CONVERT) ERROR: Conflict type field empty. Your options are: [itemize(v(VAR`CONFLICT),|,and,\,)];@include u(ccs)/INC`PARTIAL=%0,v(VAR`CONFLICT),|,CONVERT,Conflict,Anti-Conflict Mode;@include u(ccs)/INC`VERIFY={ansi(hr,WARNING:) This will disable, relocate, or destroy old code objects as appropriate. Only do this if you've already converted! You want to un-Conflict %q<Conflict>, correct? Type the same command again within ten seconds to continue.},Conflict %q<Conflict>,CONVERT;@include u(conv)/INC`Conflict`%q<Conflict>
+
+&INC`CONVERT`ALTS u(conv)=@include u(ccs)/INC`VERIFY={ansi(hr,WARNING:) This will convert [mudname()]'s Alts data to the new +account data. Are you sure you want to do this? Type the same command again within 10 seconds to verify.},CONVERT ACCOUNTS,CONVERT;@nspemit %#=msghead(CONVERT) Converting old +alts to +accounts! Please wait...;@dolist setunion(iter(lsearch(all,type,player,elock,ALTINFO`CALTSID:*),get(%i0/ALTINFO`CALTSID)),)={&[inum(0)] u(adb)=iter(setr(alts,lsearch(all,type,player,elock,ALTINFO`CALTSID:%i0)),objid(%i0));@dolist/inline %q<alts>=&D`ACCOUNT %i0=inum(1);&D`ALTS %i0=default(%i0/ALTINFO`SHOWALT,0);&[inum(0)]`EMAIL u(adb)=first(trimpenn(setunion(iter(%q<alts>,trim(edit(get(%i0/EMAIL),!,)),%b,|),,|,i,|),|),|)};@wait 5=@nspemit %#=msghead(CONVERT) Okay! [nattr(u(adb)/*)] Accounts were converted. Please verify that everything went well.
+
+&INC`CLEANUP`ALTS u(conv)=@dolist/inline lsearch(all,type,player,elock,ALTINFO:*)=@wipe %i0/ALTINFO;@nspemit %#=u(RFN`MSGHEAD) All information from the previous +alts command has been deleted.
+
+&INC`CONFLICT`ALTS u(conv)=@tel setr(old,locate(config(master_room),AltCmds,TXxi))=u(oldbag);@set %q<old>=NO_COMMAND;@nspemit %#=u(RFN`MSGHEAD) AltCmds (%q<old>) Relocated and set NO_COMMAND.
+
+&INC`CONVERT`GROUPS u(conv)=@include u(ccs)/INC`VERIFY={ansi(hr,WARNING:) This will convert [mudname()]'s Groups data to the new +group data. Are you sure you want to do this? Type the same command again within 10 seconds to verify.},CONVERT GROUPS,CONVERT;@nspemit %#=msghead(CONVERT) Converting old Groups to +groups! Please wait... This will take [mul(words(lcon(#1962)),2)] seconds to complete if all goes well!;@dolist setr(total,lcon(#1962))={@wait add(inum(0),inum(0))=@trigger/spoof u(conv)/TRG`CONVERT`GROUPS`DOCONVERT=%i0;@switch/inline eq(words(%q<total>),inum(0))=1,{@wait add(inum(0),inum(0),2)={@nspemit %#=msghead(CONVERT) Ok! Groups conversion complete. Please verify all membership and ranks were converted properly. Permissions cannot be converted and will need to be reinitialized.}}}
+
+&TRG`CONVERT`GROUPS`DOCONVERT u(conv)=@switch/inline isdbref(setr(gid1,locate(u(gop),edit(name(%0),46,),TXxi)))=0,{@include u(gso)/INC`CODE`DOCREATE=edit(name(%0),46,),1};@dolist/inline filterbool(#lambda/isint(\%0),iter(lattr(%0/RANKS`*),last(%i0,`)))={&RANK`[add(%i0,1)]`NAME %q<gid1>=get(%0/RANKS`%i0`NAME)};@dolist/inline lattr(%0/DIVISIONS`*)={&[setr(attr,DIVISION`[add(last(%i0,`),1)])] %q<gid1>=get(%0/%i0`NAME);&%q<attr>`RANK`1 %q<gid1>=Division Leader;&%q<attr>`RANK`2 %q<gid1>=Second in Command;&%q<attr>`RANK`3 %q<gid1>=Member};@cpattr %0/MEMBERS=%q<gid1>/MEMBERS;@cpattr %0/DESCRIBE=%q<gid1>/DESCRIBE;@dolist/inline filterbool(#lambda/match(get(%0/MEMBERS),objid(last(\%0,`))),lattr(%0/MEMBERS`*))={&D`GROUP`%q<gid1>`TITLE last(%i0,`)=get(%0/%i0`TITLE);&D`GROUP`%q<gid1>`RANK last(%i0,`)=add(get(%0/%i0`RANK),1);@switch/inline hasattrval(%0/%i0`DIVISION)=1,{&DIVISION`[add(get(%0/%i0`DIVISION),1)]`MEMBERS %q<gid1>=setunion(get(%q<gid1>/DIVISION`[add(get(%0/%i0`DIVISION),1)]`MEMBERS),objid(last(%i0,`)));&D`GROUP`%q<gid1>`DIVISION`[add(get(%0/%i0`DIVISION),1)]`RANK [last(%i0,`)]=bound(get(%0/%i0`DIVISION`RANK),1,3)}};@dolist u(u(gso)/FUN`LISTGROUPS)={@dolist/inline get(%i0/MEMBERS)={&D`GROUPS %i0=setunion(get(%i0/D`GROUPS),%i1)}}
+
+&INC`CONFLICT`GROUPS u(conv)=@tel setr(old,#1962)=u(oldbag);@set %q<old>=NO_COMMAND;@nspemit %#=u(RFN`MSGHEAD) [name(%q<old>)] (%q<old>) Relocated and set NO_COMMAND.
+
+&INC`CONFLICT`GROUPS u(conv)=
+
+&INC`CONVERT`FACTIONS u(conv)=@include u(ccs)/INC`VERIFY={ansi(hr,WARNING:) This will convert [mudname()]'s Factions data to the new +group data. Are you sure you want to do this? Type the same command again within 10 seconds to verify.},CONVERT FACTIONS,CONVERT;@nspemit %#=msghead(CONVERT) Converting old Factions to +groups! Please wait... This will take 10 seconds to complete if all goes well!;@dolist Union Confederate={@wait mul(5,inum(0))={@trigger me/TRG`CONVERT`FACTIONS`DOCONVERT=%i0};@switch/inline eq(2,inum(0))=1,{@wait 12=@nspemit %#=msghead(CONVERT) Faction conversion complete! (hopefully). Use +groups code to verify!}}
+
+&TRG`CONVERT`FACTIONS`DOCONVERT u(conv)=@switch/inline isdbref(setr(gid1,locate(u(gop),%0,TXxi)))=0,{@include u(gso)/INC`CODE`DOCREATE=%0,1};&SET`MAJOR %q<gid1>=1;&SET`TYPE %q<gid1>=FACTION;&MEMBERS %q<gid1>=iter(lsearch(all,type,player,elock,Faction:%0),objid(%i0));@dolist/inline setunion(lnum(1,8),lnum(20,23))={&RANK`%i0`NAME %q<gid1>=switch(%i0,1,Field Marshal,2,General,3,Colonel,4,Major,5,Captain,6,Lieutenant,7,Ensign,8,Probation,20,Ally,21,Provisional Ally,22,Last Chancer,23,Mercenary)};@dolist/inline get(%q<gid1>/MEMBERS)={&D`GROUPS %i0=setunion(get(%i0/D`GROUPS),%q<gid1>);&D`GROUP`%q<gid1>`RANK %i0=switch(default(%i0/RANK,0),7,1,6,2,5,3,4,4,3,5,2,6,1,7,0,8,A,20,PA,21,LC,22,M,23,8);@switch/inline t(match(Field Marshal|General|Colonel|Major|Captain|Lieutenant|Ensign|Enlisted|Ally|Provisional Ally|Last Chancer|Mercenary,get(%i0/POSITION),|))=0,{&D`GROUP`%q<gid1>`TITLE %i0=get(%i0/POSITION)}}
+
+&INC`CLEANUP`FACTIONS u(conv)=@dolist/inline lsearch(all,type,player,elock,FACTION:*)={@wipe %i0/FACTION};@set #2978/CMD`ROSTER=no_command;@nspemit %#=u(RFN`MSGHEAD) All Player FACTION attributes cleared. Old +roster code disabled.
+
+&INC`MYR`TRANSFER u(bbs)=@dolist setr(list,sortkey(#lambda/baseconv(\%1,36,10),get(%1/MESS_LST)))={@switch/inline %0=BB,{th setq(next,baseconv(default(u(bbs-db)/BB`%2`NEXT,1),10,36));&BB`%2`NEXT u(bbs-db)=add(default(u(bbs-db)/BB`%2`NEXT,1),1)},GB,{};th setq(head,get(%1/HDR_%i0));&%q<next> %2=get(%1/BDY_%i0);&%q<next>`BY %2=elements(%q<head>,3,|);&%q<next>`BYDB %2=objid(elements(%q<head>,4,|));&%q<next>`ON %2=convtime(elements(elements(%q<head>,2,|),2 3 ));&%q<next>`HDR %2=elements(%q<head>,1,|);&%q<next>`TIMEOUT %2=if(u(FUN`CONFIG,%2,TIMEOUT),u(FUN`CONFIG,%2,TIMEOUT),0)}
+
+&INC`CONVERT`BOARDS u(conv)=@include u(ccs)/INC`VERIFY={ansi(hr,WARNING:) This will convert [mudname()]'s Myrddin BBS data to the new BBS data. Are you sure you want to do this? Type the same command again within 10 seconds to verify.},CONVERT BOARDS,CONVERT;@force/inline %#={+bbconvert;+bbconvert};@wait add(6,mul(2,words(get(get(%#/BBPOCKET)/groups))))={@dolist/inline setunion(lnum(1,8),30)={+bblock %i0/read=ADMIN;+bblock %i0/write=ADMIN};@dolist/inline 10 11={+bblock %i0/read=FACHEAD;+bblock %i0/write=FACHEAD};@dolist/inline 9 32={+bblock %i0/read=GRIPESTAFF;+bblock %i0/write=GRIPESTAFF};@dolist/inline 12 13={+bblock %i0/write=ADMIN};@dolist/inline 25 27={+bblock %i0/write=FACHEAD};+gripe/board 9;+feedback/board 8;+report/board 15}
+
+&INC`CONFLICT`BOARDS u(conv)=@dolist/inline #1194 #1487 #1981 #1956 #1765 #2669 #472 #471 #2649 #1318 #2675 #793=@tel %i0=u(oldbag);@nspemit %#=u(RFN`MSGHEAD) Okay! Relocated a lot of old boards to the Old Code Bag ([u(oldbag)]).
+
+&INC`CONVERT`INFO u(conv)=@include u(ccs)/INC`VERIFY={ansi(hr,WARNING:) This will convert the +info files of all characters to the new +info format. Are you sure you want to do this? Type the same command again within 10 seconds to verify.},CONVERT INFO,CONVERT;@nspemit %#=u(RFN`MSGHEAD) Beginning +info conversion! This will take approximately [words(setr(players,lsearch(all,type,player,elock,ADMINATTRS`INFO`DATA:*)))] Seconds. Please wait...;@dolist %q<players>={@wait inum(0)=@trigger/spoof u(conv)/TRG`CONVERT`INFO=%i0};@wait add(2,words(%q<players>))=@nspemit %#=u(RFN`MSGHEAD) Okay! +infos should be converted. Make sure it worked!
+
+&INC`CLEANUP`INFO u(conv)=@dolist/inline lsearch(all,type,player,elock,ADMINATTRS`INFO:*)={@wipe %i0/ADMINATTRS`INFO}
+
+&INC`CONFLICT`INFO u(conv)=@tel setr(old,locate(config(master_room),Info System Mk. I,TXxi))=u(oldbag);@set %q<old>=NO_COMMAND;@nspemit %#=u(RFN`MSGHEAD) [name(%q<old>)] (%q<old>) Relocated and set NO_COMMAND.
+
+&TRG`CONVERT`INFO u(conv)=@dolist/inline lattr(%0/ADMINATTRS`INFO`DATA`*)={&[setr(attr,strfirstof(u(u(ifo)/FUN`FINDFILE,%0,last(%i0,`)),D`INFOFILE`[nextslot(%0,D`INFOFILE)]))] [setr(target,%0)]=last(%i0,`);@cpattr %0/%i0=%0/%q<attr>`CONTENTS;th setstat(%q<target>/%q<attr>`FLAGS,SetBy,%:);th setstat(%q<target>/%q<attr>`FLAGS,SetOn,secs());@switch/inline t(match(get(%0/ADMINATTRS`INFO`LOCKED),last(%i0,`)))=1,{th setstat(%q<target>/%q<attr>`FLAGS,Locked,1);th setstat(%q<target>/%q<attr>`FLAGS,LockedBy,%:);th setstat(%q<target>/%q<attr>`FLAGS,LockedOn,secs())}}
+
+&INC`CONVERT`LOCKS u(conv)=+key/make Admin;+key/conf Admin/category=Administration;+key/make Gripestaff;+key/conf Gripestaff/category=Administration;+key/conf Gripestaff/nostaffcheck=1;@dolist/inline lsearch(all,type,player,elock,adminattrs`gripestaff:>0)={+key/add Gripestaff=%i0};+key/make Exstaff;+key/conf Exstaff/category=Administration;@dolist/inline lsearch(all,type,player,elock,adminattrs`isexstaff:>0)={+key/add Exstaff=%i0};+key/make Fachead;+key/conf Fachead/category=Administration;@dolist/inline lsearch(all,type,player,elock,adminattrs`isfachead:>0)={+key/add Fachead=%i0}
+
+&INC`CONVERT`CHANNELS u(conv)=@dolist/inline/delimit | [stripansi(channels(|))]={+channel/init %i0};@dolist/inline/delimit | Admin|**CODE ALERTS**|V-CStaffSpam|Y-Admin-Screaming={+clock %i0=ADMIN};@dolist/inline/delimit | Fachead|~-Fachead-Chatter|+Fachead-Venting={+clock %i0=FACHEAD};+clock Q-Ex-Staff=EXSTAFF;+clock *-Potato=GRIPESTAFF;@dolist/inline O-union X-Union Union-ic={@clock/see %i0;@clock/join %i0;+clock/speak %i0=Union Fachead;+clock/hide %i0=Union/Moderate Fachead/Member;+clock/muzzle %i0=Union/Moderate Fachead/Member;@clock/mod %i0=FLAG^WIZARD};@dolist/inline O-confed X-confed Confederate-ic={@clock/see %i0;@clock/join %i0;+clock/speak %i0=Confederate Fachead;+clock/hide %i0=Confederate/Moderate Fachead/Member;+clock/muzzle %i0=Confederate/Moderate Fachead/Member;@clock/mod %i0=FLAG^WIZARD}
+
+&INC`CONFLICT`CHANNELS u(conv)=@tel setr(old,locate(config(master_room),Muzzle Code,TXxi))=u(oldbag);@dolist/inline #2408 #1911 #3102 #2600 #2181={@tel %i0=u(oldbag)}
+
+&INC`CONVERT`WF u(conv)=@dolist/inline lsearch(all,type,player,elock,ADMINATTRS`WATCHFOR:*)={@cpattr %i0/ADMINATTRS`WATCHFOR=%i0/D`WATCH};@nspemit %#=u(RFN`MSGHEAD) Okay! Watchfor has been converted!
+
+&INC`CLEANUP`WF u(conv)=@dolist/inline lsearch(all,type,player,elock,ADMINATTRS`WATCHFOR:*)={@wipe %i0/ADMINATTRS`WATCHFOR};@nspemit %#=u(RFN`MSGHEAD) Okay! Watchfor has been cleaned up!
+
+&INC`CONFLICT`WF u(conv)=@teleport setr(old,locate(config(master_room),WatchFor/AConnect,TXxi))=u(oldbag);@set %q<old>=NO_COMMAND;@nspemit %#=u(RFN`MSGHEAD) Okay! The old Watchfor code has been relocated and set NO_COMMAND.
+
+&INC`CONVERT`THEME u(conv)=@dolist setr(themes,lattr(#1872/NAME`*))={@cpattr #1872/%i0=u(tdb)/[inum(0)];@cpattr #1872/DESC`[after(%i0,`)]=u(tdb)/[inum(0)]`DESC;@cpattr #1872/POWERS`[after(%i0,`)]=u(tdb)/[inum(0)]`POWERS;@switch/inline eq(inum(0),words(%q<themes>))=1,{&[add(inum(0),1)] u(tdb)=Original;@trigger u(conv)/TRG`CONVERT`THEMEPLAYERS}}
+
+&TRG`CONVERT`THEMEPLAYERS u(conv)=@dolist reglattr(u(tdb)/^\\d+$)={@trigger u(conv)/TRG`CONVERT`THEMEPLAYERS`DO=%i0}
+
+&TRG`CONVERT`THEMEPLAYERS`DO u(conv)=th setq(themename,get(u(tdb)/%0));&%0`CAST u(tdb)=iter(setr(ply,lsearch(all,eplayer,\[strmatch(get(##/series),%q<themename>)\])),objid(%i0));@dolist/inline %q<ply>=&D`THEME %i0=%0
+
+&INC`CONVERT`FINGER u(conv)=@dolist/inline lsearch(all,type,player,elock,chartype:?*|profile:?*|quote:?*)={@cpattr %i0/chartype=%i0/D`FINGER`CHARTYPE;@cpattr %i0/quote=%i0/D`FINGER`QUOTE;@cpattr %i0/profile=%i0/D`FINGER`PROFILE}
+
+&INC`CONFLICT`THEME u(conv)=@tel #1871=u(oldbag);@set #1871=no_command
+
+&INC`CLEANUP`THEME u(conv)=@dolist/inline lsearch(all,type,player,elock,series:?*)=@wipe %i0/series
+
+&INC`CLEANUP`FINGER u(conv)=@dolist/inline lsearch(all,type,player,elock,chartype:?*|profile:?*|quote:?*)={@wipe %i0/quote;@wipe %i0/profile;@wipe %i0/finger}
+
+&INC`CONVERT`ADMIN u(conv)=&WIZLIST u(pco)=iter(filterbool(#lambda/isobjid(\%0),get(#546/ADMINLIST)),objid(%i0)~[inum(0)],%b,|)
+
+&INC`CONFLICT`ADMIN u(conv)=@set #546/ADMIN_CMD=no_command
+
+&INC`CONVERT`MISC u(conv)=@dolist/inline/nobreak lsearch(all,type,player,elock,myhome:?*)={@assert isic(get(%i0/myhome));@link %i0=get(%i0/myhome)};@dolist/inline lsearch(all,type,player,elock,POWER^GUEST)=@link %i0=get(u(navi)/LOC`OOCNEXUS);@dolist/inline/nobreak lsearch(all,type,player,elock,ic_loc:?*)={@assert isic(get(%i0/ic_loc));@cpattr %i0/ic_loc=%#/D`ICLOC}
+
+&INC`CLEANUP`MISC u(conv)=@dolist/inline/nobreak lsearch(all,type,player,elock,myhome:?*|ic_loc:?*)={@wipe %i0/myhome;@wipe %i0/ic_loc}
+
+&INC`CONFLICT`MISC u(conv)=@dolist/inline #3111 #459 #2457 #2161 #158 #3323 #834 #2519 #2698 #1920 #2977 #2978 #2980 #620 #1855 #1871 #620 #3074 #3438 #546 #2599 #2216 #1815 #2847 #3257 #175 #2033={@tel %i0=u(oldbag)};@dolist/inline #175 #3219={@set %i0=HALT}
+
+&INC`CONVERT`FINGER u(conv)=@dolist/inline lsearch(all,type,player)={@dolist/inline chartype function profile quote={@cpattr %i1/%i0=%i1/D`FINGER`%i0}}
+
+&INC`CONVERT`GRID u(conv)=@dolist/inline setunion(children(#1123),children(#1106))={@parent %i0;&D`IC %i0=1};@dolist/inline children(#2564)={&D`IC %i0=0;@parent %i0};@parent #3021=u(ar);@dolist/inline #3101 #3229 #3330 #327 #2348 #2598 #492 #3240 #2875 #2348=&D`IC %i0=0
+
+@dolist/inline aid allow ally chartype end eva faction function hp ic icloc ic_loc isstun levellast miss myhome power profile pull_level quote radio rank roomformat series ski skill skills startuplast str stun bb2_read group group_title ismuzz rpstatus registered_email={@attribute/access/retroactive %i0=none;@attribute/delete %i0}
+
+&STARTUP *Lain=@dolist/inline lattr(#1960/fun_*)=@function rest(%i0,_)=#1960,%i0; @dolist/inline lattr(#1960/wfun_*)=@function rest(%i0,_)=#1960,%i0,,,wizard;@function cget=#1906,func-cget,2,5,localize;@function cset=#1906,func-cset,2,5,localize wizard;@function crand=#1906,func-crand,0,2,localize;@function vr_remit=#1770,function`vr_remit,2,2,localize nogagged noguest;@config/set adestroy=1;@attribute/access/retroactive mnlock=visual;@command/add +advantages;@hook/override +advantages=#3248,cmd`+advantages; @command/add +adlib
+
+@wipe #1960/FUN_ISIC
+
+@wipe #2163/AFTER_PAGE
+@wipe #2674/CMD

@@ -1,0 +1,25 @@
+@switch/inline isdbref(u(tzm))=0,{@tel create(Target Zone Manager <TZM>)=config(master_room)}
+&tzm u(coi)=locate(config(master_room),Target Zone Manager <TZM>,TXxi)
+@parent u(tzm)=u(coi)
+@set u(tzm)=WIZARD SAFE !NO_COMMAND
+
+&RFN`MSGHEAD u(tzm)=msghead(v(VAR`MSGHEAD))
+&RFN`HEADER u(tzm)=header(%0,,TARGETS`BORDER,TARGETS`BORDERDOT,TARGETS`BORDERTEXT)
+&RFN`SUBHEADER u(tzm)=subheader(%0,,TARGETS`BORDER,TARGETS`BORDERDOT,TARGETS`BORDERTEXT)
+&RFN`SEPARATOR u(tzm)=separator(%0,,TARGETS`BORDER,TARGETS`BORDERDOT,TARGETS`BORDERTEXT)
+&VAR`MSGHEAD u(tzm)=TARGETS
+
+&CMD`TARGETS u(tzm)=$+targets:@assert words(setr(targets,sort(children(#2820),attr:owner)))=@nspemit %#=u(RFN`MSGHEAD) ERROR: No Target Zones registered!;@nspemit %#=u(RFN`HEADER,Target Listing);@switch/inline isadmin(%#)=1,{@nspemit %#=ansi(hw,align(5 25 12 15 15,DBref,Target Name,Faction,Last Changed,Changed By));@dolist/inline %q<targets>={@nspemit %#=align(5 25 12 15 15,ansi(hx,%i0),ansi(c,trim(edit(name(%i0),TARGET: ,))),ansi(switch(setr(o,default(%i0/owner,Contested)),Union,c,Confederate,r,hx),%qo),ansi(hx,timefmt($m/$d $I:$M $p,get(%i0/owner`setwhen))),if(get(%i0/owner`setby),name(get(%i0/owner`setby))))}},0,{@nspemit %#=ansi(hw,align(33 12 15 15,Target Name,Faction,Last Battle,Last Changed));@dolist/inline %q<targets>={@nspemit %#=align(33 12 15 15,ansi(c,trim(edit(name(%i0),TARGET: ,))),ansi(switch(setr(o,default(%i0/owner,Contested)),Union,c,Confederate,r,hx),%qo),ansi(hx,timefmt($m/$d $I:$M $p,get(%i0/lastfightsecs))),ansi(hx,timefmt($m/$d $I:$M $p,get(%i0/owner`setwhen))))}};@nspemit %#=u(RFN`HEADER)
+
+&CMD`+ZONEGUIDE u(tzm)=$+zoneguide:@assert hasattrpval(%l,zone`guide)=@nspemit %#=u(RFN`MSGHEAD) Your location has no zone guide.;@nspemit %#=u(RFN`HEADER,default(%l/zone,name(%l)));@nspemit %#=u(%l/zone`guide);@nspemit %#=u(RFN`HEADER)
+
+&CMD`+ZONERULES u(tzm)=$+zonerules:@assert hasattrpval(%l,zone`guide)=@nspemit %#=u(RFN`MSGHEAD) Your location has no zone rules.;@nspemit %#=u(RFN`HEADER,default(%l/zone,name(%l)));@nspemit %#=u(%l/zone`rules);@nspemit %#=u(RFN`HEADER)
+
+&CMD_LASTBATTLE #2820=$+fight:think [attrib_set(me/lastfightsecs,secs())][attrib_set(me/lastfightplayer,%:)][set(me,Lastfight:[convsecs(secs())])][remit(me,[ansi(hy,[name(%#)])] [ansi(hg,marks that there is going to be a battle fought in this target zone now.)])]
+
+&DESCSUFFIX #2820=%r%r[ansi(r,VULNERABLE TERRITORY - OCCUPIED BY:)] [ansi(h,[default(owner,Contested)])]%r[ansi(hx,The last battle that was fought here was on [ansi(hw,default(me/lastfight,UNKNOWN))] based off of +time.)]%r[ansi(hx,If you are going to fight a battle here now please type:)] [ansi(h,+fight)]
+
+&OWNER_CMD #2820=$+owner *:@switch [isadmin(%#)]=0,{@pemit %#=Contact an admin to have this territory re-assigned.},{@break [if(match(setr(f,Union Confederate Unaffiliated Contested),%0),setq(n,elements(%qf,match(%qf,%0)))0,pemit(%#,ansi(r,Valid arguments are: [itemize(%qf)]))1)]; &owner me=%qn; &owner`setby me=%#; &owner`setwhen me=secs(); @remit %#=[ansi(h,Territory has been reassigned to:)] [ansi(hr,get(me/owner))]}
+
+&UFUNC-FINDTARGET #2820=[switch(match(setr(n,iter(setr(c,children(#2820)),switch(name(##),TARGET: *,after(#$,TARGET:%b),#$),,|)),*%0*,|),0,[],elements(%qc,#$))]
+&VALID-OWNERS #2820=union|confederate|unaffiliated|contested

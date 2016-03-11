@@ -1,0 +1,29 @@
+@switch/inline isdbref(u(rost))=0,{@tel create(Roster System Code <ROST>)=config(master_room)}
+&rost u(coi)=locate(config(master_room),Roster System Code <ROST>,TXxi)
+@parent u(rost)=u(coi)
+@set u(rost)=WIZARD !NO_COMMAND
+
+&CMD`+ROSTER u(rost)=$^(?s)(?\:\+)?(?\:roster)(?\:/(\S+)?)?(?\: +(.+?))?$:@include u(ccs)/INC`PARTIAL=%1,setunion(get(u(rost)/VAR`PLAYFLAGS),if(isadmin(%#),get(u(rost)/VAR`ADMINFLAGS)),|,|),|,RADIO,switch,switch;@include u(rost)/INC`[strfirstof(%q<switch>,MAIN)]=%2
+@set u(rost)/CMD`+ROSTER=regexp
+
+&VAR`PLAYFLAGS u(rost)=FULL
+
+&RFN`MSGHEAD u(rost)=msghead(v(VAR`MSGHEAD))
+&RFN`HEADER u(rost)=header(%0,,GROUP`BORDER,GROUP`BORDERDOT,GROUP`BORDERTEXT)
+&RFN`SUBHEADER u(rost)=subheader(%0,,GROUP`BORDER,GROUP`BORDERDOT,GROUP`BORDERTEXT)
+&RFN`SEPARATOR u(rost)=separator(%0,,GROUP`BORDER,GROUP`BORDERDOT,GROUP`BORDERTEXT)
+&VAR`MSGHEAD u(rost)=ROSTER
+
+&INC`MAIN u(rost)=@switch/inline strlen(%0)=0,{@switch/inline words(setr(facs,setinter(get(%#/D`GROUPS),factions())))=0,{@include u(rost)/INC`UNAFFIL},1,{@include u(rost)/INC`FACTION=%q<facs>},{@nspemit %#=u(RFN`MSGHEAD) You are in more than one faction! Please specify what roster to check.}},{@include u(ccs)/INC`PARTIAL=%0,iter(setr(facs,factions()),name(%i0),,|)|Unaffiliated|Neutral,|,ROSTER,Faction,Faction;@switch/inline %q<faction>=UNAFFILIATED,{@include u(rost)/INC`UNAFFIL},NEUTRAL,{@include u(rost)/INC`NEUTRAL},{@include u(rost)/INC`FACTION=namegrab(%q<facs>,%q<faction>)}}
+
+&INC`FULL u(rost)=th setq(full,1);@include u(rost)/INC`MAIN
+
+&INC`FACTION u(rost)=@assert words(setr(roster,sortkey(#lambda/get(\%0/D`GROUP`%0`RANK),sort(lsearch(all,type,player,elock,D`GROUP`%0`RANK:[if(%q<full>,?*,<9)]),namei),n)))=@nspemit %#=u(RFN`MSGHEAD) No players to show!;@nspemit %#=u(RFN`HEADER,if(%q<full>,Full%b)Roster - [name(%0)]);@nspemit %#=iter(lnum(1,div(width(%#),38)),Name[space(29)]Rank%B);@nspemit %#=separator();th setq(gid1,%0);th step(FUN`FACTIONROSTER,%q<roster>,div(width(%#),38));@nspemit %#=u(RFN`HEADER)
+
+&FUN`FACTIONROSTER u(rost)=nspemit(%#,trim(iter(iter(lnum(0,sub(%+,1)),pueblize(ansi(custcolor(%#,GROUP`GWHONAME),setr(name,name(v(%i0)))),+finger [name(v(%i0))])%B[rjust(left(u(u(gso)/FUN`FACRANK,%q<gid1>,v(%i0)),sub(37,strlen(%q<name>),1)),sub(37,strlen(%q<name>),1))],%b,|),ljust(%i0,38),|,%b)))
+
+&INC`UNAFFIL u(rost)=th setq(facs,factions());@assert words(setr(roster,setdiff(lsearch(all,eplayer,\[not(words(setinter(get(##/D`GROUPS),%q<facs>)))\]),lsearch(all,type,player,elock,FLAG^WIZARD|FLAG^ROYALTY|POWER^GUEST|POWER^BUILDER|FLAG^UNREGISTERED|OOC_CHARACTER:>0),,namei)))=@nspemit %#=u(RFN`MSGHEAD) No players to show!;@nspemit %#=u(RFN`HEADER,if(%q<full>,Full%b)Roster - Unaffiliated);@nspemit %#=iter(lnum(1,div(width(%#),38)),Name[space(29)]Rank%B);@nspemit %#=separator();th step(FUN`UNAFFILROSTER,%q<roster>,div(width(%#),38));@nspemit %#=u(RFN`HEADER)
+
+&INC`NEUTRAL u(rost)=th setq(facs,setdiff(factions(),#2073));@assert words(setr(roster,setdiff(lsearch(all,eplayer,\[not(words(setinter(get(##/D`GROUPS),%q<facs>)))\]),lsearch(all,type,player,elock,FLAG^WIZARD|FLAG^ROYALTY|POWER^GUEST|POWER^BUILDER|FLAG^UNREGISTERED|OOC_CHARACTER:>0),,namei)))=@nspemit %#=u(RFN`MSGHEAD) No players to show!;@nspemit %#=u(RFN`HEADER,if(%q<full>,Full%b)Roster - Neutral);@nspemit %#=iter(lnum(1,div(width(%#),38)),Name[space(29)]Rank%B);@nspemit %#=separator();th step(FUN`UNAFFILROSTER,%q<roster>,div(width(%#),38));@nspemit %#=u(RFN`HEADER)
+
+&FUN`UNAFFILROSTER u(rost)=nspemit(%#,trim(iter(iter(lnum(0,sub(%+,1)),pueblize(ansi(custcolor(%#,GROUP`GWHONAME),setr(name,name(v(%i0)))),+finger [name(v(%i0))])%B[@@([rjust(left(u(u(gso)/FUN`FACRANK,%q<gid1>,v(%i0)),sub(37,strlen(%q<name>),1)),sub(37,strlen(%q<name>),1))])],%b,|),ljust(%i0,38),|,%b)))

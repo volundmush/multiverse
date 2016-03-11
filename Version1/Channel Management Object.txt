@@ -1,0 +1,33 @@
+
+&MOGORDER`MESSAGE u(cdb)=url marklar
+&MOGUSE`MESSAGE u(cdb)=url marklar
+
+&FUN`MESSAGE`MARKLAR u(cdb)=case(1,v(MOGCONF`MARKLAR),regeditalli(%0,%\b-%(?:[v(honorifics)]%)%\b,-marklar),%0)
+
+&HONORIFICS u(cdb)=chan|san|sama|kun|dono|hime|senpai|sensei|shi|bo|kohai|gakusei|sifu|oneesan|oniichan|onichan|onesan|oneechan|onechan|onisan|oniisan|chwan|kyun|tan|sempai|senpai|sugoi|domo
+
+&VAR`MOGTYPES`TITLE u(cmo)=TRIM|STAFFTAG|RANKTAG
+
+&MOGORDER`TITLE u(cdb)=noansi trim stafftag ranktag
+&MOGUSE`TITLE u(cdb)=noansi trim stafftag ranktag
+
+&FUN`TITLE`RANKTAG u(cdb)=if(cand(isdbref(setr(fac,v(MOGCONF`TITLE`RANKTAG))),strlen(setr(tag,switch(setr(r,get(%#/D`GROUP`%q<fac>`RANK))[null(if(strmatch(get(%#/D`GROUP`%q<fac>`TITLE),Reserve*),setq(rf,1)))],1,ansi(h+xterm81,%qr-CO),2,ansi(+xterm69,%qr-XO),<5,ansi(+xterm149,%qr-[if(%q<rf>,RF,Of)]),5,ansi(+xterm223,%qr-[if(%q<rf>,RF,Of)]),<=8,if(%q<rf>,ansi(+xterm223,%qr-RF),%qr),20,A,21,PA,22,switch(%q<fac>,#1781,W,#1783,LC),23,M)))),\[%q<tag>\][if(strlen(%0),%b%0)],if(strlen(%0),%0))
+
+
+
+CONFED: #1781
+UNION: #1783
+
+&INC`CHANNEL`MOGCONF`TITLE`RANKTAG u(cmo)=@assert isdbref(setr(entry,%1))=@nspemit %#=u(RFN`MSGHEAD) ERROR: Ranktags must be pointed at DBREFs. Make sure it's a group DBref!
+
+@@ &UFUNC-FACTIONALRANK GlobalMogrifier=[if(isnum(setr(r,get(%#/rank))),setq(sa,strmatch(get(%#/position),Senior Ally))%[[switch(%qr,8,ansi(h+xterm208,%qr-HC),7,ansi(h+xterm81,7-CO),6,ansi(+xterm69,6-XO),>3,ansi(+xterm149,%qr-[if(%q<sa>,SA,Of)]),3,ansi(+xterm223,%qr-[if(%q<sa>,SA,Of)]),%qr)]%],%[%qr%])][if(strlen(%0),%b[left(stripansi(%0),25)])]
+
+
+&MOGRIFY`BLOCK u(cdb)=localize(null(iter(v(MOGUSE`BLOCK),if(strlen(setr(block,u(FUN`BLOCK`%i0,%2,%1))),ibreak())))%q<block>)
+&MOGORDER`BLOCK u(cdb)=muzzle accmuzzle nostaffspoof nocodename badcodename badwords esperanto
+&MOGUSE`BLOCK u(cdb)=muzzle accmuzzle nostaffspoof nocodename badcodename badwords
+
+&FUN`BLOCK`ESPERANTO u(cdb)=if(cand(regmatchi(%0,v(MOGCONF`BLOCK`ESPERANTO)),haspower(%#,GUEST)),u(RFN`MSGHEAD) Yeah how about not.[cemit(**CODE ALERTS**,[ansi(hr,%n)] just tripped the Esperanto Filter on the %1 Channel. IP is [get(%#/LASTIP)]. ATTEMPTED MESSAGE: %0,1)])
+&MOGCONF`BLOCK`ESPERANTO u(cdb)=\b(pafilo|bombo|mortig|informojn)
+
+&STARTUP`EXTRA u(pco)=@dolist @pemit @nspemit @remit @nsremit @prompt @nsprompt @oemit @nsoemit @dolist=@command/restrict %i0=Noguest;@dolist pemit nspemit remit nsremit prompt nsprompt iter fold munge step map=@function/restrict %i0=noguest

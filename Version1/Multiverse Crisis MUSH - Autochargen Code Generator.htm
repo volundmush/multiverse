@@ -1,0 +1,83 @@
+
+<!-- saved from url=(0049)http://www.mcmush.org/admintools/autochargen.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<title>Multiverse Crisis MUSH - Autochargen Code Generator</title>
+	<script language="JavaScript" src="./Multiverse Crisis MUSH - Autochargen Code Generator_files/autochargen.js">
+	</script>
+	<script language="JavaScript">
+	window.onload = startup;
+	</script>
+</head>
+	<body>
+		<h1>Autochargen Code Generator</h1>
+		<p>
+			This system automatically generates the code for the chargen machine in order to generate a particular character.  Note that you must have the proper permissions in order to actually use the machine.  Operation is simple - just enter (via cut and paste <em>or</em> manual entry) the values, click the 'Process' button, and copy the 'Result' box below.
+		</p>
+		<p>
+			<em>Please keep in mind</em> that this does <strong>not</strong> actually make the character on the MUSH!  It merely writes the code to do that for you.  You <strong>must</strong> have a character object on the MUSH with the proper access levels <em>and</em> be in Character Control in order to use this code.  Paste the results in the input box in your MUSH client and send it in order to use it, while in Character Control and logged into your chargen-capable character object.
+		</p>
+		<hr>
+		<form id="application">
+			<input type="checkbox" id="debugModeBox" checked=""><em>Debug mode</em><br>		
+			Character Name:<br>
+				<input type="text" id="charname"><br>
+			Character Password (<em>not hidden on this screen</em>):<br>
+				<input type="text" id="password"><br>
+			Theme:<br>
+				<input type="text" id="theme"><br>
+			Character Type:<br>
+				<select id="chartype">
+					<option selected="">FC</option>
+					<option>OFC</option>
+					<option>OC</option>
+					<option>TP</option>
+					<option>FILCH</option>
+				</select><br>
+			Faction:<br>
+				<select id="faction">
+					<option selected="">Other</option>
+					<option>Union</option>
+					<option>Confederate</option>
+					<option>Unaffiliated</option>
+					<option>Admin</option>
+				</select><br>
+			Rank:<br>
+				<select id="rank">
+					<option selected="" value="0">0</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+					<option value="9">9</option>
+					<option value="PA">Provisional Ally</option>
+					<option value="A">Ally</option>
+					<option value="SA">Senior Ally</option>
+					<option value="W">Wraith</option>
+					<option value="LC">Last Chancer</option>
+					<option value="U">Union Citizen</option>
+					<option value="C">Confederate Citizen</option>
+					<option value="X">None</option>
+				</select><br>
+			<input type="checkbox" id="navalBox"> Use naval ranks instead of army ranks<br>
+			Function:<br>
+				<input type="text" id="function"><br>
+			Quote:<br>
+				<textarea id="quote" cols="80" rows="4"></textarea><br>
+			Profile:<br>
+				<textarea id="profile" rows="15" cols="80"></textarea><br>
+			Powers:<br>
+				<textarea id="powers" rows="15" cols="80"></textarea><br>
+			Flaws:<br>
+				<textarea id="flaws" rows="15" cols="80"></textarea><br>
+			PL:<br><input type="text" id="pl"><br><br>
+			<input type="button" value="Process" onclick="processForm()">
+		</form>
+
+		<textarea id="resultCode" rows="30" cols="80" readonly="true"></textarea>		
+	
+
+</body></html>

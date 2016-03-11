@@ -1,0 +1,32 @@
+&SWITCHES`PLAYER`EXTRA [u(cobj,fclist)]=POWERS
+&SWITCHES`ADMIN`EXTRA [u(cobj,fclist)]=SETPOWERS|CLEARPOWERS
+
+&INC`POWERS [u(cobj,fclist)]=@check strlen(%0)=@attach %!/INC`MSG=Which theme would you like to check?;@include %!/INC`FINDTHEME=%0,1;@check gt(strlen(u(setr,powers,get(%q<theme1>/POWERS))),0)=@attach %!/INC`MSG=%q<themename1> has no powers.;@pemit %#=u(HEADER,Theme Powers: %q<themename1>);@pemit %#=get(%q<theme1>/POWERS);@pemit %#=u(SUBHEADER)
+
+&INC`SETPOWERS [u(cobj,fclist)]=@check strlen(%0)=@attach %!/INC`MSG=ERROR: Name field empty.;@include %!/INC`FINDTHEME=%0,1;@check strlen(%1)=@attach %!/INC`MSG=ERROR: Theme powers field empty.;@select/inline u(setr,mail,gt(strlen(u(setr,oldpowers,get(%q<theme1>/POWERS))),0))=1,{@mail %#=%q<themename1>/OLD POWERS WERE:%R%q<oldpowers>};&POWERS %q<theme1>=%1;@attach %!/INC`MSG=You have changed theme %q<themename1>'s powers.[if(%q<mail>,%bIts old contents have been @mail'd to you.)];@attach %!/INC`MSG`CHAN=Changed the Theme powers for '[u(pueblize,%q<themename1>,+theme %q<themename1>)]'
+
+&INC`CLEARPOWERS [u(cobj,fclist)]=@check strlen(%0)=@attach %!/INC`MSG=ERROR: Name field empty.;@include %!/INC`FINDTHEME=%0,1;@check strlen(%q<theme1>/POWERS))=@attach %!/INC`MSG=ERROR: Theme has no powers.;@mail %#=%q<themename1>/OLD POWERS WERE:%R[get(%q<theme1>/POWERS)];@attach %!/WIPE=%q<theme1>,POWERS;@attach %!/INC`MSG=You have deleted theme %q<themename1>'s powers. Its old contents have been @mail'd to you.;@attach %!/INC`MSG=Deleted the Theme powers for '[u(pueblize,%q<themename1>,+theme %q<themename1>)]'
+
+&INC`CAST [u(cobj,fclist)]=@check strlen(%0)=@attach %!/INC`MSG=Which casts would you like to see?;@check words(setr(themes,u(sortname,namegraball(children(u(cobj,fclistdb)),%0))))=@attach %!/INC`MSG=No themes matched '%0'.;@pemit %#=u(HEADER,Casts for: %0);@dolist/inline %q<themes>={@attach %!/INC`CASTLIST=%i0};@pemit %#=u(SUBHEADER)
+
++help/add +theme=[u(cobj,fclist)]/HLP`+THEME
++help/category +theme=Community
+&HLP`+THEME [u(cobj,fclist)]=The +theme system keeps track of [mudname()]'s many themes in play!%R%R[ansi(hc,Commands)]%R[align(5 [sub(u(width,%#),6)],,{[ansi(h,+theme/list)] - Lists all +themes in play. Very spammy!%R[ansi(h,+theme <name>)] - Lists a specific theme and its cast.%R[ansi(h,+theme/cast <text>)] - Lists the casts of all themes that partially match <text>.%R[ansi(h,+theme/powers <theme>)] - Lists any shared powers for a theme.%RAll commands accept partial matches and will warn about ambiguity if need be.})]%R%R[ansi(hc,Old Commands)]%R[align(5 [sub(u(width,%#),6)],,{[ansi(h,+themelist)] - Alternate for +theme/list%R[ansi(h,+themelist <name)] - Alternate for +theme <name>%R[ansi(h,+themelist/powers <name>)] - Alternate for +theme/powers <name>%R[ansi(h,+cast <text>)] - Alternate for +theme/cast <text>})]
+
++shelp/add +theme=[u(cobj,fclist)]/SHLP`+THEME
++shelp/category +theme=Community
+&SHLP`+THEME [u(cobj,fclist)]=The +theme system keeps track of [mudname()]'s many themes in play!%R%R[ansi(hc,Staff Commands)]%R[align(5 [sub(u(width,%#),6)],,{[ansi(h,+theme/add <name>=<description>)] - Creates a new theme.%R[ansi(h,+theme/setdesc <theme>=<new description>)] - Overwrites a description.%R[ansi(h,+theme/setpowers <Theme>=<new powers>)] - Sets or overwrites theme powers.%R[ansi(h,+theme/assign <character>=<theme>)] - Places a character in a theme.%R[ansi(h,+theme/remove <character>)] - Remove a character from whatever theme they're in.%R[ansi(h,+theme/unassigned)] - Find all characters who aren't linked to a theme.%R[ansi(h,+theme/delete <theme>)] - Delete a theme.%R[ansi(h,+theme/clearpowers <theme>)] - Erases a theme's +theme/powers.%R[ansi(h,+theme/rename <theme>=<new name>)] - Renames a theme. Should update on all characters!})]%R%R[ansi(hc,Old Commands)]%RThese still work! They're just shortcuts though.%R[align(5 [sub(u(width,%#),6)],,{[ansi(h,+addtheme <theme>=<description>)] - Alternate for +theme/add. Will not overwrite anymore, you'll need to use +theme/setdesc.%R[ansi(h,+Addtheme/powers <theme>=<powers>)] - Alternate for +theme/setpowers.%R[ansi(h,+setseries <player>=<theme>)] - Alternate for +theme/assign})]
+
+@@ SHORTCUTS
+&CMD`ADDTHEMEPOWERS [u(cobj,staff_globals)]=$+addtheme/powers *=*:@trigger/spoof u(cobj,fclist)/INC`SETPOWERS=%0,%1
+&CMD`SETSERIES [u(cobj,cmm)]=$+setseries *=*:@trigger/spoof u(cobj,fclist)/INC`ASSIGN=%0,%1
+&CMD`ADDTHEME [u(cobj,staff_globals)]=$+addtheme *=*:@trigger/spoof u(cobj,fclist)/INC`CREATE=%0,%1
+&CMD`DELTHEME [u(cobj,staff_globals)]=$+deltheme *:@trigger/spoof u(cobj,fclist)/INC`DELETE=%0,%1
+&CMD`THEMELIST [u(cobj,player_globals)]=$+themelist:@trigger/spoof u(cobj,fclist)/INC`LISTALL=%0,%1
+&CMD`THEMELISTARG [u(cobj,player_globals)]=$+themelist *:@trigger/spoof u(cobj,fclist)/INC`DISPLAY=%0,%1
+&CMD`THEMELISTPOWERS [u(cobj,player_globals)]=$+themelist/powers *:@trigger/spoof u(cobj,fclist)/INC`POWERS=%0,%1
+&CMD`CAST [u(cobj,player_globals)]=$+cast *:@trigger/spoof u(cobj,fclist)/INC`CAST=%0,%1
+
+&MIGRATE`THEME [u(cobj,migrate)]=@check isdbref(u(setr,tdb,u(coi,tdb)))=@attach %!/INC`MSG=ERROR: Cannot locate 1.0 Theme Database. Cannot continue.;@dolist u(lattr,%q<tdb>/*)={@tel u(setr,newtheme,create(edit(get(%q<tdb>/%i0),&,and)))=u(cobj,fclistdb);@parent %q<newtheme>=u(cobj,fclistdb);&CAST %q<newtheme>=u(setr,cast,u(sortname,u(filter,ISOBJID,get(%q<tdb>/%i0`CAST))));@cpattr %q<tdb>/%i0`POWERS=%q<newtheme>/POWERS;@cpattr %q<tdb>/%i0`DESC=%q<newtheme>/DESCRIBE;@dolist/inline %q<cast>={&D`THEME %i0=%q<newtheme>}};@dolist/inline lsearch(all,type,player,elock,D`FINGER`CHARTYPE:?*)={@mvattr %i0/D`FINGER`CHARTYPE=%i0/D`FINGER`TYPE}
+
+&CONFLICT`THEME [u(cobj,migrate)]=@dolist u(coi,theme)={@set %i0=HALT NO_COMMAND;@tel %i0=u(cobj,oldbox)}

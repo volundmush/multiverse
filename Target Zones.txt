@@ -1,0 +1,24 @@
+@switch/inline isdbref([u(cobj,targets)])=0,{@tel create(Target Zone Manager <TZM>)=config(master_room)}
+&tzm u(coi)=locate(config(master_room),Target Zone Manager <TZM>,TXxi)
+@parent [u(cobj,targets)]=u(coi)
+@set [u(cobj,targets)]=WIZARD SAFE !NO_COMMAND
+
+&SYSTEM`NAME [u(cobj,targets)]=TARGETS
+
+&CMD`TARGETS [u(cobj,targets)]=$+targets:@assert words(u(setr,targets,sort(children(#2820),attr:owner)))=@attach %!/INC`MSG=ERROR: No Target Zones registered!;@pemit %#=u(HEADER,Target Listing);@switch/inline u(isadmin,%#)=1,{@pemit %#=ansi(u(color,%#,COLOR,COLUM_NAMES),align(5 25 12 15 15,DBref,Target Name,Faction,Last Changed,Changed By));@pemit %#=u(separator);@dolist/inline %q<targets>={@pemit %#=align(5 25 12 15 15,ansi(hx,%i0),ansi(c,trim(edit(name(%i0),TARGET: ,))),ansi(switch(u(setr,o,default(%i0/owner,Contested)),Union,c,Confederate,r,hx),%qo),ansi(hx,timefmt($m/$d $I:$M $p,get(%i0/owner`setwhen))),if(get(%i0/owner`setby),name(get(%i0/owner`setby))))}},0,{@pemit %#=ansi(hw,align(33 12 15 15,Target Name,Faction,Last Battle,Last Changed));@dolist/inline %q<targets>={@pemit %#=align(33 12 15 15,ansi(c,trim(edit(name(%i0),TARGET: ,))),ansi(switch(u(setr,o,default(%i0/owner,Contested)),Union,c,Confederate,r,hx),%qo),ansi(hx,u(fancytime,get(%i0/lastfightsecs),%#)),ansi(hx,u(fancytime,get(%i0/owner`setwhen),%#)))}};@pemit %#=u(SUBHEADER)
+
+&CMD`OWNER [u(cobj,targets)]=$^(?s)\+owner(?\:/(\S+)?)?(?\: +(.+?))?(?\:=(.*))?$:@check u(isadmin,%#)=@attach %!/INC`MSG=ERROR: Permission denied.;@switch/inline gt(strlen(%3),0)=1,{th u(setq,loc,%2);th u(setq,newown,%3)},0,{th u(setq,loc,%l);th u(setq,newown,%2)};@assert u(setr,tz,namegrab(u(setr,tzs,children(#2820)),%q<loc>))=@attach %!/INC`MSG=ERROR: Target zone not found.;@include %!/INC`PARTIAL=%q<newown>,UNION|UNAFFILIATED|SYNDICATE|CONFEDERATE|CONTESTED,|,choice,choice;&owner %q<tz>=capnames(%q<choice>);&owner`setby %q<tz>=%#;&owner`setwhen %q<tz>=secs();@remit %q<tz>=[ansi(h,Territory '[ansi(nc,name(%q<tz>))]' has been reassigned to:)] [ansi(hr,get(%q<tz>/owner))];@attach %!/INC`MSG=Territory [ansi(h,name(%q<tz>))] set to: %q<choice>;@attach %!/INC`MSG`NOTICE=Territory [ansi(h,name(%q<tz>))] assigned to: [capnames(%q<choice>)],lcon(%q<tz>);@attach %!/INC`MSG`CHAN={Territory [ansi(h,name(%q<tz>))] assigned to: [capnames(%q<choice>)].};@attach %!/INC`MSG`CHAN={Territory [ansi(h,name(%q<tz>))] assigned to: [capnames(%q<choice>)].},RP,,1,,1
+@set [u(cobj,targets)]/CMD`OWNER=regexp
+
+&CMD`+ZONEGUIDE [u(cobj,targets)]=$+zoneguide:@assert hasattrpval(%l,zone`guide)=@attach %!/INC`MSG=Your location has no zone guide.;@pemit %#=u(HEADER,default(%l/zone,name(%l)));@pemit %#=u(%l/zone`guide);@pemit %#=u(HEADER)
+
+&CMD`+ZONERULES [u(cobj,targets)]=$+zonerules:@assert hasattrpval(%l,zone`guide)=@attach %!/INC`MSG=Your location has no zone rules.;@pemit %#=u(HEADER,default(%l/zone,name(%l)));@pemit %#=u(%l/zone`rules);@pemit %#=u(HEADER)
+
+&CMD_LASTBATTLE #2820=$+fight:think [attrib_set(me/lastfightsecs,secs())][attrib_set(me/lastfightplayer,%:)][set(me,Lastfight:[convsecs(secs())])][remit(me,[ansi(hy,[name(%#)])] [ansi(hg,marks that there is going to be a battle fought in this target zone now.)])]
+
+&DESCSUFFIX #2820=%r%r[ansi(r,VULNERABLE TERRITORY - OCCUPIED BY:)] [ansi(h,[default(owner,Contested)])]%r[ansi(hx,The last battle that was fought here was on [ansi(hw,default(me/lastfight,UNKNOWN))] based off of +time.)]%r[ansi(hx,If you are going to fight a battle here now please type:)] [ansi(h,+fight)]
+
+&OWNER_CMD #2820=$+owner *:@switch [u(isadmin,%#)]=0,{@pemit %#=Contact an admin to have this territory re-assigned.},{@break [if(match(u(setr,f,Union Confederate Unaffiliated Contested),%0),u(setq,n,elements(%qf,match(%qf,%0)))0,pemit(%#,ansi(r,Valid arguments are: [itemize(%qf)]))1)]; &owner me=%qn; &owner`setby me=%#; &owner`setwhen me=secs(); @remit %#=[ansi(h,Territory has been reassigned to:)] [ansi(hr,get(me/owner))]}
+
+&UFUNC-FINDTARGET #2820=[switch(match(u(setr,n,iter(u(setr,c,children(#2820)),switch(name(##),TARGET: *,after(#$,TARGET:%b),#$),,|)),*%0*,|),0,[],elements(%qc,#$))]
+&VALID-OWNERS #2820=union|confederate|unaffiliated|contested

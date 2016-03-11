@@ -1,0 +1,51 @@
+&INC`FINGER`MAIN u(finger)=@include u(ccs)/INC`CHECKPC=strfirstof(%0,%#),1,FINGER;th setq(mode,default(me/VAR`FINGER`MODE,DEFAULT));@nspemit %#=u(RFN`HEADER,u(GET`FINGER`%q<mode>,%q<t1>,NAME));th setq(col1,u(VAR`FINGER`%q<mode>`COLUMN1,%q<t1>));th setq(rjust1,lmath(max,iter(%q<col1>,strlen(last(%i0,~)),|,%b)));th setq(col2,u(VAR`FINGER`%q<mode>`COLUMN2,%q<t1>));th setq(rjust2,lmath(max,iter(%q<col2>,strlen(last(%i0,~)),|,%b)));@nspemit %#=align(1. [floor(fdiv(sub(width(%#),7),2))] 1. [ceil(fdiv(sub(width(%#),7),2))] 1.,ansi(firstcolor(%#,FINGER`BORDER,DEFAULT`BORDER),|),iter(%q<col1>,rjust(elements(%i0,2,~),%q<rjust1>):%B[u(GET`FINGER`%q<mode>,%q<t1>,elements(%i0,1,~))],|,%R),ansi(firstcolor(%#,FINGER`BORDER,DEFAULT`BORDER),|),iter(%q<col2>,rjust(elements(%i0,2,~),%q<rjust2>):%B[u(GET`FINGER`%q<mode>,%q<t1>,elements(%i0,1,~))],|,%R),ansi(firstcolor(%#,FINGER`BORDER,DEFAULT`BORDER),|));@dolist/inline/delimit | [v(VAR`FINGER`%q<mode>`EXTRA)]=@switch/inline t(strlen(u(GET`FINGER`%q<mode>,%q<t1>,%i0)))=1,{@nspemit %#=u(RFN`SEPARATOR,capnames(%i0));@nspemit %#=align(1. [sub(width(%#),4)] 1.,ansi(firstcolor(%#,FINGER`BORDER,DEFAULT`BORDER),|),u(GET`FINGER`%q<mode>,%q<t1>,%i0),ansi(firstcolor(%#,FINGER`BORDER,DEFAULT`BORDER),|))};@nspemit %#=u(RFN`HEADER);@switch/inline cand(nor(isadmin(%#),strmatch(%#,%q<t1>)),get(%q<t1>/afinger))=1,{@include u(ccs)/INC`MSG=v(VAR`MSGHEAD),%q<t1>,{%n just checked your +finger}};@switch/inline approved(%q<t1>)=0,{@nspemit %#=ansi(hr,%q<t1name> is not approved.)}
+
+
+&VAR`FINGER`MODE u(finger)=MCM
+&VAR`FINGER`MCM`COLUMN1 u(finger)=FACTION~Faction|GENDER~Gender|SPECIES~Species
+&VAR`FINGER`MCM`COLUMN2 u(finger)=RANK~Rank|FUNCTION~Function|SERIES~Series
+&VAR`FINGER`MCM`EXTRA u(finger)=GROUPS|QUOTE|PROFILE|WIKI
+&VAR`FINGER`MCM`PLAYERSET u(finger)=GENDER|SPECIES
+&VAR`FINGER`MCM`ADMINSET u(finger)=QUOTE|PROFILE|GROUP|SOURCE|TYPE|FUNCTION|CHARTYPE
+
+&SET`FINGER`MCM u(finger)=if(hasattr(u(finger)/SET`FINGER`MCM`%1),u(u(finger)/SET`FINGER`MCM`%1,%0,%2),u(SET`FINGER`DEFAULT,%0,%1,%2))
+
+&SET`FINGER`MCM`SPECIES u(finger)=attrib_set(%0/SPECIES,%1)
+&SET`FINGER`MCM`GENDER u(finger)=attrib_set(%0/SEX,%1)
+
+&GET`FINGER`MCM u(finger)=edit(if(hasattr(u(finger)/GET`FINGER`MCM`%1),u(u(finger)/GET`FINGER`MCM`%1,%0),u(u(finger)/GET`FINGER`DEFAULT,%0,%1)),%t,space(8))
+
+&GET`FINGER`MCM`FACTION u(finger)=strfirstof(getproperty(%0,faction,1),Unaffiliated)
+&GET`FINGER`MCM`RANK u(finger)=strfirstof(getproperty(%0,rank),N/A)
+&GET`FINGER`MCM`GENDER u(finger)=u(GET`FINGER`DEFAULT,%0,SEX)
+&GET`FINGER`MCM`SPECIES u(finger)=getproperty(%0,species)
+&GET`FINGER`MCM`SERIES u(finger)=[default(%0/D`FINGER`CHARTYPE,???)] - [strfirstof(getproperty(%0,series,1),???)]
+&GET`FINGER`MCM`GROUPS u(finger)=getproperty(%0,groupnames,1)
+
+&GET`FINGER`MCM`WIKI u(finger)=getproperty(%0,wiki)
+
+&VAR`OOCFINGER`MODE u(finger)=MCM
+&VAR`OOCFINGER`MCM`COLUMN u(finger)=ALIAS~Alias|MAIL~Mush Mail|LAST~Last On|EMAIL~Email|CONTACT~Contact|HOMEPAGE~Homepage|THEME~Theme Song|ALTS~Alts|OTHERALTS~Other Alts|VOICEACTOR~Voice Actor
+&VAR`OOCFINGER`MCM`COLUMN`WIDTH u(finger)=11
+&VAR`OOCFINGER`MCM`EXTRA u(finger)=NOTES|INFO|PLAN
+&VAR`OOCFINGER`MCM`PLAYERSET u(finger)=EMAIL|CONTACT|HOMEPAGE|THEME|ALTS|OTHERALTS|VOICEACTOR|NOTES|PLAN|INFO
+&VAR`OOCFINGER`MCM`ADMINSET u(finger)=
+
+&GET`OOCFINGER`MCM u(finger)=edit(if(hasattr(u(finger)/GET`OOCFINGER`MCM`%1),u(u(finger)/GET`OOCFINGER`MCM`%1,%0),u(u(finger)/GET`OOCFINGER`DEFAULT,%0,%1)),%t,space(8))
+
+&SET`OOCFINGER`MCM u(finger)=u(SET`OOCFINGER`DEFAULT,%0,%1,%2)
+
+&FUN`GETPROPERTY`SPECIES u(finger)=get(%0/SPECIES)
+&FUN`GETPROPERTY`SERIES u(finger)=switch(setr(theme,get(%0/D`THEME)),>0,if(%1,pueblize(get(u(tdb)/%q<theme>),+theme [get(u(tdb)/%q<theme>)]),get(u(tdb)/%q<theme>)),???)
+&FUN`GETPROPERTY`CHARTYPE u(finger)=get(%0/D`FINGER`CHARTYPE)
+
+&FUN`GETPROPERTY`FULLHP u(finger)=if(get(%0/adminattrs`noscan),if(cor(isadmin(%#),strmatch(%0,%#)),ansi(hx,rjust(get(%0/HP_NOW),3,0)/[rjust(get(%0/HP_MAX),3,0)]),???/???),ansi(if(get(%0/HP_NOW),n,r),rjust(get(%0/HP_NOW),3,0))/[rjust(get(%0/HP_MAX),0,3)])
+
+&FUN`GETPROPERTY`CURHP u(finger)=if(get(%0/adminattrs`noscan),if(cor(isadmin(%#),strmatch(%0,%#)),ansi(hx,trim(get(%0/HP_NOW))),???),ansi(if(trim(get(%0/HP_NOW)),n,r),trim(get(%0/HP_NOW))))
+
+&FUN`GETPROPERTY`PL u(finger)=if(get(%0/adminattrs`noscan),if(cor(isadmin(%#),strmatch(%0,%#)),ansi(hx,get(%0/level)),??),get(%0/level))
+&FUN`GETPROPERTY`CURPL u(finger)=if(get(%0/adminattrs`noscan),if(cor(isadmin(%#),strmatch(%0,%#)),ansi(hx,lmath(add,get(%0/stats),|)),??),lmath(add,get(%0/stats),|))
+
+&FUN`GETPROPERTY`WIKI u(finger)=localize(if(setr(pageid,sql(SELECT page_id FROM multiver_mw114.mw_page WHERE page_title="[sqlescape(edit(name(%0),%b,_))]" LIMIT 1)),weblink(http://multiversemush.com/mw/index.php?title=[sql(SELECT page_title from multiver_mw114.mw_page WHERE page_id=%q<pageid>)])))
+
+&FUN`GETPROPERTY`FACLETTER u(finger)=switch(1,hasflag(%0,WIZARD),ansi(hr,WIZ),hasflag(%0,ROYALTY),ansi(hb,ROY),if(isdbref(setr(fac,u(FUN`GETPROPERTY`FACTIONDB,%0,%1,%2,%3))),ansi(strfirstof(custcolor(%#,%q<fac>`NAME,,1),get(%q<fac>/SET`COLOR),n),strfirstof(get(%q<fac>/SET`LETTER),left(get(%q<fac>/SET`ABBREVIATION),1))),ansi(hx,X)))

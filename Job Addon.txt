@@ -1,0 +1,4 @@
+&SWITCHES`ADMIN [u(cobj,jms)]=NEWCATEGORY|DELCATEGORY|RENCATEGORY|LOCKCATEGORY|UNLOCKCATEGORY|CATEGORY|CONFIG|DESC|SHOWSUBMIT
+&INC`SHOWSUBMIT [u(cobj,jms)]=@assert hasflag(%#,WIZARD)=@pemit %#=Huh?  (Type "help" for help.);@assert u(setr,jid,u(SQL,GET`JOBID,%0))=@attach %!/INC`MSG=ERROR: Job %0 not found.;@pemit %#=Job was submitted by: [u(SQL,GET`OWNERNAME,%q<jid>)];@mail lsearch(all,type,player,elock,FLAG^WIZARD)=Anonymous Job Breach/+job/submit was used by [ansi(hr,%n)] on Job %0 at [time()]!
+
++shelp/add +job/extra=[ansi(hc,Wizard Commands)]%R[ansi(h,+job/showsubmit <id>)] - Display the person who submitted a job. used for emergencies when Anonymity backfires. This is NOT TO BE USED OTHERWISE. ALL WIZARDS ARE ALERTED WHEN IT IS USED.

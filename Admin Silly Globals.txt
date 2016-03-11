@@ -1,0 +1,30 @@
+@switch/inline isdbref(u(asg))=0,{@tel create(Admin Silly Globals <ASG>)=config(master_room)}
+&asg u(coi)=locate(config(master_room),Admin Silly Globals <ASG>,TXxi)
+@parent u(asg)=u(coi)
+@set u(asg)=WIZARD SAFE !NO_COMMAND
+@lock/command u(asg)=@[u(sgo)]/Command
+
+&VAR`MSGHEAD u(asg)=SILLY
+
+&CMD`+SLAP u(asg)=$+slap *:@break findplayer(%0); @break strmatch(%:,%qp);@assert nearby(%qp,%#);@remit %l=ansi(h,%n slaps [name(%qp)].%rMorrigan Disapproves. :|)
+
+&CMD`+PHASER u(asg)=$+phaser *:@include u(ccs)/INC`CHECKPC=%0,1,v(VAR`MSGHEAD);@nspemit %#=ansi(yh,*** LCARS REPORT > PHASER DISCHARGE\, TARGET DESTROYED.);@nsremit loc(%q<t1>)={In the sky, far off, a tiny mote accelerates at unspeakable speeds.  It's underside glows with unholy power, before a red beam lances out, smashing straight into %q<t1name>. The smell of ozone is rife on the air, and in the end, they're completely vaporized, leaving nothing left but a smoking crater and a few giblets tossed hither and yon.%r%r[ansi(rh,** BZZZZZOOOOORRRRRRRTTTTT! **)]};@pemit %q<t1>=You are struck by %n's [ansi(rh,Phaser Array Barrage)] for [add(10000000,rand(50000000))] damage!
+
+&CMD`+BLUEICE u(asg)=$+blueice *:@include u(ccs)/INC`CHECKPC=%0,1,v(VAR`MSGHEAD);@nspemit %#=ansi(yh,*** LCARS REPORT > WASTE EJECTED.);@nsremit loc(%q<t1>)=In the late 20th century, airplanes used a thing called 'blue ice' to hold the output of their lavatories in flight in suspension to allow sanitary containment of such substances.  And occasionally, some of it falls out, occasionally with innocent bystanders getting in the way.  Such is the case as a starship does NOT fly overhead, but a 747 flying like the pilot is drunk (or on a joyride in someone else's plane) cruises by, spewing out several large, blue chunks of the stuff.  Against the laws of physics and common sense, all of them hurtle towards the ground, aimed straight at the skull of unfortunate %q<t1name>.%r%r[ansi(ch,** THUD! **)];@nspemit %q<t1>=You are struck by %n's [ansi(rh,Lavatory Accident - Blue Ice Boogaloo)] for [add(10000000,rand(1000000))] damage!
+
+&CMD`+APRILSONG u(asg)=$+aprilsong:think setq(d,#2600); @pemit %#=if(get(%qd/flags`song),attrib_set(%qd/flags`song)[ansi(hx,No chantitle song :%()][cemit(Y-admin-screaming,[ansi(hx,%[%n%])] [ansi(hx,No chantitle song:%()],1)],attrib_set(%qd/flags`song,1)[ansi(hr,GO MR. ROGERS!)][cemit(Y-admin-screaming,[ansi(hx,%[%n%])] [ansi(hr,GO MR. ROGERS!)],1)])
+
+&CMD`+GIGATEL u(asg)=$+gigatel *:@assert hasflag(%#,wizard); @assert fplayer(%0)=@pemit %#=%0 not found.; think setq(l,shuffle(u(u(navi)/FUN`LISTIC))); @pemit %#=Sending [name(%qp)] through [words(%ql)] rooms with no delay.; @include u(asg)/trigger`gigatel=%qp,loc(%qp),%ql
+&TRIGGER`GIGATEL u(asg)=@tel %0=first(%2);@assert rest(%2)={@pemit %#=name(%0) has gone through the new grid.;@tel %0=%1};@trigger u(asg)/trigger`gigatel=%0,%1,rest(%2)
+
+&CMD`+MARKLAR u(asg)=$+marklar:@pemit %#=if(get(u(cdb)/MOGCONF`marklar),attrib_set(u(cdb)/mogconf`marklar)[ansi(hx,No Marklar :%()][cemit(Y-admin-screaming,[ansi(hx,%[%n%])] [ansi(hx,No Marklar :%()],1)],attrib_set(u(cdb)/MOGCONF`marklar,1)[ansi(hr,MARKLAR!)][cemit(Y-admin-screaming,[ansi(hx,%[%n%])] [ansi(hr,MARKLAR!)],1)])
+
+&CMD`+MARKLAR? u(asg)=$+marklar?:@pemit %#=if(get(u(cdb)/MOGCONF`marklar),ansi(hr,MARKLAR!),ansi(hx,No Marklar :%())
+
+&CMD`+EATBRAIN u(asg)=$+eatbrain *:@include u(ccs)/INC`CHECKPC=%0,1,v(VAR`MSGHEAD);@nspemit %#=You have eaten %q<t1name>'s brains.;@nsremit loc(%q<t1>)=ansi(h,A rabid headcrab suddenly leaps from the shadows and attaches itself to %q<t1name>'s head\, sucking out and eating [poss(%q<t1>)] brains.%r%rAfter a few seconds\, the now-full headcrab hops off and yells: "[ansi(c,Alright chums\, let's do this! LEEEROY JENNNNNKINS!)]" And leaps off into a crab battle.)
+
+&CMD`+PBUG u(asg)=$+pbug *:@break not(isstaff(%#)); @break case(1,hastype(setr(p,pmatch(%0))),0,hasattrval(%qp,apowers),0,pemit(%#,Player %0 not found or does not have apowers set.)1); @cemit/noisy Y-Admin-Screaming=%n has just +pbug'd [name(%qp)];@pemit/silent %#=Bugging [name(%qp)].;@dolist [shuffle(filter(#lambda/isadmin(%%0),setunion(lwho(%qp),)))]=@wait [add(#@,rand(4))]={@pemit/silent %#=Sent power request from: [name(%i0)];@pemit/silent %qp=[name(%i0)] just checked your powers.}
+
+&CMD`+TORPEDO u(asg)=$+torpedo *:@include u(ccs)/INC`CHECKPC=%0,1,v(VAR`MSGHEAD);@nsremit loc(%q<t1>)=ansi(h,{A mote of light tears through the sky at unspeakable speeds%, stradling the ionosphere as the friction between the upper atmospheric oxygen and the hull illuminates it for all to see. A faint kerthunk comes from that same mote%, barely audible all the way down on terra firma%, and another mote of light flies from it, the first majestically returning to the heavens from wence it came. Hurtling towards %q<t1name> at unspeakable speeds%, the blue bolt suddenly detonates%, the fury of the antimatter vaporizing [obj(%q<t1>)] completely!%r%r[ansi(ch,** KABLAAAAM! **)]});@nspemit %q<t1>=ansi(h,You are struck by %n's [ansi(rh,Quantum Torpedo Barrage)] for [ansi(hr,power(add(10000000,rand(1000000000)),2))] damage!)%r; @nspemit %#=ansi(yh,*** LCARS REPORT > TORPEDO LAUNCH\,TARGET [ucstr(%q<t1name>)] DESTROYED.)
+
+&CMD`+ZEEKYBOOGYDOOG u(asg)=$+zeekyboogydoog *:@include u(ccs)/INC`CHECKPC=%0,1,v(VAR`MSGHEAD);@nsremit loc(%q<t1>)=ansi(h,{A small stick figure with googly eyes wearing a top hat and carrying a cane drops from the sky to stand next to %q<t1name>.%r%r"[ansi(c,OOOHH...)]"%r%rBackground music begins to play, and the little stick figure begins to dance erratically around %q<t1name>%, singing: "[ansi(c,Zeeky boogy doog%, zeeky boogy doog%, zeeky boogy doog%, zeeky boogy doog!)]"%r%rDozens of smiley-faced hydrogen bombs rain down upon the unfortunate %q<t1name> and the planet on which [subj(%q<t1>)] stands%, shattering it%, causing a worldwide nuclear winter%, and eventually causing the planet to "fall" into the sun with a *bloop*.});@nspemit %#=%q<t1name> has become demented.

@@ -1,0 +1,5 @@
+&WIZLIST`MSG u(pco)=center(ansi(u,Don't) bug CharStaff about your app until the bugtime in +appinfo has passed.,78)%r[center(For server issues contact Reliant\, Lain\, Benediction\, or Dremarian,78, )]%r[center(Please submit Bugs & Errors through +feedback.,78, )]%r[center(Please do not bother Off-Duty Admin.,78)]
+
+&STARTUP`EXTRA u(pco)=@dolist/inline COMBAT_OK HP_MAX HP_NOW LEVEL flaws adminattrs={@attribute/access/retroactive %i0=wizard};@dolist/inline desc_curr describe={@attribute/access/retroactive %i0=visual};@command/restrict @sweep=admin
+
+&VAR`GUESTROOM u(pco)=#423

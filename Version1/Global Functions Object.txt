@@ -1,0 +1,17 @@
+&GFN`ISFACHEAD u(gfo)=get(%0/adminattrs`isfachead)
+&GFN`ISGM u(gfo)=isjudge(%0)
+&GFN`ISJRGM u(gfo)=hasattr(%#,adminattrs`isjrgm)
+&GFN`ISJUDGE u(gfo)=orlflags(%0,royalty wizard judge)
+&GFN`ISPUBLIC u(gfo)=cand(isic(%0),cor(hasattrpval(%0,adminattrs`public),hasflag(%0,public)),case(type(%0),PLAYER,neq(conn(%0),-1),1))
+&GFN`ISWIZARD u(gfo)=hasflag(%0,wizard)
+&AGFN`GETNUM u(gfo)=floor(elements(get(%0/stats),match(SKI|EVA|STR|END|AID,%1,|),|))
+&AGFN`GETSTA u(gfo)=if(neq(words(get(%0/status),|),3),set(%0,status:0|1|0))[elements(get(%0/status),match(ALLOW|MISS|STUN,%1,|),|)]
+
+@@ &GFN`FINDNEARBYPO u(gfo)=if(cand(isdbref(setr(%1,objid(locate(%#,%0,TPFhlnaypz)))),cor(isadmin(%#),strmatch(%l,loc(r(%1))))),0,pemit(%#,ansi(r,Could not find %0.))[setq(%1,#-1)]1)
+@@ &GFN`FINDPLAYER u(gfo)=if(isdbref(pmatch(%0)),setq(p,objid(pmatch(%0)))0,pemit(%#,ansi(r,Could not find %0.))1)
+@@ &GFN`FPLAYER u(gfo)=if(isdbref(pmatch(%0)),setq(p,objid(pmatch(%0)))1,setq(e,Could not find %0.)0)
+
+@@ &AGFN`CHECKPC u(gfo)=[setq(a,Level Chartype altinfo`calts:Alts Quote Profile Series Function Faction Rank advantages`powers:Power Flaws)][setq(l,[if(cand(hastype(%0,player),words([setr(l,setunion(iter(%qa,case(hasattr(%0,first(%i0,:)),0,firstof(rest(%i0,:),%i0))),))])),%ql)])]if(cor(strmatch(get(%0/series),Original),hasattr(#1872,name`[u(#1871/ufunc-name2attr,get(%0/series))])),%ql,setunion(%ql,Themelist))
+@@ &AGFN`PID u(gfo)=default(%0/adminattrs`pid,pemit(%#,%0))
+@@ &AGFN`THEMELIST u(gfo)=pemit(#1978,search(all,type,player,elock,series:[get(%0/series)]))
+@@ &AGFN`VR_REMIT u(gfo)=[setq(loc,if(setinter(lparent(%l),#1770),LOCATION`,LOC-))][setq(a,isadmin(%#))][setq(p,edit(regrep(%l,%q<loc>*,^[default(%l/location`%#,%l/LOC-%#,%l/default`room,#0)]$),%q<loc>,))][setq(v,setinter(%qp,lcon(%l)))][if(%1,nspemit(%#,You say%, "%2%")[setq(v,setdiff(%qv,%#))])][objeval(%#,pemit(%qv,%0))]

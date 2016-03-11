@@ -1,0 +1,22 @@
+&GETNUM [u(cobj,mco)]=floor(elements(get(%0/stats),match(SKI|EVA|STR|END|AID,%1,|),|))
+&GETSTA [u(cobj,mco)]=if(neq(words(get(%0/status),|),3),set(%0,status:0|1|0))[elements(get(%0/status),match(ALLOW|MISS|STUN,%1,|),|)]
+
+th u(attrib_set,u(cobj,mco),FUNCTIONLIST`EXTRA,setunion(get(u(cobj,mco)/FUNCTIONLIST`EXTRA),getnum getsta))
+th u(attrib_set,u(cobj,mco),FUNCTIONLIST`ADMIN,setunion(get(u(cobj,mco)/FUNCTIONLIST`ADMIN),getnum getsta))
+
+&STARTUP`MAIN`EXTRA [u(cobj,mco)]=@dolist/inline COMBAT_OK HP_MAX HP_NOW LEVEL flaws adminattrs={@attribute/access/retroactive %i0=wizard};@dolist/inline desc_curr describe={@attribute/access/retroactive %i0=visual};@command/restrict @sweep=admin
+
+&GETPROPERTY`MCMSERIES [u(cobj,mco)]=[default(%0/D`FINGER`TYPE,???)] - [u(getproperty,%0,series,1)]
+&GETPROPERTY`SPECIES [u(cobj,mco)]=u(strfirstof,get(%0/D`FINGER`SPECIES),get(%0/SPECIES))
+&GETPROPERTY`SERIES [u(cobj,mco)]=localize(if(isdbref(u(setr,theme,get(%0/D`THEME))),u(pueblize,name(%q<theme>),+theme [name(%q<theme>)]),???))
+
+&GETPROPERTY`FULLHP [u(cobj,mco)]=if(get(%0/adminattrs`noscan),if(cor(u(isadmin,%#),strmatch(%0,%#)),ansi(hx,rjust(get(%0/HP_NOW),3,0)/[rjust(get(%0/HP_MAX),3,0)]),???/???),ansi(if(get(%0/HP_NOW),n,r),rjust(get(%0/HP_NOW),3,0))/[rjust(get(%0/HP_MAX),0,3)])
+
+&GETPROPERTY`CURHP [u(cobj,mco)]=if(get(%0/adminattrs`noscan),if(cor(u(isadmin,%#),strmatch(%0,%#)),ansi(hx,trim(get(%0/HP_NOW))),???),ansi(if(trim(get(%0/HP_NOW)),n,r),trim(get(%0/HP_NOW))))
+
+&GETPROPERTY`PL [u(cobj,mco)]=if(get(%0/adminattrs`noscan),if(cor(u(isadmin,%#),strmatch(%0,%#)),ansi(hx,get(%0/level)),??),get(%0/level))
+&GETPROPERTY`CURPL [u(cobj,mco)]=if(get(%0/adminattrs`noscan),if(cor(u(isadmin,%#),strmatch(%0,%#)),ansi(hx,lmath(add,get(%0/stats),|)),??),lmath(add,get(%0/stats),|))
+
+&GETPROPERTY`WIKI [u(cobj,mco)]=localize(if(u(setr,pageid,sql(SELECT page_id FROM multiver_mw114.mw_page WHERE page_title="[sqlescape(edit(name(%0),%b,_))]" LIMIT 1)),weblink(http://multiversemush.com/mw/index.php?title=[sql(SELECT page_title from multiver_mw114.mw_page WHERE page_id=%q<pageid>)]),get(%0/D`FINGER`WIKI)))
+
+&GETPROPERTY`FACLETTER [u(cobj,mco)]=switch(1,hasflag(%0,WIZARD),ansi(hr,WIZ),hasflag(%0,ROYALTY),ansi(hb,ROY),if(isdbref(u(setr,fac,u(GETPROPERTY`FACTIONDB,%0,%1,%2,%3))),ansi(strfirstof(u(color,%#,GROUP,%q<fac>,,1),get(%q<fac>/SET`COLOR),n),strfirstof(get(%q<fac>/SET`LETTER),left(get(%q<fac>/SET`ABBREVIATION),1))),ansi(hx,X)))

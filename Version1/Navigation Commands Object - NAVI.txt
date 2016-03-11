@@ -1,0 +1,41 @@
+&LOC`ICNEXUS u(navi)=#1522
+&LOC`OOCNEXUS u(navi)=#423
+@tel #855=u(navi)
+
+&ROOMPARENTS u(navi)=#1123 #1106 #1918 #3021
+
+&CMD`+FIRSTROOM u(navi)=$+firstroom:@break strmatch(%l,setr(m,first(setr(l,sort(iter(v(ROOMPARENTS),children(%i0)),name)))))=@pemit %#=You are already there.; @assert elock(%l/leave,%#)=@pemit %#=Permission denied. You do not pass the leave lock.;  @assert elock(%qm/teleport,%#)=@pemit %#=Permission denied. You do not pass the teleport lock.;  @tel %#=%qm; @pemit %#=Room 1 of [words(%ql)]
+
+&CMD`+MAP u(navi)=$+map:@pemit %#=[switch(words(setr(z,grep(#855,map`*`rooms`*,%l))),>1,setq(z,grab(%qz,*`CENTRAL`*)))][if(%qz,localize([setq(last(%qz,`),r)][u(#855/map`[extract(%qz,2,1,`)])]),u(#855/map`central))]
+
+&CMD`+MAP`ARG u(navi)=$+map *:@break findplayer(%0)[setq(z,%qp,p,)]; @assert cand(findable(%#,%qz),cor(isadmin(%#),cand(orflags(%qz,!D),not(hidden(%qz)))))=@pemit %#=Can not find [name(%qz)].; @assert [switch(words(setr(x,grep(#855,map`*`rooms`*,room(%qz)))),>1,[setq(x,grab(%qx,*`CENTRAL`*))]1,1,1,0)]=@pemit %#=[name(%qz)] was not found on any map.; @pemit %#=[localize([setq(last(%qx,`),r)][u(#855/map`[extract(%qx,2,1,`)])])]
+
+&CMD`+MAP1 u(navi)=$+map/central:@pemit %#=[if(setr(y,grep(#855,map`central`rooms`*,room(%#))),setq(last(%qy,`),r))][u(#855/map`central)]
+
+&CMD`+MAP1`ARG u(navi)=$+map/central *:@break findplayer(%0)[setq(z,%qp,p,)]; @assert cand(findable(%#,%qz),cor(isadmin(%#),cand(orflags(%qz,!D),not(hidden(%qz)))))=@pemit %#=Can not find [name(%qz)].; @assert [if(setr(y,grep(#855,map`central`rooms`*,room(%qz))),setq(last(%qy,`),r)1)]=@pemit %#=[name(%qz)] is not in the central grid area.; @pemit %#=[u(#855/map`central)]
+
+&CMD`+MAP2 u(navi)=$+map/void:@pemit %#=[if(setr(y,grep(#855,map`void`rooms`*,room(%#))),setq(last(%qy,`),r))][u(#855/map`void)]
+
+&CMD`+MAP2`ARG u(navi)=$+map/void *:@break findplayer(%0)[setq(z,%qp,p,)]; @assert cand(findable(%#,%qz),cor(isadmin(%#),cand(orflags(%qz,!D),not(hidden(%qz)))))=@pemit %#=Can not find [name(%qz)].; @assert [if(setr(y,grep(#855,map`void`rooms`*,room(%qz))),setq(last(%qy,`),r)1)]=@pemit %#=[name(%qz)] is not in the void.; @pemit %#=[u(#855/map`void)]
+
+&CMD`+MAP3 u(navi)=$+map/south:@pemit %#=[if(setr(y,grep(#855,map`summer`rooms`*,room(%#))),setq(last(%qy,`),r))][u(#855/map`summer)]
+
+&CMD`+MAP3`ARG u(navi)=$+map/south *:@break findplayer(%0)[setq(z,%qp,p,)]; @assert cand(findable(%#,%qz),cor(isadmin(%#),cand(orflags(%qz,!D),not(hidden(%qz)))))=@pemit %#=Can not find [name(%qz)].; @assert [if(setr(y,grep(#855,map`summer`rooms`*,room(%qz))),setq(last(%qy,`),r)1)]=@pemit %#=[name(%qz)] is not in the south.; @pemit %#=[u(#855/map`summer)]
+
+&CMD`+MAP4 u(navi)=$+map/west:@pemit %#=[if(setr(y,grep(#855,map`fall`rooms`*,room(%#))),setq(last(%qy,`),r))][u(#855/map`fall)]
+
+&CMD`+MAP4`ARG u(navi)=$+map/west *:@break findplayer(%0)[setq(z,%qp,p,)]; @assert cand(findable(%#,%qz),cor(isadmin(%#),cand(orflags(%qz,!D),not(hidden(%qz)))))=@pemit %#=Can not find [name(%qz)].; @assert [if(setr(y,grep(#855,map`fall`rooms`*,room(%qz))),setq(last(%qy,`),r)1)]=@pemit %#=[name(%qz)] is not in the west.; @pemit %#=[u(#855/map`fall)]
+
+&CMD`+MAP5 u(navi)=$+map/north:@pemit %#=[if(setr(y,grep(#855,map`winter`rooms`*,room(%#))),setq(last(%qy,`),r))][u(#855/map`winter)]
+
+&CMD`+MAP5`ARG u(navi)=$+map/north *:@break findplayer(%0)[setq(z,%qp,p,)]; @assert cand(findable(%#,%qz),cor(isadmin(%#),cand(orflags(%qz,!D),not(hidden(%qz)))))=@pemit %#=Can not find [name(%qz)].; @assert [if(setr(y,grep(#855,map`winter`rooms`*,room(%qz))),setq(last(%qy,`),r)1)]=@pemit %#=[name(%qz)] is not in the north.; @pemit %#=[u(#855/map`winter)]
+
+&CMD`+MAP6 u(navi)=$+map/east:@pemit %#=[if(setr(y,grep(#855,map`spring`rooms`*,room(%#))),setq(last(%qy,`),r))][u(#855/map`spring)]
+
+&CMD`+MAP6`ARG u(navi)=$+map/east *:@break findplayer(%0)[setq(z,%qp,p,)]; @assert cand(findable(%#,%qz),cor(isadmin(%#),cand(orflags(%qz,!D),not(hidden(%qz)))))=@pemit %#=Can not find [name(%qz)].; @assert [if(setr(y,grep(#855,map`spring`rooms`*,room(%qz))),setq(last(%qy,`),r)1)]=@pemit %#=[name(%qz)] is not in the east.; @pemit %#=[u(#855/map`spring)]
+
+&CMD`MORE u(navi)=$more:think setq(l,filter(#lambda/andflags(%%0,T!p),if(isadmin(%#),lcon(%l),lvcon(%l)))); @assert words(%ql)=@pemit %#=Nothing found.; @pemit %#=Room Contents:%r[iter(%ql,%b%b[name(owner(%i0))]'s [name(%i0)][switch([cand(hasflag(%i0,enter_ok),elock(%i0/enter,%#))][hasattr(%i0,ealias)],0?,%b<[ansi(r,enter locked)]>,11,%b<[ansi(hx,ucstr(first(get(%i0/ealias),;)))]>)],,%r)]
+
+&CMD`+NEXTROOM u(navi)=$+nextroom:think setq(l,sort(iter(v(ROOMPARENTS),children(%i0)),name))[setq(d,extract(%ql,inc(match(%ql,%l)),1))]; @break strmatch(match(%ql,%l),words(%ql))=@pemit %#=Already in the last room.; @break strmatch(%l,setr(m,%qd))=@pemit %#=You are already there.; @assert elock(%l/leave,%#)=@pemit %#=Permission denied. You do not pass the leave lock.;  @assert elock(%qm/teleport,%#)=@pemit %#=Permission denied. You do not pass the teleport lock.;  @tel %#=%qd; @pemit %#=Room [match(%ql,%l)] of [words(%ql)]
+
+&CMD`+OLDGRID u(sgo)=$+oldgrid:@break strmatch(%l,setr(m,#1449))=@pemit %#=You are already there.; @assert elock(%l/leave,%#)=@pemit %#=Permission denied. You do not pass the leave lock.;  @assert elock(%qm/teleport,%#)=@pemit %#=Permission denied. You do not pass the teleport lock.; @tel %#=%qm;@pemit %#=You are now on the old grid.  Use +nexus to return to the new grid.
