@@ -1,6 +1,6 @@
 &VAR`MODE u(cobj,ancestor_room)=MCM
 
-&CONFORMAT`PLAYERS`MCM u(cobj,ancestor_room)=u(SEPARATOR,Players)%R[ansi(vol_color(%#,ROOM,ROOM_COLUMNS),align(19 22 18 2 7 4,Name,Faction,Desc,PL,Health,Idle))]%R[trim(iter(vol_sortname(lvplayers(%!)),align(19 22 18 2 -7 4,vol_pueblize(moniker(%i0),look [name(%i0)]),strfirstof(if(vol_isadmin(%i0),Admin),vol_getproperty(%i0,factions,,,1),Unaffiliated),get(%i0/desc_curr),vol_getproperty(%i0,PL),if(lte(vol_getproperty(%i0,CURHP),0),ansi(hr,KO),vol_getproperty(%i0,CURHP)),vol_hideidle(%i0)),%b,%R),%r)]
+&CONFORMAT`PLAYERS`MCM u(cobj,ancestor_room)=u(SEPARATOR,Players)%R[ansi(vol_color(%#,ROOM,COLUMN_NAMES),align(19 19 15 2 7 4 5,Name,Faction,Desc,PL,Health,Idle,Scene))]%R[trim(iter(vol_sortname(lvplayers(%!)),align(19 19 15 2 -7 4 5,vol_pueblize(moniker(%i0),look [name(%i0)]),strfirstof(if(vol_isadmin(%i0),Admin),vol_getproperty(%i0,MAJORNAMELISTLINE,,,1),Unaffiliated),get(%i0/desc_curr),vol_getproperty(%i0,PL),if(lte(vol_getproperty(%i0,CURHP),0),ansi(hr,KO),vol_getproperty(%i0,CURHP)),vol_hideidle(%i0),vol_getproperty(%i0,CURSCENE)),%b,%R),%r)]
 
 &EXITFORMAT`MCM u(cobj,ancestor_room)=u(SEPARATOR,Exits)%R[table(iter(vol_sortorder(vol_sortname(lvexits(%!))),ljust(if(strlen(alias(%i0)),<[vol_pueblize(ansi(vol_color(%#,ROOM,EXITALIAS),ucstr(alias(%i0))),name(%i0))]>),6)[ansi(vol_color(%#,ROOM,EXITNAME),vol_pueblize(name(%i0),name(%i0)))][if(v(ALTEXITS),,%bto [left(moniker(loc(%i0)),sub(37,6,4,strlen(name(%i0))))])],%b,|),37,width(%#),|)]%R[u(HEADER)]
 

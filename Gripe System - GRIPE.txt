@@ -4,19 +4,14 @@
 @set u(gripe)=WIZARD SAFE !NO_COMMAND
 @lock/command u(gripe)=!FLAG^JAILED
 
-&CMD`+GRIPE u(gripe)=$^(?s)(?\:\+)?(gripe|feedback|report)(?\:/(\S+)?)?(?\: +(.+?))?(?\:=(.+)?)?$:@include u(ccs)/INC`PARTIAL=%2,setunion(get(u(gripe)/VAR`PLAYFLAGS),if(hasflag(%#,WIZARD),get(u(gripe)/VAR`ADMINFLAGS)),|,|),|,%2,switch,switch;@include u(gripe)/INC`[strfirstof(%q<switch>,MAIN)]=%3,%4,lcstr(%1)
-@set u(gripe)/CMD`+GRIPE=regexp
-
-&VAR`PLAYFLAGS u(gripe)=
-&VAR`ADMINFLAGS u(gripe)=BOARD|LOCK|MARK
-
-&INC`MAIN u(gripe)=@assert u(setr,accid,accid(%#))=@pemit %#=Only characters with accounts may use +%2.;@break default(u(adb)/%q<accid>`NO%2,0)=@pemit %#=u(msg-locked);@assert isdbref(v(VAR`%2))=@pemit %#=CODE ERROR: +[ucstr(%2)] is not configured properly. Please alert Codestaff immediately!;@include u(gripe)/INC`%2=%0,%1
+&CMD`+GRIPE u(cobj,gripe)=$^(?s)(?\:\+)?(gripe|feedback|report)(?\: +(.+?))?(?\:=(.+)?)?$:@attach u(cobj,gripe)/INC`%1=%2,%3
+@set u(cobj,gripe)/CMD`+GRIPE=regexp
 
 &INC`FEEDBACK u(cobj,gripe)=@trigger/spoof u(cobj,jms)/CMD`+REQUEST`MAIN=,FEEDBACK,%0,%1
 
-&INC`GRIPE u(gripe)=@trigger/spoof u(cobj,jms)/CMD`+REQUEST`MAIN=,GRIPE,%0,%1
+&INC`GRIPE u(cobj,gripe)=@trigger/spoof u(cobj,jms)/CMD`+REQUEST`MAIN=,GRIPE,%0,%1
 
-&INC`REPORT u(gripe)=@trigger/spoof u(cobj,jms)/CMD`+REQUEST`MAIN=,REPORT,%0,%1
+&INC`REPORT u(cobj,gripe)=@trigger/spoof u(cobj,jms)/CMD`+REQUEST`MAIN=,REPORT,%0,%1
 
 @@ +shelp/addmain Administration/+gripe=[u(gripe)]/SHLP`+GRIPE
 @@ &SHLP`+GRIPE u(gripe)=ansi(hc,Wizard Commands)%R[align(5 [sub(u(width,%#),6)],,{Note: <command> refers to +gripe, +feedback, or +report%R[ansi(h,<command>/board <board number or name>)] - Link a command to post to a certain board.%R[ansi(h,<command>/lock <player>)] - Restrict a player from using a command. Account-wide. use again to undo.%R[ansi(h,<command>/mark <player>)] - Feedback or Gripe only, but affects both. Removes anonymous access, account-wide. use again to toggle off.})]

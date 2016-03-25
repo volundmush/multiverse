@@ -12,9 +12,9 @@ th u(newcobj,Character management Machine <CMM>,cmm,#495,,,WIZARD SAFE !NO_COMMA
 
 &CMD`+SETDESC [u(cobj,cmm)]=$+setdesc *=*:th u(setq,0,num(*%0));th u(setq,1,get(%q0/rank));@desc %q0=%1;@pemit %#=Desc changed for %0 from '[ansi(h,%q1)]' to '[ansi(h,%1)]'.
 
-&CMD`+SETFACTION [u(cobj,cmm)]=$+setfaction *=*:@include %!/INC`CHECKPC=%0,1;@assert isdbref(u(setr,fac,namegrab(u(setr,facs,u(filter,FACTIONS,u(u(cobj,gms)/FUN`LISTGROUPS))),%1)))=@attach %!/INC`MSG=Faction '%1' not found. Choices are: [itemize(iter(%q<facs>,name(%i0),,|),|,and,\,)];@force/inline %#=+gadd %q<t1>=%q<fac>
+&CMD`+SETFACTION [u(cobj,cmm)]=$+setfaction *=*:@include %!/INC`CHECKPC=%0,1;@assert isdbref(u(setr,fac,namegrab(u(setr,facs,u(filter,MAJORGROUPS,u(u(cobj,gms)/FUN`LISTGROUPS))),%1)))=@attach %!/INC`MSG=Faction '%1' not found. Choices are: [itemize(iter(%q<facs>,name(%i0),,|),|,and,\,)];@force/inline %#=+gadd %q<t1>=%q<fac>
 
-&CMD`+SETRANK [u(cobj,cmm)]=$+setrank *=*:@include %!/INC`CHECKPC=%0,1;@assert isdbref(u(setr,gid1,getproperty(%q<t1>,factiondb)))=@attach %!/INC`MSG=ERROR: %q<t1name> is not a member of any faction.;@break gt(words(getproperty(%q<t1>,factionsdb)),1)=@attach %!/INC`MSG=ERROR: %q<t1name> belongs to multiple factions. You must use +grank for them.;@assert strlen(%1)=@attach %!/INC`MSG=ERROR: No rank entered to set.;@assert valnum(%1)=@attach %!/INC`MSG=ERROR: Ranks must be set as numbers.;@assert hasattrp(%q<gid1>/RANK`%1)=@attach %!/INC`MSG=ERROR: [name(%q<t1>)] doesn't have a rank '%1'.;&D`GROUP`%q<gid1>`RANK %q<t1>=%1;@pemit %#=Rank set!
+&CMD`+SETRANK [u(cobj,cmm)]=$+setrank *=*:@include %!/INC`CHECKPC=%0,1;@assert isdbref(u(setr,gid1,u(getproperty,%q<t1>,majordb)))=@attach %!/INC`MSG=ERROR: %q<t1name> is not a member of any faction.;@break gt(words(getproperty(%q<t1>,factionsdb)),1)=@attach %!/INC`MSG=ERROR: %q<t1name> belongs to multiple factions. You must use +grank for them.;@assert strlen(%1)=@attach %!/INC`MSG=ERROR: No rank entered to set.;@assert valnum(%1)=@attach %!/INC`MSG=ERROR: Ranks must be set as numbers.;@assert hasattrp(%q<gid1>/RANK`%1)=@attach %!/INC`MSG=ERROR: [name(%q<t1>)] doesn't have a rank '%1'.;&D`GROUP`%q<gid1>`RANK %q<t1>=%1;@pemit %#=Rank set!
 
 &CMD`+SETFUNCTION [u(cobj,cmm)]=$+setfunction *=*:@force/inline %#=+finger/set %0/function=%1
 

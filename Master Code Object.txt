@@ -20,3 +20,5 @@ th u(attrib_set,u(cobj,mco),FUNCTIONLIST`ADMIN,setunion(get(u(cobj,mco)/FUNCTION
 &GETPROPERTY`WIKI [u(cobj,mco)]=localize(if(u(setr,pageid,sql(SELECT page_id FROM multiver_mw114.mw_page WHERE page_title="[sqlescape(edit(name(%0),%b,_))]" LIMIT 1)),weblink(http://multiversemush.com/mw/index.php?title=[sql(SELECT page_title from multiver_mw114.mw_page WHERE page_id=%q<pageid>)]),get(%0/D`FINGER`WIKI)))
 
 &GETPROPERTY`FACLETTER [u(cobj,mco)]=switch(1,hasflag(%0,WIZARD),ansi(hr,WIZ),hasflag(%0,ROYALTY),ansi(hb,ROY),if(isdbref(u(setr,fac,u(GETPROPERTY`FACTIONDB,%0,%1,%2,%3))),ansi(strfirstof(u(color,%#,GROUP,%q<fac>,,1),get(%q<fac>/SET`COLOR),n),strfirstof(get(%q<fac>/SET`LETTER),left(get(%q<fac>/SET`ABBREVIATION),1))),ansi(hx,X)))
+
+&GETPROPERTY`CURSCENE [u(cobj,mco)]=default(%0/D`SCENE`ACTIVE,???)
