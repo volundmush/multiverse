@@ -1,6 +1,6 @@
 
-&MOGORDER`MESSAGE [u(cobj,mop)]=marklar
-&MOGUSE`MESSAGE [u(cobj,mop)]=marklar
+&MOGORDER`MESSAGE [u(cobj,mop)]=marklar markup
+&MOGUSE`MESSAGE [u(cobj,mop)]=marklar markup
 
 &FUN`MESSAGE`MARKLAR [u(cobj,mop)]=case(1,v(MOGCONF`MARKLAR),regeditalli(%0,%\b-%(?:[v(honorifics)]%)%\b,-marklar),%0)
 

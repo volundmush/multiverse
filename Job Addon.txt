@@ -1,6 +1,10 @@
 &SWITCHES`ADMIN`EXTRA [u(cobj,jms)]=SHOWSUBMIT
 &INC`SHOWSUBMIT [u(cobj,jms)]=@assert hasflag(%#,WIZARD)=@pemit %#=Huh?  (Type "help" for help.);@assert u(setr,jid,u(SQL,GET`JOBID,%0))=@attach %!/INC`MSG=ERROR: Job %0 not found.;@pemit %#=Job was submitted by: [u(SQL,GET`OWNERNAME,%q<jid>)];@mail lsearch(all,type,player,elock,FLAG^WIZARD)=Anonymous Job Breach/+job/submit was used by [ansi(hr,%n)] on Job %0 at [time()]!
 
-&FUN`LIST`OWNERNAME [u(cobj,jms)]=localize(if(strmatch(u(setr,owner,u(mysql,GET`OWNEROBJID,%0)),%:),u(mysql,GET`OWNERNAME,%0),switch(u(FUN`CONF,u(mysql,GET`JOBCAT,%0),ANONYMOUS),0,u(mysql,GET`OWNERNAME,%0),1,if(cand(u(isadmin,%#),strmatch(#165,u(accid,%q<owner>))),Anonymous [ansi(hc,\([u(mysql,GET`OWNERNAME,%0)]\))],Anonymous),3,if(cand(u(isadmin,%#),strmatch(#165,u(accid,%q<owner>))),Anonymous [ansi(hc,\([u(mysql,GET`OWNERNAME,%0)]\))],Anonymous),u(mysql,GET`OWNERNAME,%0))))
+&FUN`LIST`OWNERNAME [u(cobj,jms)]=localize(if(strmatch(u(setr,ownobj,u(mysql,GET`OWNEROBJID,%0)),%:),u(mysql,GET`OWNERNAME,%0),switch(u(FUN`CONF,u(mysql,GET`JOBCAT,%0),ANONYMOUS),0,ansi(if(isobjid(%q<ownobj>),,hx),u(mysql,GET`OWNERNAME,%0)),1,if(cand(u(isadmin,%#),strmatch(#165,u(accid,%q<ownobj>))),Anonymous [ansi(hc,\([u(mysql,GET`OWNERNAME,%0)]\))],Anonymous),3,if(cand(u(isadmin,%#),strmatch(#165,u(accid,%q<ownobj>))),Anonymous [ansi(hc,\([u(mysql,GET`OWNERNAME,%0)]\))],Anonymous),ansi(if(isobjid(%q<ownobj>),,hx),u(mysql,GET`OWNERNAME,%0)))))
+
+
+@@ &FUN`LIST`OWNERNAME [u(cobj,jms)]=if(strmatch(u(setr,ownobj,u(mysql,GET`OWNEROBJID,%0)),%:),u(mysql,GET`OWNERNAME,%0),switch(u(FUN`CONF,u(mysql,GET`JOBCAT,%0),ANONYMOUS),0,ansi(if(isobjid(%q<ownobj>),,hx),u(mysql,GET`OWNERNAME,%0)),1,Anonymous,3,Anonymous,ansi(if(isobjid(%q<ownobj>),,hx),u(mysql,GET`OWNERNAME,%0))))
+
 
 +shelp/add +job/extra=[ansi(hc,Wizard Commands)]%R[ansi(h,+job/showsubmit <id>)] - Display the person who submitted a job. Used for emergencies when Anonymity backfires. This is NOT TO BE USED OTHERWISE. ALL WIZARDS ARE ALERTED WHEN IT IS USED.
