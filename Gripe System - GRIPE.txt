@@ -4,7 +4,7 @@
 @set u(gripe)=WIZARD SAFE !NO_COMMAND
 @lock/command u(gripe)=!FLAG^JAILED
 
-&CMD`+GRIPE u(cobj,gripe)=$^(?s)(?\:\+)?(gripe|feedback|report)(?\: +(.+?))?(?\:=(.+)?)?$:@attach u(cobj,gripe)/INC`%1=%2,%3
+&CMD`+GRIPE u(cobj,gripe)=$^(?s)(?\:\+)?(gripe|feedback)(?\: +(.+?))?(?\:=(.+)?)?$:@attach u(cobj,gripe)/INC`%1=%2,%3
 @set u(cobj,gripe)/CMD`+GRIPE=regexp
 
 &INC`FEEDBACK u(cobj,gripe)=@trigger/spoof u(cobj,jms)/CMD`+REQUEST`MAIN=,FEEDBACK,%0,%1

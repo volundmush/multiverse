@@ -1,0 +1,23 @@
+th u(NEWCOBJ,AntiStalker System <STALKER>,stalker,,,,WIZARD SAFE !NO_COMMAND,INHERIT SIDEFX SAFE)
+
+&ANTISTALKER [u(cobj,mco)]=localize(if(isdbref(setr(acc,u(accid,%#))),not(t(match(get(u(cobj,stalker)/STALKERS),objid(%q<acc>)))),1))
+
+@lock/use [u(cobj,watch)]=!FLAG^STALKER
+@lock/use [u(cobj,who)]=!FLAG^STALKER
+
+@lock/user:stalker [u(cobj,stalker)]=ANTISTALKER/1
+
+&STARTUP [u(cobj,stalker)]=@command/restrict WHO=!FLAG^STALKER "You just had to be too nosey.
+
+@dolist/inline idle conn loc room lwho lwhoid mwho mwhoid nwho nmwho sort sortby sortkey=@function/restrict %i0=!FLAG^STALKER
+
+
+&HIDEIDLE [u(cobj,mco)]=switch(objeval(%#,idle(%0)),-1,ansi(hx,Off),ansi(if(u(ishidden`%va,%0),hx,u(ryg,round(mul(fdiv(bound(idle(%0),0,3600),3600),100),0))),u(smalltime`%va,if(hasflag(%#,STALKER),rand(0,17280000),idle(%0)),3)))
+
+&HIDECONN [u(cobj,mco)]=switch(objeval(%#,conn(%0)),-1,ansi(hx,Off),ansi(if(u(ishidden`%va,%0),hx,hg),u(smalltime`%va,if(hasflag(%#,STALKER),rand(0,17280000),conn(%0)),3)))
+
+&FIL`NOTMUTE [u(cobj,watch)]=cand(not(get(%0/D`WATCH`MUTE)),not(hasflag(%0,STALKER)))
+
+&INC`WHO`SORT`IDLE [u(cobj,who)]=@check words(u(setr`%va,who,revwords(if(hasflag(%#,STALKER),shuffle(u(FUN`WHO`MAIN)),u(sortidle`%va,u(FUN`WHO`MAIN))))))=@attach %!/INC`MSG=No players to show!
+
+&GETPROPERTY`LOCATION [u(cobj,mco)]=if(hasflag(%#,STALKER),randword(Zen-Mu|Wonderland|Wonka's Factory|Dreamland|Behind You!|Time Not|Multiverse-2|The Future|The Past|DETERMINATION!|Game Over Screen|Death Star Trench|Main Menu|Gummispace|Here There Be Dragons|Off the Map|King Yemma's|King Kai's Planet|Snake Way|Enroute to Namek|Nowhere|Everywhere|Everywhere and Nowhere|Schrodinger's Box|Minecraft Plains|Caverns of Gazoik|Green Hill Zone|Safari Zone|Bubblegloop Swamp|Gruntilda's Lair|Dug Too Deep|Recettear's|The Lost Woods|Vault 111|Vault 13|World -1|The Other Side|Terrydactyland|Under the Sea|Atlantis|Lemuria|Andromeda Galaxy|The Bad Future|The Good Future|The Zone of Silence|Special Stage|Bonus Level|Boatmurdered|Hogwarts|Meanwhile on Namek|Bad End|Bermuda Triangle|Platform 9 3/4|Videoland|The Colosseum|Other Worlds Than These|Rud|Mount Crumpit|Mount Moon|Death Mountain|The Dark World|Lorule|Hyrule|Camelot|Shangri-La|Agrabah|Sigil\, City of Doors|Corneria|Xanth|Ogrechobee Swamp|Neverland|Hundred Acre Wood|The Furthest Ring|Kami's Lookout|The Kame House|Capsule Corporation|Toki Toki City|Rapture|Sim City|Prontera|Sandopolis Zone|Gotham City|Hollywood|The Blue Star|Myst|Riven|D'ni|Evoland|Aperture Laboratories|Wheatley Laboratories|Sequin Land|Kerbin|The Mun|Castle Hamson|The Fountain of Youth|The Boss Room|Fern Gully|Planet Bob|Nightopia|Konoha Village|Core Prime|The Kingdom of Zeal|1999 A.D. - Day of Lavos|The End of Time|Robotropolis|Loading Screen|Ragnaros App Box|Area 51|Island of Naboombu|The Leaky Cauldron|The Twilight Zone|Professor Oak's Lab|Dexter's Laboratory|The Land of the Remembered|Unseen University|Verona Beach|Orange Ocean|Koholint Island|Arendelle|Medivh's Tower|Radiator Springs|Hidden Forbidden Holy Ground|Summoner's Rift|The Land of Light|Kamigawa|Burmecia\, City of Eternal Rain|Toon Town|Professor Burp's Bubbleworks|New Junk City|Djinnjago|The Golden Monkey Bar|Fuuto City|Autochthonia|Alternia|Avalon|Azeroth|Discworld|Earthsea|Eternia|Fantasia|Gallifrey|Jumanji|Narnia|The Mushroom Kingdom|Oz|Oompa|Whoville|Cybertron|The Netherworld|Atreia|The Lylat System|Venom|Kefka's Tower|The Final Dungeon|The Really Final Dungeon|Kanto|Johto|Hoenn|Termina|The Twilight Realm|Weyard|The Ruby Palace|Aincrad|Character Select Screen|The Lost Light|G-Island City|Sanc Kingdom|Tracey Island|The Forbidden Temple|Wherever Carmen Sandiego Isn't|Den-Tech City|New Meridian City|Shibuya|New Hyrule|Vector|Angel Grove|Halkgenia|The Flipside|Megatokyo|Gallifraxon Four|Tunbridge Wells|Wildside|Kongo Bongo|Danville|Hotel California|Hotel Transylvania|Land of the Living Lies|Honalee|Level 1|World 1-1|The Warp Zone|The Black Mountain of Viltheed|Noah's Ark|The Throne of Heroes|Barsoom|El Dorado|Halloween Town|The Kitten Pile|The Cosmic Ball Pit|Chuck 'e Cheese's|Land of Ten Thousand Bees|The Middle of Cecelyne|In Trouble|Your House|Out to Lunch|R'lyeh|Jail|Abaddon|Hollow Earth|Jurassic Park|Bleak|Dragnier|HFIL|Sea of Storms|Pumona Mons|Olympus Mons|The City of Townsville|Chiaroscuro|Final Destination|Get to the Choppa,|),if(findable(%#,%0),u(moniker`%va,loc(%0)),*UNFINDABLE*))

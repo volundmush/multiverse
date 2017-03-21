@@ -34,7 +34,7 @@ th u(newcobj,Character management Machine <CMM>,cmm,#495,,,WIZARD SAFE !NO_COMMA
 
 &STARTUP [u(cobj,cmm)]=@function checkpc=%!,AGFN`CHECKPC;@function/restrict checkpc=localize admin
 
-&AGFN`CHECKPC [u(cobj,cmm)]=filterbool(#lambda/u(FUN`CHECKPC`\%0,%0),Level Chartype Account AccountEmail Quote Profile Series Function Faction Advantages`Powers Advantages`Skills Advantages`Assets Advantages`NPCs Flaws)
+&AGFN`CHECKPC [u(cobj,cmm)]=filterbool(#lambda/u(FUN`CHECKPC`\%0,%0),Level Chartype Account AccountEmail Quote Profile Series Function Faction Advantages`Defining Advantages`Significant Advantages`Minor Flaws)
 &FUN`CHECKPC`LEVEL [u(cobj,cmm)]=not(gt(get(%0/LEVEL),0))
 &FUN`CHECKPC`CHARTYPE [u(cobj,cmm)]=not(strlen(get(%0/D`FINGER`TYPE)))
 &FUN`CHECKPC`ACCOUNT [u(cobj,cmm)]=not(isdbref(u(accid,%0)))
@@ -43,9 +43,8 @@ th u(newcobj,Character management Machine <CMM>,cmm,#495,,,WIZARD SAFE !NO_COMMA
 &FUN`CHECKPC`PROFILE [u(cobj,cmm)]=not(strlen(get(%0/D`FINGER`PROFILE)))
 &FUN`CHECKPC`FUNCTION [u(cobj,cmm)]=not(strlen(get(%0/D`FINGER`FUNCTION)))
 &FUN`CHECKPC`FACTION [u(cobj,cmm)]=not(words(getproperty(%0,FACTION)))
-&FUN`CHECKPC`ADVANTAGES`POWERS [u(cobj,cmm)]=not(strlen(get(%0/ADVANTAGES`POWERS)))
-&FUN`CHECKPC`ADVANTAGES`SKILLS [u(cobj,cmm)]=not(strlen(get(%0/ADVANTAGES`SKILLS)))
-&FUN`CHECKPC`ADVANTAGES`ASSETS [u(cobj,cmm)]=not(strlen(get(%0/ADVANTAGES`ASSETS)))
-&FUN`CHECKPC`ADVANTAGES`NPCS [u(cobj,cmm)]=not(strlen(get(%0/ADVANTAGES`NPCS)))
-&FUN`CHECKPC`FLAWS [u(cobj,cmm)]=not(strlen(get(%0/FLAWS)))
+&FUN`CHECKPC`ADVANTAGES`DEFINING [u(cobj,cmm)]=not(strlen(get(%0/D`ADV`DEFINING)))
+&FUN`CHECKPC`ADVANTAGES`SIGNIFICANT [u(cobj,cmm)]=not(strlen(get(%0/D`ADV`SIGNIFICANT)))
+&FUN`CHECKPC`ADVANTAGES`MINOR [u(cobj,cmm)]=not(strlen(get(%0/D`ADV`MINOR)))
+&FUN`CHECKPC`FLAWS [u(cobj,cmm)]=not(strlen(get(%0/D`ADV`FLAWS)))
 &FUN`CHECKPC`SERIES [u(cobj,cmm)]=not(get(%0/D`THEME))

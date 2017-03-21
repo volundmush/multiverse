@@ -1,6 +1,17 @@
 &GETNUM [u(cobj,mco)]=floor(elements(get(%0/stats),match(SKI|EVA|STR|END|AID,%1,|),|))
 &GETSTA [u(cobj,mco)]=if(neq(words(get(%0/status),|),3),set(%0,status:0|1|0))[elements(get(%0/status),match(ALLOW|MISS|STUN,%1,|),|)]
 
+&FACOLOR [u(cobj,mco)]=ansi(get(%0/SET`COLOR),%1)
+
+&PALADIN [u(cobj,mco)]=u(facolor,#3686,%0)
+&LEAGUE [u(cobj,mco)]=u(facolor,#684,%0)
+&WATCH [u(cobj,mco)]=u(facolor,#3687,%0)
+&CONCORD [u(cobj,mco)]=u(facolor,#3688,%0)
+
+&BANNER [u(cobj,mco)]=localize(if(isdbref(setr(0,pmatch(%0))),u(getproperty,%q0,banner),%q0))
+
+&STARTUP`FACOLOR [u(Cobj,mco)]=@dolist/inline paladin league watch concord banner={@function %i0=%!,%i0}
+
 th u(attrib_set,u(cobj,mco),FUNCTIONLIST`EXTRA,setunion(get(u(cobj,mco)/FUNCTIONLIST`EXTRA),getnum getsta))
 th u(attrib_set,u(cobj,mco),FUNCTIONLIST`ADMIN,setunion(get(u(cobj,mco)/FUNCTIONLIST`ADMIN),getnum getsta))
 
