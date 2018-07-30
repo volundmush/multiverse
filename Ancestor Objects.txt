@@ -1,7 +1,12 @@
 &VAR`MODE u(cobj,ancestor_room)=MCM
 
-&CONFORMAT`PLAYERS`MCM u(cobj,ancestor_room)=u(SEPARATOR,Players)%R[ansi(vol_color(%#,ROOM,COLUMN_NAMES),align(19 19 15 2 7 4 5,Name,Faction,Desc,PL,Health,Idle,Scene))]%R[trim(iter(vol_sortname(lvplayers(%!)),align(19 19 15 2 -7 4 5,vol_pueblize(moniker(%i0),look [name(%i0)]),strfirstof(if(vol_isadmin(%i0),Admin),vol_getproperty(%i0,MAJORNAMELISTLINE,,,1),Unaffiliated),get(%i0/desc_curr),vol_getproperty(%i0,PL),if(lte(vol_getproperty(%i0,CURHP),0),ansi(hr,KO),vol_getproperty(%i0,CURHP)),vol_hideidle(%i0),vol_getproperty(%i0,CURSCENE)),%b,%R),%r)]
+&SETTINGS`ROOM_PLAYERS [u(Cobj,ancestor_room)]=MCM
+&SETTINGS`ROOM_EXITS [u(Cobj,ancestor_room)]=MCM
 
-&EXITFORMAT`MCM u(cobj,ancestor_room)=u(SEPARATOR,Exits)%R[table(iter(vol_sortorder(vol_sortname(lvexits(%!))),ljust(if(strlen(alias(%i0)),<[vol_pueblize(ansi(vol_color(%#,ROOM,EXITALIAS),ucstr(alias(%i0))),name(%i0))]>),6)[ansi(vol_color(%#,ROOM,EXITNAME),vol_pueblize(name(%i0),name(%i0)))][if(v(ALTEXITS),,%bto [left(moniker(loc(%i0)),sub(37,6,4,strlen(name(%i0))))])],%b,|),37,width(%#),|)]%R[u(HEADER)]
+&PLAYERS`MCM u(cobj,ancestor_room)=u(SEPARATOR,Players)%R[ansi(vol_color(%#,COLUMN_NAMES),align(19 19 15 10 4 5,Name,Faction,Desc,Combat,Idle,Scene))]%R[trim(iter(vol_sortname(lvplayers(%!)),align(19 19 15 10 4 5,vol_pueblize(moniker(%i0),look [name(%i0)]),strfirstof(if(vol_isadmin(%i0),Admin),vol_getproperty(%i0,Faction),Unaffiliated),get(%i0/desc_curr),vol_getproperty(%i0,COMBAT),vol_hideidle(%i0),vol_getproperty(%i0,CURSCENE)),%b,%R),%r)]
 
-th u(NEWCONF,pconf,ROOM,EXITALIAS,hx,Color of exit names.,COLOR)
+&GETPROPERTY`COMBAT [u(cobj,ccp)]=if(nattr(%0/D`COMBAT`**),ansi(u(ryg,bound(sub(100,u(setr,perc,round(mul(u(u(cobj,age)/percent,%0),100),0))),0)),%q<perc>\%)%b[u(u(cobj,age)/FANCYWEIGHT,%0,1)][ansi(220,repeat(*,get(%0/D`COMBAT`ACCOLADES)))])
+
+
+
+&EXITS`MCM u(cobj,ancestor_room)=u(SEPARATOR,Exits)%R[table(iter(vol_sortorder(vol_sortname(lvexits(%!))),ljust(if(strlen(alias(%i0)),<[vol_pueblize(ansi(vol_color(%#,EXITALIAS),ucstr(alias(%i0))),name(%i0))]>),6)[ansi(vol_color(%#,EXITNAME),vol_pueblize(name(%i0),name(%i0)))][if(v(ALTEXITS),,%bto [left(moniker(loc(%i0)),sub(37,6,4,strlen(name(%i0))))])],%b,|),37,width(%#),|)]%R[u(FOOTER)]

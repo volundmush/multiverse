@@ -1,13 +1,15 @@
 th u(NEWCOBJ,MCM Advantages <ADV>,adv,,,,WIZARD SAFE !NO_COMMAND,INHERIT SIDEFX SAFE)
 
-&CMD`SET [u(cobj,adv)]=$^(?s)\+(set|add|clear|edit)(adv|flaws)(?\:/(\S+)?)?(?\: +(.+?))?(?\:=(.*))?$:@check u(isadmin`%va,%#)=@attach %!/INC`MSG=ERROR: Permission denied.;@attach %!/INC`%1`%2=%3,%4,%5
+&CMD`SET [u(cobj,adv)]=$^(?s)\+(set|add|clear|edit)(adv|flaws)(?\:/(\S+)?)?(?\: +(.+?))?(?\:=(.*))?$:@check u(isadmin,%#)=@attach %!/INC`MSG=ERROR: Permission denied.;@attach %!/INC`%1`%2=%3,%4,%5
 @set [u(cobj,adv)]/CMD`SET=regexp
 
 &INC`SET`FLAWS [u(cobj,adv)]=@attach %!/INC`SET`ADV=Flaws,%1,%2
 
-&INC`SET`ADV [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to set!;&D`ADV`%q<field> %q<t1>=%2;@attach %!/INC`MSG=%q<field> for %q<t1name> set! Total size: [strlen(%2)].[if(gte(strlen(%2),3900),%b[ansi(hr,Please check for overflow!)])]
+&VERSION [u(cobj,adv)]=5.5
 
-&INC`ADD`ADV [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to set!;&D`ADV`%q<field> %q<t1>=u(setr`%va,results,strcat(get(%q<t1>/D`ADV`%q<field>),%2));@attach %!/INC`MSG=%q<field> for %q<t1name> now has additional text. Total size: [strlen(%q<results>)].[if(gte(strlen(%q<results>),7900),%b[ansi(hr,Please check for overflow!)])]
+&INC`SET`ADV [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to set!;&D`ADV`%q<field> %q<t1>=%2;@attach %!/INC`MSG=%q<field> for %q<t1name> set! Total size: [strlen(%2)].[if(gte(strlen(%2),3900),%b[ansi(hr,Please check for overflow!)])];th u(attrib_set,%q<t1>,D`ADV`VERSION,v(VERSION));
+
+&INC`ADD`ADV [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to set!;&D`ADV`%q<field> %q<t1>=u(setr,results,strcat(get(%q<t1>/D`ADV`%q<field>),%2));@attach %!/INC`MSG=%q<field> for %q<t1name> now has additional text. Total size: [strlen(%q<results>)].[if(gte(strlen(%q<results>),7900),%b[ansi(hr,Please check for overflow!)])]
 
 &INC`ADD`FLAWS [u(cobj,adv)]=@attach %!/INC`ADD`ADV=Flaws,%1,%2
 
@@ -24,22 +26,29 @@ th u(NEWCOBJ,MCM Advantages <ADV>,adv,,,,WIZARD SAFE !NO_COMMAND,INHERIT SIDEFX 
 &FIELDS [u(cobj,adv)]=Defining|Significant|Minor|Flaws
 &DISPLAY [u(cobj,adv)]=Defining|Significant|Minor
 
-&CMD`DISPLAY [u(cobj,adv)]=$^\+(defining|significant|minor|flaws|advantages|disadvantages)(?\:/(\S+)?)?(?\: +(.+?))?$:@attach %!/INC`CHECKPC=u(strfirstof`%va,%3,%#),1;@select/inline %1=ADVANTAGES,{@attach %!/INC`LISTALL},{@attach %!/INC`LISTONE=,switch(%1,disadvantages,flaws,%1)}
+&CMD`DISPLAY [u(cobj,adv)]=$^\+(defining|significant|minor|flaws|advantages|disadvantages)(?\:/(\S+)?)?(?\: +(.+?))?$:@select/inline strlen(%2)=>0,{@attach %!/INC`PARTIAL=%2,GET,|,switch};@attach %!/INC`CHECKPC=u(strfirstof,%3,%#),1;@select/inline %1=ADVANTAGES,{@attach %!/INC`LISTALL},{@attach %!/INC`LISTONE=,switch(%1,disadvantages,flaws,%1)}
 @set [u(cobj,adv)]/CMD`DISPLAY=regexp
 
 &INC`LISTONE [u(cobj,adv)]=@check cor(hasattrval(%q<t1>/D`ADV`%1),switch(%1,flaws,hasattrval(%q<t1>/flaws),0))=@attach %!/INC`MSG=%q<t1name> has no [capstr(%1)]!;@attach %!/INC`LIST=%1,,,1;@pemit %#=u(footer)
 
-&INC`LIST [u(cobj,adv)]=@pemit %#=u(if(%3,header,subheader),[ansi(hw,[capstr(%0)]: %q<t1name>)]);@pemit %#=u(FORMATADV,switch(1,t(match(Powers|Skills|Assets|NPCs,%0)),get(%q<t1>/ADVANTAGES`%0),default(%q<t1>/D`ADV`%0,switch(%0,Flaws,%q<t1>/Flaws,%q<t1>/ADVANTAGES`%0),)));
+&INC`LIST [u(cobj,adv)]=@pemit %#=u(if(%3,header,subheader),[ansi(hw,[capstr(%0)]: %q<t1name>)]);th u(setq,get,u(FORMATADV,switch(1,t(match(Powers|Skills|Assets|NPCs,%0)),get(%q<t1>/ADVANTAGES`%0),default(%q<t1>/D`ADV`%0,switch(%0,Flaws,%q<t1>/Flaws,%q<t1>/ADVANTAGES`%0),))));@select/inline %q<switch>=GET,{th u(setq,get,decompose(%q<get>))};@pemit %#=%q<get>
 
-&FORMATADV [u(cobj,adv)]=regeditall(%0,v(REG`ADV),ansi(h,trimpenn($1,%b,r):)$2)
+&FORMATADV [u(cobj,adv)]=%0
+
+
+@@ regeditall(%0,v(REG`ADV),ansi(h,trimpenn($1,%b,r):)$2)
 
 &REG`ADV [u(cobj,adv)]=(?m)^(.{2,50}?)(?: )?(?:-|:)(\s)
 
-&INC`LISTALL [u(cobj,adv)]=@dolist/inline/delimit | [u(setr`%va,fields,filterbool(#lambda/cor(hasattrval(%q<t1>/D`ADV`\%0),hasattrval(%q<t1>/ADVANTAGES`\%0)),if(nattr(%q<t1>/D`ADV`*),v(Display),Powers|Skills|Assets|NPCs),|,|))]={@attach %!/INC`LIST=%i0,,,null(if(eq(inum(0),1),1,0))};@select/inline words(%q<fields>,|)=0,{@attach %!/INC`MSG=%q<t1name> has no advantages!},{@pemit %#=u(footer)}
+&INC`LISTALL [u(cobj,adv)]=@dolist/inline/delimit | [u(setr,fields,filterbool(#lambda/cor(hasattrval(%q<t1>/D`ADV`\%0),hasattrval(%q<t1>/ADVANTAGES`\%0)),switch(get(%q<t1>/D`ADV`VERSION),4.0,Powers|Skills|Assets|NPCs,v(Display)),|,|))]={@attach %!/INC`LIST=%i0,,,null(if(eq(inum(0),1),1,0))};@select/inline words(%q<fields>,|)=0,{@attach %!/INC`MSG=%q<t1name> has no advantages!},{@pemit %#=u(footer)}
 
 &STARTUP [u(cobj,adv)]=@hook/override/inline +advantages=%!,CMD`DISPLAY;@hook/override/inline +disadvantages=%!,CMD`DISPLAY
 
-+shelp/add +advantages=[u(cobj,adv)]/SHLP`+ADV
-+shelp/category +advantages=Character
-+shelp/metatags +advantages=+setadv +flaws +defining +significant +minor +clearadv +addadv +setflaws +clearflaws +addflaws flaws defining significant minor setadv +editflaws +editadv
+&HLP`ADVANTAGES [u(cobj,adv)]=Syntax: [ansi(h,+advantages <target>)]%R%RDisplays advantages information for <target>. This includes powers, skills, assets, and NPCs. If <target> is omitted, it will show your own advantages. Command can be shortened to +adv.%R%RTo show an individual advantage, use the following syntax:%R%RSyntax: +advantages/<type> <target>%R%RReplace <type> with one of: powers, skills, assets, or NPCs. For example, +advantages/npcs to view NPCs.%R%RTo be notified when someone views your advantages, use:%R%R&aadvantages me=1%R%RTo clear, use:%R%R&aadvantages me
++help/add Character/+advantages=[u(cobj,adv)]/HLP`ADVANTAGES
+
+&HLP`FLAWS [u(cobj,adv)]=[ansi(h,+flaws <target>)]%R%RShows the flaws information for <target>, i.e. +flaws Richie would show the flaw information for Richie.%R+flaws without any parameters will display your own flaw listing.
++help/add Character/+flaws=[u(cobj,adv)]/HLP`FLAWS
+
 &SHLP`+ADV [u(cobj,adv)]=This covers how to manipulate the various power-fields of MCM's characters.%R%R[ansi(hc,Commands)]%R[align(5 [sub(u(width,%#),6)],,[ansi(h,+setadv/<field> <player>=<text>)] - Sets a player's stuff. Fields: Defining\, Significant\, Minor\, Flaws.%R[ansi(h,+clearadv/<field> <player>)] - Deletes a player's stuff. Be careful.%R[ansi(h,+addadv/<field> <player>=<text>)] - Appends text to a character's existing field. This can allow a field to break the 4kb limit. Note: text is appended directly at end of string. ENTER LINEBREAKS AT BEGINNING if you want to start a new paragraph!%R[ansi(h,+editadv/<field> <player>=<search>|<replace>)] - Use the edit\(\) function on a field. Note: uses the | (PIPE, not I) character to separate words to find and what to replace with. For advanced users. READ HELP EDIT\(\) before using!)]%R%R[ansi(hc,Old Commands)]%R[align(5 [sub(u(width,%#),6)],,[ansi(h,+setflaws <player>=<text>)] - This should be obvious enough.%RNOTE: +addflaws\, +clearflaws\, and +editflaws also works like this.)]
++shelp/add Character/+advantages=[u(cobj,adv)]/SHLP`+ADV

@@ -2,41 +2,42 @@ th u(newcobj,Character management Machine <CMM>,cmm,#495,,,WIZARD SAFE !NO_COMMA
 @lock/command [u(cobj,cmm)]=(POWER^PLAYER_CREATE&FLAG^ROYALTY)|FLAG^WIZARD
 
 &SYSTEm`NAME [u(cobj,cmm)]=CHARGEN
+&SYSTEM`COLORS [u(Cobj,cmm)]=CHARGEN
+&SYSTEM`OPTIONS [u(Cobj,cmm)]=CHARGEN
 
 &DESCRIBE [u(cobj,cmm)]=THIS IS THE CHARACTER MANAGEMENT MACHINE.  It will not work for you if you do not have authorization to use it via the pcreate power or a wizbit.%r%rType 'managehelp' for more information.
-
-&CMD`+SETFLAWS [u(cobj,cmm)]=$+setflaws *=*:think u(setq,a,if(regmatch(%0,^%(%[^/%]+%)/%(%\d+%)$,-1 p 0),FLAWS`PAGE`[val(%q0)],u(setq,p,%0)FLAWS))[u(setq,p,pmatch(%qp))][u(setq,t,case(%1,clear,,%1))];@switch/inline cand(isdbref(%qp),hastype(%qp,player))=0,{@pemit %#=ansi(r,Could not find player.)},{@pemit %#=Flaws [switch(%q0,,,in page [val(%q0)]%b)]changed for [name(%qp)] from '[ansi(h,get(%qp/%qa))]' to '[ansi(h,%qt)]'.; think switch(%qt%qa,flaws`page`*,wipe(%qp/%qa),set(%qp,%qa:%qt));@pemit %#=if(words(setdiff(u(lattr,%qp/flaws`page`*),%qa)),name(%qp) [switch(%qa,flaws,,also%b)]has flaws in pages: [itemize(iter(u(lattr,%qp/flaws`page`*),last(##,`)))]); @pemit %#=ansi(h,if(u(setr,l,itemize(iter(checkpc(%qp),ansi(hr,%i0)))),name(%qp) is still missing %ql.))
 
 &MANAGEHELP2_CMD [u(cobj,cmm)]=$managehelp2:@pemit %#=To reset a character's password, use +setpassword <Target>=<Newpassword>.  For instance, type%r%r+setpassword Mr.Mime=StupidMime%r%rTo set Mr. Mime's password to StupidMime.  USE THIS COMMAND WITH CAUTION.%r%rTo create a new character, use the @pcreate command.  See PennMUSH help on @pcreate for more information.%r%rTo reset a character's credits, type +setcredits <Target>=<Credits>.  For example, type%r%r+setcredits Joe=15%r%rTo set Joe's credits to 15.  Typically you should use this command to set a new character's credits to 0.%r%rThe +setpuppetseries command allows you to set the series of any puppet-type object. To use it, type +setpuppetseries <dbref>=<series> - for example, to set the series of the Pokemon puppet at dbref #5 to Magikarp, use '+setpuppetseries #5=Magikarp', sans single-quotes.  You can also use this for evolutions.
 &MANAGEHELP_CMD [u(cobj,cmm)]=$managehelp:@pemit %#=This is the only place at which you may use the +setlevel, +setpstat, +setstat, +setprofile, +setadv/powers, +setquote, +setrank, +setfaction, +setskills, +setseries and +setfunction commands.%r%rTO USE +SETLEVEL, +SETPSTAT, AND +SETSTAT refer to the admin help files (+adminhelp).%r%rTHE FORMAT FOR +SETPROFILE, +SETADV/POWERS, +SETSPECIES, +SETFACTION, +SETFUNCTION, +SETQUOTE, +SETSKILLS, AND +SETRANK ARE ALL IDENTICAL AND ARE ONLY INTENDED TO BE USED ON PLAYERS.  DO NOT USE THEM ON POKEMON PUPPETS OR OBJECTS.  However, you MAY use +setseries on a Pokemon puppet, ONLY in the case of making a mistake during regular Pokemon generation.%r%rFor this example we will use +setprofile but you can put in any of the above commands and it will work for the appropriate attribute.%r%r+setprofile <Target>=<Data>%r%r<Target> must be a dbref or a player or trainer name with * prepended.  To change Ash's profile to 'Hi, mom', type%r%r+setprofile *Ash=Hi, mom%r%rPowers titles are also auto-formatted if they match: '<powername>: ' or '<powername>- ' with an optional space before the - and :.%r%rType 'managehelp2' for more information.
 
-&CMD`+SETDESC [u(cobj,cmm)]=$+setdesc *=*:th u(setq,0,num(*%0));th u(setq,1,get(%q0/rank));@desc %q0=%1;@pemit %#=Desc changed for %0 from '[ansi(h,%q1)]' to '[ansi(h,%1)]'.
+&CMD`+SETFACTION [u(cobj,cmm)]=$+setfaction *=*:@attach %!/INC`CHECKPC=%0,1;@attach %!/INC`VALID`GROUP=%1;@trigger u(cobj,group)/GRP`GMEMBER`ADD`DO=%q<value>,%q<t1objid>;@attach %!/INC`MSG=You assigned %q<t1name> to the [u(%q<value>/GET`NAME)]
 
-&CMD`+SETFACTION [u(cobj,cmm)]=$+setfaction *=*:@include %!/INC`CHECKPC=%0,1;@assert isdbref(u(setr,fac,namegrab(u(setr,facs,u(filter,MAJORGROUPS,u(u(cobj,gms)/FUN`LISTGROUPS))),%1)))=@attach %!/INC`MSG=Faction '%1' not found. Choices are: [itemize(iter(%q<facs>,name(%i0),,|),|,and,\,)];@force/inline %#=+gadd %q<t1>=%q<fac>
+&CMD`+SETRANK [u(cobj,cmm)]=$+setrank *=*:@attach %!/INC`CHECKPC=%0,1;@check isdbref(u(setr,gid1,first(get(%q<t1>/V`TIERS`1))))=@attach %!/INC`MSG=ERROR: %q<t1name> is not a member of any faction.;@break gt(words(get(%q<t1>/V`TIERS`1)),1)=@attach %!/INC`MSG=ERROR: %q<t1name> belongs to multiple factions. You must use +gmember/rank for them.;@check strlen(%1)=@attach %!/INC`MSG=ERROR: No rank entered to set.;@assert valnum(%1)=@attach %!/INC`MSG=ERROR: Ranks must be set as numbers.;@assert hasattrp(%q<gid1>/RANK`%1)=@attach %!/INC`MSG=ERROR: [name(%q<t1>)] doesn't have a rank '%1'.;@trigger u(cobj,group)/GRP`GMEMBER`RANK`DO=%q<gid1>,%q<t1objid>,%1;@pemit %#=Rank set!
 
-&CMD`+SETRANK [u(cobj,cmm)]=$+setrank *=*:@include %!/INC`CHECKPC=%0,1;@assert isdbref(u(setr,gid1,u(getproperty,%q<t1>,majordb)))=@attach %!/INC`MSG=ERROR: %q<t1name> is not a member of any faction.;@break gt(words(getproperty(%q<t1>,factionsdb)),1)=@attach %!/INC`MSG=ERROR: %q<t1name> belongs to multiple factions. You must use +grank for them.;@assert strlen(%1)=@attach %!/INC`MSG=ERROR: No rank entered to set.;@assert valnum(%1)=@attach %!/INC`MSG=ERROR: Ranks must be set as numbers.;@assert hasattrp(%q<gid1>/RANK`%1)=@attach %!/INC`MSG=ERROR: [name(%q<t1>)] doesn't have a rank '%1'.;&D`GROUP`%q<gid1>`RANK %q<t1>=%1;@pemit %#=Rank set!
+&CMD`+SETFUNCTION [u(cobj,cmm)]=$+setfunction *=*:@trigger/spoof [u(cobj,finger)]/CMD`+FINGER`MAIN=+finger/set %0/function=%1,set,%0/function,%1
 
-&CMD`+SETFUNCTION [u(cobj,cmm)]=$+setfunction *=*:@force/inline %#=+finger/set %0/function=%1
-
-&CMD`+SETCHARTYPE [u(cobj,cmm)]=$+chartype *=*:@force/inline %#=+finger/set %0/type=%1
+&CMD`+SETSPECIES [u(cobj,cmm)]=$+setspecies *=*:@attach %!/INC`CHECKPC=%0,1;@check strlen(%1)=@attach %!/INC`MSG=ERROR: Nothing entered!;&SPECIES %q<t1>=%1;@attach %!/INC`MSG=Species set to: %1
 
 &CMD`+SETLEVEL [u(cobj,cmm)]=$+setlevel *=*:@break findplayer(%0);@switch/inline u(setr,A,num(*%0))=#-1,{@pemit %#=That player does not exist.},{think u(u_rec,%0,%1);think u(u_setlevel,%qA,%1);&HP_max %qA=100;&stats %qA=0|0|0|0|0;&status %qA=0|1|0;@pemit %#=fullname(%qA) level set to %1.; @pemit %#=ansi(h,if(u(setr,l,itemize(iter(checkpc(%qp),ansi(hr,%i0)))),name(%qp) is still missing %ql.))}
 
-&CMD`+SETNAME [u(cobj,cmm)]=$+setname *=*:@break findplayer(%0);th u(setq,a,%qp);@assert strlen(%1)=@pemit %#=ERROR: New name field empty!;@assert valid(playername,%1,%qa)=@pemit %#=ERROR: [name(%qa)] cannot be re-named to %1. Check to make sure there are no @name or @alias conflicts.;@name %qa=%1;@pemit %#=Name set!
+&INC`VALID`NEWNAME [u(cobj,cmm)]=@check strlen(u(setr,value,trim(stripansi(%0))))=@attach %!/INC`MSG=ERROR: Must enter a new name!;@check valid(playername,%q<value>,%1)=@attach %!/INC`MSG=ERROR: Name cannot be '%q<value>'. This either conflicts with an existing @name/alias\, is too long\, or contains unacceptable characters. The current max length is [config(player_name_len)] and spaces are [switch(config(player_name_spaces),yes,allowed,not allowed.)];
 
-&CMD`+SETPASSWORD [u(cobj,cmm)]=$+setpassword *=*:@break findplayer(%0); @break u(isadmin,%qp)=@nscemit/noisy Wizard=ansi(hr,*SETPASSWORD*) %N just attempted to setpassword [name(%qp)];@attach %!/INC`MSG`CHAN=%N just used setpassword on [name(%qp)],Wizard; @force me={@newpassword %qp=%1}; @pemit %#=Password for [name(%qp)] changed to '%1'.
+&CMD`+SETNAME [u(cobj,cmm)]=$+setname *=*:@attach %!/INC`CHECKPC=%0,1;@attach %!/INC`VALID`NEWNAME=%1,%q<t1>;@name %q<t1>=%q<value>;@attach %!/INC`MSG=Name set!
 
-&CMD`+SETPROFILE [u(cobj,cmm)]=$+setprofile *=*:@force/inline/noeval %#=+finger/set %0/profile=%1
+&INC`VALID`PASSWORD [u(cobj,cmm)]=@check strlen(u(setr,value,%0))=@attach %!/INC`MSG=ERROR: Must enter a new name!;@check valid(password,%q<value>,%1)=@attach %!/INC`MSG=ERROR: Password cannot be '%q<value>'. Try something else. Passwords cannot contain spaces\, unprintiable characters\, or the = symbol.
 
-&CMD`+SETQUOTE [u(cobj,cmm)]=$+setquote *=*:@force/inline/noeval %#=+finger/set %0/quote=%1
+&CMD`+SETPASSWORD [u(cobj,cmm)]=$+setpassword *=*:@attach %!/INC`CHECKPC=%0,1;@attach %!/INC`VALID`PASSWORD=%1,%q<t1>;@attach %!/INC`MSG`CHAN=Used SetPassword on %q<t1name>!;@newpassword %q<t1>=%q<value>;@attach %!/INC`MSG=Password for %q<t1name> changed to '%q<value>'.
+
+&CMD`+SETPROFILE [u(cobj,cmm)]=$+setprofile *=*:@trigger/spoof [u(cobj,finger)]/CMD`+FINGER`MAIN=+finger/set %0/profile=%1,set,%0/profile,%1
+
+&CMD`+SETQUOTE [u(cobj,cmm)]=$+setquote *=*:@trigger/spoof [u(cobj,finger)]/CMD`+FINGER`MAIN=+finger/set %0/quote=%1,set,%0/quote,%1
 
 &U_SETLEVEL [u(cobj,cmm)]=attrib_set(%0/LEVEL,%1)[attrib_set(%0/combat`level,mul(%1,25))]
 
 &STARTUP [u(cobj,cmm)]=@function checkpc=%!,AGFN`CHECKPC;@function/restrict checkpc=localize admin
 
-&AGFN`CHECKPC [u(cobj,cmm)]=filterbool(#lambda/u(FUN`CHECKPC`\%0,%0),Level Chartype Account AccountEmail Quote Profile Series Function Faction Advantages`Defining Advantages`Significant Advantages`Minor Flaws)
+&AGFN`CHECKPC [u(cobj,cmm)]=filterbool(#lambda/u(FUN`CHECKPC`\%0,%0),Level Account AccountEmail Quote Profile Series Function Faction Advantages`Defining Advantages`Significant Advantages`Minor Flaws)
 &FUN`CHECKPC`LEVEL [u(cobj,cmm)]=not(gt(get(%0/LEVEL),0))
-&FUN`CHECKPC`CHARTYPE [u(cobj,cmm)]=not(strlen(get(%0/D`FINGER`TYPE)))
 &FUN`CHECKPC`ACCOUNT [u(cobj,cmm)]=not(isdbref(u(accid,%0)))
 &FUN`CHECKPC`ACCOUNTEMAIl [u(cobj,cmm)]=not(if(isdbref(u(accid,%0)),strlen(get(u(accid,%0)/EMAIL)),0))
 &FUN`CHECKPC`QUOTE [u(cobj,cmm)]=not(strlen(get(%0/D`FINGER`QUOTE)))
@@ -47,4 +48,4 @@ th u(newcobj,Character management Machine <CMM>,cmm,#495,,,WIZARD SAFE !NO_COMMA
 &FUN`CHECKPC`ADVANTAGES`SIGNIFICANT [u(cobj,cmm)]=not(strlen(get(%0/D`ADV`SIGNIFICANT)))
 &FUN`CHECKPC`ADVANTAGES`MINOR [u(cobj,cmm)]=not(strlen(get(%0/D`ADV`MINOR)))
 &FUN`CHECKPC`FLAWS [u(cobj,cmm)]=not(strlen(get(%0/D`ADV`FLAWS)))
-&FUN`CHECKPC`SERIES [u(cobj,cmm)]=not(get(%0/D`THEME))
+&FUN`CHECKPC`SERIES [u(cobj,cmm)]=not(get(%0/V`THEME))

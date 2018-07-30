@@ -1,8 +1,5 @@
 +gameconfig staff/wizlist_footer=[center(ansi(u,Don't) bug CharStaff about your app until the bugtime in +appinfo has passed.,78)]%r[center(For server issues contact Reliant\, Lain\, Benediction\, or Dremarian,78)]%r[center(Please submit Bugs & Errors through +feedback.,78)]%r[center(Please do not bother Off-Duty Admin.,78)]
 
-th u(newconf,config,STAFF,FACHEAD_FOOTER,,message shown at bottom of +fachead,WORD)
-
-+gameconfig staff/fachead_footer=[center(ansi(hc,MCMFacheads@gmail.com),78)]%r[center(Page on-duty facheads\, then page-OK/emergency duty facheads.,78)]%r[center(Try to page the appropriate fachead,78)]
 +gameconfig navigation/ic_nexus=#1522
 +gameconfig navigation/ooc_nexus=#423
 +gameconfig navigation/guest=#423
@@ -11,11 +8,13 @@ th u(newconf,config,STAFF,FACHEAD_FOOTER,,message shown at bottom of +fachead,WO
 +gameconfig system/namelink=+finger|+advantages|+flaws|+info|+oocfinger
 +gameconfig system/public_email=mcmush@gmail.com
 
-+gameconfig finger/column1=MAJORNAMECLICK~Faction~Unaffiliated|SEX~Gender~??|SPECIES~Species~??
-+gameconfig finger/column2=MAJORRANK~Rank~N/A|FUNCTION~Function~Unknown|MCMSERIES~Series
-+gameconfig finger/extra=GROUPNAMES2~Groups|QUOTE~Quote|PROFILE~Profile|WIKI~Wiki
-+gameconfig finger/playerset=SPECIES
-+gameconfig finger/adminset=QUOTE|PROFILE|TYPE|FUNCTION
++finger/config left_column=FACTION/1~Faction~Unaffiliated|SEX~Gender~??|SPECIES~Species~??
++finger/config right_column=FACRANK/1~Rank~N/A|FUNCTION~Function~Unknown|THEME~Series
++finger/config bottom_column=TIERNAMES/0~Groups|QUOTE~Quote|PROFILE~Profile|WIKI~Wiki
++finger/config player=SPECIES
++finger/config admin=QUOTE|PROFILE|TYPE|FUNCTION
+
+&GETPROPERTY`SPECIES [u(cobj,ccp)]=get(%0/SPECIES)
 
 +gameconfig oocfinger/column=ALIAS~Alias|MAIL~Mush Mail|LAST~Last On|EMAIL~Email|CONTACT~Contact|HOMEPAGE~Homepage|THEMESONG~Theme Song|ACCALTS~Alts|OTHERALTS~Other Alts|ACTOR~Actor|VOICEACTOR~Voice Actor|PLAN~Plan
 +gameconfig oocfinger/playerset=EMAIL|CONTACT|HOMEPAGE|THEMESONG|OTHERALTS|ACTOR|VOICEACTOR|PLAN

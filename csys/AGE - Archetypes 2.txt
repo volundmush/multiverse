@@ -1,0 +1,91 @@
+
+@@ Specialists
+&ARC`13 [u(cobj,agedb)]=Ace
+
+
+&ARC`14 [u(cobj,agedb)]=Arsenal
+
+
+&ARC`15 [u(cobj,agedb)]=Aspirant
+
+
+&ARC`16 [u(cobj,agedb)]=Assassin
+
+
+&ARC`17 [u(cobj,agedb)]=Berserker
+
+
+&ARC`18 [u(cobj,agedb)]=Big Four
+
+
+&ARC`19 [u(cobj,agedb)]=Blaster
+
+
+&ARC`20 [u(cobj,agedb)]=Demoralizer
+
+
+&ARC`21 [u(cobj,agedb)]=Destroyer
+
+
+&ARC`22 [u(cobj,agedb)]=Fencer
+
+
+&ARC`23 [u(cobj,agedb)]=Fury
+
+
+&ARC`24 [u(cobj,agedb)]=Gambler
+
+
+&ARC`25 [u(cobj,agedb)]=Grappler
+
+
+&ARC`26 [u(cobj,agedb)]=Ghost
+
+
+&ARC`27 [u(cobj,agedb)]=Glass Cannon
+
+
+&ARC`28 [u(cobj,agedb)]=Hot-Blooded
+
+
+&ARC`29 [u(cobj,agedb)]=Hotshot
+
+
+&ARC`30 [u(cobj,agedb)]=Immortal
+
+
+&ARC`31 [u(cobj,agedb)]=Juggernaut
+
+
+&ARC`32 [u(cobj,agedb)]=Operator
+
+
+&ARC`33 [u(cobj,agedb)]=Predator
+
+
+&ARC`34 [u(cobj,agedb)]=Sniper
+
+
+&ARC`35 [u(cobj,agedb)]=Survivor
+
+
+&ARC`36 [u(cobj,agedb)]=Ultimate
+
+
+
+@@ Synergists
+&ARC`37 [u(cobj,agedb)]=Aegis
+
+
+
+&ARC`38 [u(cobj,agedb)]=Conspirator
+
+
+
+&ARC`37 [u(cobj,agedb)]=Aegis
+
+&ARC`37 [u(cobj,agedb)]=Aegis
+
+&ARC`37 [u(cobj,agedb)]=Aegis
+
+&ARC`37 [u(cobj,agedb)]=Aegis
