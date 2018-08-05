@@ -12,11 +12,11 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 @lock/use [u(cobj,age)]=FUN`VERSION/1
 
-&INC`EANNOUNCE [u(cobj,age)]=@attach %!/INC`MSG`ROOM=[ansi(90,COMBAT:)]%B[ansi(117,%0:)]%B%1,,,,,1
-&INC`ANNOUNCE [u(Cobj,age)]=@attach %!/INC`MSG`ROOM=[ansi(90,COMBAT:)]%B%0,,,,,1
-&INC`EPRIVATE [u(cobj,age)]=@attach %!/INC`MSG=[ansi(90,COMBAT:)]%B[ansi(117,%0:)]%B%1,%2,,,1
-&INC`PRIVATE [u(cobj,age)]=@attach %!/INC`MSG=[ansi(90,COMBAT:)]%B%0,%1,,,1
-&INC`DEBUG [u(cobj,age)]=@select/inline words(u(setr,testlist,u(filter,TESTER,lplayers(%l))))=>0,{@attach %!/INC`MSG`ROOM=[ansi(90,DEBUG:)][ansi(117,%0:)]%B%1,%q<testlist>,,,,1};
+&INC`EANNOUNCE [u(cobj,age)]=@attach %!/INC`MSG`ROOM=[ansi(m,COMBAT:)]%B[ansi(177,%0:)]%B%1,,,,,1
+&INC`ANNOUNCE [u(Cobj,age)]=@attach %!/INC`MSG`ROOM=[ansi(m,COMBAT:)]%B%0,,,,,1
+&INC`EPRIVATE [u(cobj,age)]=@attach %!/INC`MSG=[ansi(m,COMBAT:)]%B[ansi(117,%0:)]%B%1,%2,,,1
+&INC`PRIVATE [u(cobj,age)]=@attach %!/INC`MSG=[ansi(m,COMBAT:)]%B%0,%1,,,1
+&INC`DEBUG [u(cobj,age)]=@select/inline words(u(setr,testlist,u(filter,TESTER,lplayers(%l))))=>0,{@attach %!/INC`MSG`ROOM=[ansi(117,DEBUG:)][ansi(117,%0:)]%B%1,%q<testlist>,,,,1};
 
 
 @@ -- Section for AGE Config.
@@ -1063,10 +1063,10 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &PUSH`6 [u(cobj,agedb)]=Damage Over Time
 &PUSH`6`CHOICES [u(cobj,agedb)]=1|3|5|7
-&PUSH`6`1 [u(cobj,agedb)]=A Tiny amount of the total damage you deal on your next attack will be dealt to the target when they attack, for their next 2 turns.
-&PUSH`6`3 [u(cobj,agedb)]=A Standard amount of the total damage you deal on your next attack will be dealt to the target when they attack, for their next 2 turns.
-&PUSH`6`5 [u(cobj,agedb)]=A Considerable amount of the total damage you deal on your next attack will be dealt to the target when they attack, for their next 2 turns.
-&PUSH`6`7 [u(cobj,agedb)]=A Substantial amount of the total damage you deal on your next attack will be dealt to the target when they attack, for their next 2 turns.
+&PUSH`6`1 [u(cobj,agedb)]=A Small amount of damage from your next attack will be dealt to the target at the beginning of their turn, then a Tiny amount for their next 2 turns.
+&PUSH`6`3 [u(cobj,agedb)]=A Standard amount of damage from your next attack will be dealt to the target at the beginning of their turn, then a Small amount for their next 2 turns.
+&PUSH`6`5 [u(cobj,agedb)]=A Considerable amount of damage from your next attack will be dealt to the target at the beginning of their turn, then a Standard amount for their next 2 turns.
+&PUSH`6`7 [u(cobj,agedb)]=A Substantial amount of damage from your next attack will be dealt to the target at the beginning of their turn, then a Standard amount for their next 2 turns.
 &PUSH`6`ACTIVATE [u(cobj,agedb)]=@attach %!/INC`SETSTATUS=%#,%#,PUSH_INFLICT_DOT,COST=%q<hypecost>|DISPLAY=[switch(%q<hypecost>,1,Tiny,3,Standard,5,Considerable,7,Substantial)],1,0
 
 &PUSH`7 [u(cobj,agedb)]=Cure
@@ -1163,7 +1163,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`DEF_RALLY`DEFENSE`BONUS`DRIVE_GAIN [u(cobj,age)]=5
 &STATUS`DEF_RALLY`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=Minor
 &STATUS`DEF_RALLY`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Minor
-&STATUS`DEF_RALLY`DEFENSE_END_TURN [u(cobj,age)]=@attach %!/INC`DRIVE=%0,u(getstatus,%0,%1,DEFENSE,BONUS`DRIVE_GAIN),Rally
+&STATUS`DEF_RALLY`DEFENSE_END_TURN [u(cobj,age)]=@@ @attach %!/INC`DRIVE=%0,u(setr,rally,u(getstatus,%0,%1,DEFENSE,BONUS`DRIVE_GAIN)),Rally,,1,sub(%q<rally>,u(STATUS`DEF_RALLY`DEFENSE`BONUS`DRIVE_GAIN))
 
 @@ STATUS - Archetypes - Generalists
 
@@ -1397,7 +1397,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_DEMORALIZER_POWER`ATTACK`BONUS`STAT`0 [u(Cobj,age)]=Moderate
 
 &STATUS`ARC_DESTROYER [u(cobj,age)]=Destroyer
-&STATUS`ARC_DESTROYER`ATTACK_INFLICT_STATUS [u(cobj,age)]=@select/inline %q<off>=1,{@attach %!/INC`SETSTATUS=%0,%0,ARC_DESTROYER_DOT,DAMAGE=%q<damage>|INCREMENT=0,0,4},2,{@attach %!/INC`SETSTATUS=%0,%0,ARC_DESTROYER_FORCEFUL,,0,2;@attach %!/INC`EANNOUNCE=DESTROYER,[ansi(h,%n)] now suffers from a Moderate Penalty to Endurance and Mitigation!},3,{@attach %!/INC`DRIVE=%0,mul(%q<atklevel>,-2),Destroyer},4,{@attach %!/INC`HEAL=%q<atker>,round(mul(%q<damage>,u(scatter,12)),0),Destroyer}
+&STATUS`ARC_DESTROYER`ATTACK_INFLICT_STATUS [u(cobj,age)]=@select/inline %q<off>=1,{@attach %!/INC`SETSTATUS=%0,%0,ARC_DESTROYER_DOT,DAMAGE=%q<damage>|INCREMENT=0,0,4},2,{@attach %!/INC`SETSTATUS=%0,%0,ARC_DESTROYER_FORCEFUL,,0,2;@attach %!/INC`EANNOUNCE=DESTROYER,[ansi(h,%n)] now suffers from a Moderate Penalty to Endurance and Mitigation!},3,{@attach %!/INC`DRIVE=%0,mul(%q<atklevel>,-2),Destroyer},4,{@attach %!/INC`HEAL=%q<atker>,round(mul(%q<damage>,u(scatter,17)),0),Destroyer}
 &STATUS`ARC_DESTROYER`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Solid
 &STATUS`ARC_DESTROYER`ATTACK`BONUS`STAT`2 [u(cobj,age)]=Solid
 &STATUS`ARC_DESTROYER`STATIC`MAXIMUM`HP [u(Cobj,age)]=-50
@@ -1559,7 +1559,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_IMMORTAL`STATUS`DEF_GUARD`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=Minor
 &STATUS`ARC_IMMORTAL`STATUS`DEF_MANEUVER`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Minor
 &STATUS`ARC_IMMORTAL`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Significant
-&STATUS`ARC_IMMORTAL`ATTACK_END_TURN [u(cobj,age)]=@select/inline cand(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),gt(u(percent,%0),0))=1,{@attach %!/INC`HEAL=%0,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,11)),0),Immortal Regeneration}
+&STATUS`ARC_IMMORTAL`ATTACK_END_TURN [u(cobj,age)]=@select/inline cand(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),gt(u(percent,%0),0))=1,{@attach %!/INC`HEAL=%0,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,16)),0),Immortal Regeneration}
 
 
 &STATUS`ARC_JUGGERNAUT [u(cobj,age)]=Juggernaut
@@ -1580,7 +1580,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &STATUS`ARC_JUGGERNAUT_RALLY [u(cobj,age)]=Juggernaut-Rally
 &STATUS`ARC_JUGGERNAUT_RALLY`DEFENSE`BONUS`STAT`1 [u(Cobj,age)]=Minor
-&STATUS`ARC_JUGGERNAUT_RALLY`DEFENSE_END_TURN [u(cobj,age)]=@attach %!/INC`HEAL=%0,u(setr,jugheal,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,9)),0)),Juggernaut Regeneration,1;@attach %!/INC`EANNOUNCE=JUGGERNAUT,[ansi(hw,name(%0))] readies for more action... and regenerates [ansi(h,%q<jugheal> HP)]!
+&STATUS`ARC_JUGGERNAUT_RALLY`DEFENSE_END_TURN [u(cobj,age)]=@attach %!/INC`HEAL=%0,u(setr,jugheal,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,13)),0)),Juggernaut Regeneration,1;@attach %!/INC`EANNOUNCE=JUGGERNAUT,[ansi(hw,name(%0))] readies for more action... and regenerates [ansi(h,%q<jugheal> HP)]!
 
 
 
@@ -1880,8 +1880,8 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`SUP_MASTERMIND [u(cobj,age)]=Mastermind-Support
 &STATUS`SUP_MASTERMIND`TAGS [u(cobj,age)]=SUPPORT DISPLAY
 &STATUS`SUP_MASTERMIND`DESCRIPTION [u(Cobj,age)]=Heal a Small amount of damage you inflict.
-&STATUS`SUP_MASTERMIND`ATTACK_POST_DAMAGE [u(cobj,age)]=@attach %!/INC`HEAL=%q<atker>,round(mul(add(%q<damage>,%q<dot>),u(scatter,6.5)),0),Mastermind Support Regen
-&STATUS`SUP_MASTERMIND`DEFENSE_POST_DAMAGE [u(cobj,age)]=@attach %!/INC`HEAL=[get(%0/%q<atk>`STATUS`%1`SOURCE)],round(mul(%q<damage>,u(scatter,5)),0),Mastermind Support Regen
+&STATUS`SUP_MASTERMIND`ATTACK_POST_DAMAGE [u(cobj,age)]=@attach %!/INC`HEAL=%q<atker>,round(mul(add(%q<damage>,%q<dot>),u(scatter,8.5)),0),Mastermind Support Regen
+&STATUS`SUP_MASTERMIND`DEFENSE_POST_DAMAGE [u(cobj,age)]=@attach %!/INC`HEAL=[get(%0/%q<atk>`STATUS`%1`SOURCE)],round(mul(%q<damage>,u(scatter,7)),0),Mastermind Support Regen
 
 
 &STATUS`ARC_PANACEA [u(cobj,age)]=Panacea
@@ -1893,7 +1893,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_PANACEA`DEF`5`ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_PANACEA_RALLY,,0,1
 
 &STATUS`ARC_PANACEA_RALLY [u(cobj,age)]=Panacea-Rally
-&STATUS`ARC_PANACEA_RALLY`DEFENSE_END_TURN [u(cobj,age)]=@select/inline get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE)=>0,{@attach %!/INC`HEAL=%0,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,5)),0),Panacea Rally Regen}
+&STATUS`ARC_PANACEA_RALLY`DEFENSE_END_TURN [u(cobj,age)]=@select/inline get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE)=>0,{@attach %!/INC`HEAL=%0,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,8)),0),Panacea Rally Regen}
 &STATUS`ARC_PANACEA_RALLY`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Moderate
 
 &STATUS`ARC_PANACEA_CLEANSE [u(cobj,age)]=Panacea-Cleanse
@@ -1968,7 +1968,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`SUP_SAINT [u(cobj,age)]=Saint-Support
 &STATUS`SUP_SAINT`TAGS [u(cobj,age)]=SUPPORT DISPLAY
 &STATUS`SUP_SAINT`DESCRIPTION [u(cobj,age)]=Regen a Standard amount of Damage you suffer.
-&STATUS`SUP_SAINT`ATTACK_END_TURN [u(cobj,age)]=@select/inline cand(gt(u(percent,%0),0),get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE))=1,{@attach %!/INC`HEAL=%0,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,11)),0),Saint Support Regen}
+&STATUS`SUP_SAINT`ATTACK_END_TURN [u(cobj,age)]=@select/inline cand(gt(u(percent,%0),0),get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE))=1,{@attach %!/INC`HEAL=%0,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,16)),0),Saint Support Regen}
 
 
 
@@ -2080,7 +2080,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`SUP_WITCH_DEBUFF_MITIGATION`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Minor
 
 &STATUS`SUP_WITCH_FORCEFUL [u(cobj,age)]=Witch-Support-Forceful
-&STATUS`SUP_WITCH_FORCEFUL`ATTACK_POST_DAMAGE [u(cobj,age)]=@attach %!/INC`HEAL=%q<atker>,round(mul(%q<damage>,u(scatter,3)),0),Witch Support
+&STATUS`SUP_WITCH_FORCEFUL`ATTACK_POST_DAMAGE [u(cobj,age)]=@attach %!/INC`HEAL=%q<atker>,round(mul(%q<damage>,u(scatter,4.5)),0),Witch Support
 
 &STATUS`SUP_WITCH_DRAMATIC [u(cobj,age)]=Witch-Support-Dramatic
 &STATUS`SUP_WITCH_DRAMATIC`ATTACK_ON_CRITICAL [u(Cobj,age)]=@attach %!/INC`HYPE=%0,-1,Witch Support Dramatic Penalty
@@ -2147,8 +2147,8 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`QRK_KILLERINSTINCT`ATTACK`BONUS`STAT`2 [u(cobj,age)]=Minor
 
 &STATUS`QRK_LASTWORD [u(cobj,age)]=Last Word
-&STATUS`QRK_LASTWORD`ATTACK`BONUS`STAT`0 [u(cobj,age)]=if(lte(u(percent,%0),0.25),Massive,0)
-&STATUS`QRK_LASTWORD`ATTACK`BONUS`STAT`2 [u(cobj,age)]=if(lte(u(percent,%0),0.25),Massive,0)
+&STATUS`QRK_LASTWORD`STATUS`OFF_FORCEFUL`ATTACK`BONUS`STAT`0 [u(cobj,age)]=if(lte(u(percent,%0),0.25),Massive,0)
+&STATUS`QRK_LASTWORD`STATUS`OFF_CONSISTENT`ATTACK`BONUS`STAT`2 [u(cobj,age)]=if(lte(u(percent,%0),0.25),Massive,0)
 &STATUS`QRK_LASTWORD`BELOW_25_HEALTH [u(cobj,age)]=@attach %!/INC`EANNOUNCE=LAST WORD,[ansi(hw,name(%0))] readies for a last stand! Massive Bonus to Power and Precision!
 
 &STATUS`QRK_MIGHTY [u(cobj,age)]=Mighty
@@ -2281,7 +2281,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`QRK_QUICKREFLEXES`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=Moderate
 
 &STATUS`QRK_REGENERATION [u(cobj,age)]=Regeneration
-&STATUS`QRK_REGENERATION`ATTACK_END_TURN [u(cobj,age)]=@select/inline cand(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),gt(u(percent,%0),0))=1,{@attach %!/INC`HEAL=%0,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,5.5)),0),Regeneration}
+&STATUS`QRK_REGENERATION`ATTACK_END_TURN [u(cobj,age)]=@select/inline cand(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),gt(u(percent,%0),0))=1,{@attach %!/INC`HEAL=%0,round(mul(get(%0/D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE),u(scatter,8)),0),Regeneration}
 
 &STATUS`QRK_RESILIENCE [u(cobj,age)]=Resilience
 &STATUS`QRK_RESILIENCE`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Moderate
@@ -2341,7 +2341,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &SCATTER [u(Cobj,age)]=fdiv(mul(%0,add(1.0,mul([if(rand(0,1),-,)]1,0.[rjust(rand(0,u(cust,CORE,SCATTER)),2,0)]))),100)
 
 &STATUS`QRK_BLOODTHIRSTY [u(cobj,age)]=Bloodthirsty
-&STATUS`QRK_BLOODTHIRSTY`ATTACK_ON_DEFENSE_ENDTURN [u(cobj,age)]=@attach %!/INC`HEAL=%q<atker>,u(setr,blood,round(mul(add(%q<damage>,%q<dot>),u(scatter,6.5)),0)),Bloodthirsty,1;@attach %!/INC`EANNOUNCE=BLOODTHIRSTY,[ansi(hw,name(%0))] regains [ansi(118,%q<blood>)] HP!
+&STATUS`QRK_BLOODTHIRSTY`ATTACK_ON_DEFENSE_ENDTURN [u(cobj,age)]=@attach %!/INC`HEAL=%q<atker>,u(setr,blood,round(mul(add(%q<damage>,%q<dot>),u(scatter,8.5)),0)),Bloodthirsty,1;@attach %!/INC`EANNOUNCE=BLOODTHIRSTY,[ansi(hw,name(%q<atker>))] regains [ansi(118,%q<blood>)] HP!
 
 &STATUS`QRK_DESTINY [u(Cobj,age)]=Destiny
 &STATUS`QRK_DESTINY`DEFENSE_ON_CRITICAL [u(cobj,age)]=@select/inline not(get(%0/D`COMBAT`HISTORY`DESTINY`DEFENSE_ON_CRITICAL))=1,{@attach %!/INC`HYPE=%0,2,Destiny;th u(attrib_set,%0,D`COMBAT`HISTORY`DESTINY`DEFENSE_ON_CRITICAL,1)}
@@ -2585,7 +2585,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`PUSH_ATTACK`BREAK`INTENSITY [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),2,Standard,4,Substantial,6,Overwhelming)
 
 &STATUS`PUSH_DEFENSE [u(cobj,age)]=Defense
-&STATUS`PUSH_DEFENSE`DEFENSE_ON_CALCULATE [u(cobj,age)]=th u(setq,xcon,sub(%q<xcon>,mul(-1,switch(get(%0/D`COMBAT`STATUS`%1`COST),2,0.2,4,0.4,6,0.6))))
+&STATUS`PUSH_DEFENSE`DEFENSE_ON_CALCULATE [u(cobj,age)]=th u(setq,xcon,sub(%q<xcon>,switch(get(%0/D`COMBAT`STATUS`%1`COST),2,0.2,4,0.4,6,0.6)))
 &STATUS`PUSH_DEFENSE`TAGS [u(cobj,age)]=PUSH PUSH_DEFENSE DISPLAY BUFF
 &STATUS`PUSH_DEFENSE`DESCRIPTION [u(cobj,age)]=Variable Defense increase
 &STATUS`PUSH_DEFENSE`BREAK`INTENSITY [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),2,Standard,4,Substantial,6,Overwhelming)
@@ -2672,17 +2672,17 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 
 &STATUS`PUSH_INFLICT_DOT [u(cobj,age)]=Inflict-Damage Over Time
-&STATUS`PUSH_INFLICT_DOT`ATTACK_INFLICT_STATUS [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%q<atker>,PUSH_DOT,COST=[get(%0/%q<atk>`STATUS`%1`COST)]|DAMAGE=%q<damage>|DISPLAY=[get(%#/%q<atk>`STATUS`%1`DISPLAY)]|INCREMENT=0,0,4;@attach %!/INC`EANNOUNCE=DAMAGE OVER TIME,[ansi(h,%n)] will suffer Damage over Time if not quickly cured!! Uh-oh!
+&STATUS`PUSH_INFLICT_DOT`ATTACK_INFLICT_STATUS [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%q<atker>,PUSH_DOT,COST=[get(%0/%q<atk>`STATUS`%1`COST)]|HITMUL=%q<hitmul>|DAMAGEMOD=%q<damagemod>|DISPLAY=[get(%#/%q<atk>`STATUS`%1`DISPLAY)]|INCREMENT=0,0,4;@attach %!/INC`EANNOUNCE=DAMAGE OVER TIME,[ansi(h,%n)] will suffer Damage over Time if not quickly cured!! Uh-oh!
 &STATUS`PUSH_INFLICT_DOT`TAGS [u(cobj,age)]=PUSH PUSH_ATTACK DISPLAY
 &STATUS`PUSH_INFLICT_DOT`DESCRIPTIION [u(cobj,age)]=Inflicts DoT on Victim
 
 &STATUS`PUSH_DOT [u(cobj,age)]=Damage Over Time
 &STATUS`PUSH_DOT`TAGS [u(cobj,age)]=DOT PUSH DISPLAY
-&STATUS`PUSH_DOT`DEFENSE`DOT [u(cobj,age)]=u(STATUS`PUSH_DOT`DEFENSE`DOT`[get(%0/D`COMBAT`STATUS`%1`COST)],%0,%1)
-&STATUS`PUSH_DOT`DEFENSE`DOT`1 [u(cobj,age)]=bound(floor(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.08,0.03))),0)
-&STATUS`PUSH_DOT`DEFENSE`DOT`3 [u(cobj,age)]=bound(floor(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.26,0.08))),0)
-&STATUS`PUSH_DOT`DEFENSE`DOT`5 [u(cobj,age)]=bound(floor(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.31,0.2))),0)
-&STATUS`PUSH_DOT`DEFENSE`DOT`7 [u(cobj,age)]=bound(floor(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.49,0.25))),0)
+&STATUS`PUSH_DOT`DEFENSE`DOT [u(cobj,age)]=bound(floor(mul(u(cust,CORE,BASEDAMAGE),get(%0/D`COMBAT`STATUS`%1`HITMUL),get(%0/D`COMBAT`STATUS`%1`DAMAGEMOD),u(STATUS`PUSH_DOT`DEFENSE`DOT`[get(%0/D`COMBAT`STATUS`%1`COST)],%0,%1))),0)
+&STATUS`PUSH_DOT`DEFENSE`DOT`1 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.08,0.03)
+&STATUS`PUSH_DOT`DEFENSE`DOT`3 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.26,0.08)
+&STATUS`PUSH_DOT`DEFENSE`DOT`5 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.31,0.2)
+&STATUS`PUSH_DOT`DEFENSE`DOT`7 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.49,0.25)
 &STATUS`PUSH_DOT`DESCRIPTION [u(Cobj,age)]=Suffers DoT on Defense
 &STATUS`PUSH_DOT`CURE`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_DOT`CURE`INTENSITY`[get(%0/D`COMBAT`STATUS`%1`COST)],%0,%1)
 &STATUS`PUSH_DOT`CURE`INTENSITY`1 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,Small,1,Small,Tiny)
@@ -2958,7 +2958,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`HYPE [u(Cobj,age)]=th u(addto,%0,D`COMBAT`HYPE,%1);@select/inline gte(get(%0/D`COMBAT`HYPE),get(%0/D`COMBAT`HYPE`MAXIMUM))=1,{&D`COMBAT`HYPE %0=get(%0/D`COMBAT`HYPE`MAXIMUM)};@select/inline not(%3)=1,{@attach %!/INC`ANNOUNCE=[ansi(hw,name(%0))] [if(gte(%1,0),gains,loses)] [ansi(118,abs(%1))] [ansi(118,Hype)] from [ansi(hw,%2)]!}
 
-&INC`COMBAT`ATTACK`MAIN`LAUNCH [u(cobj,age)]=th [u(setq,fullname,[if(strlen(%q<atkname>),'%q<atkname>' \([get(u(cobj,agedb)/OFF`%q<off>)] Level %q<atklevel>\),[get(u(cobj,agedb)/OFF`%q<off>)] Level %q<atklevel>)])];th u(setq,boss,default(%#/D`COMBAT`BOSS,1));@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS)={@attach %!/STATUS`[before(%i0,$)]`ATTACK_BEFORE_LAUNCH=%#,%i0};@select/inline u(setr,dafter,add(get(%#/D`COMBAT`DRIVE),mul(u(setr,dcost,add(u(cost,ATTACKS,%q<atklevel>`COST),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DRIVE_COST))))),-1)))=<-25,{@attach %!/INC`DRIVE=%#,mul(%q<dcost>,-1),attack costs!,1;@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] tries to launch a [ansi(u(scalecolor,%q<atklevel>),u(u(cobj,agedb)/ATTACKS`%q<atklevel>`DESCRIPTION) [u(u(cobj,agedb)/OFF`%q<off>)])]%B[if(strlen(%q<atkname>),%q<atkname>,attack)] at [u(itemize,iter(u(sortname,%q<targets>),ansi(hw,name(%i0)),%B,\,|),|,and,\,)]! ... but can't summon the strength!;@select/inline gt(u(setr,overe,u(overexert,%#)),0)=1,{@attach %!/INC`DAMAGE=%#,floor(mul(get(%#/D`COMBAT`HEALTH),%q<overe>)),Exhaustion!}},{@dolist/inline/nobreak %q<targets>={@attach %!/INC`COMBAT`ATTACK`LAUNCH=%#,%i0,%q<extargeffs>,%q<fullname>};&D`COMCHECK`ATTACKED %#=%q<targets>;@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] launched a [ansi(u(scalecolor,%q<atklevel>),u(u(cobj,agedb)/ATTACKS`%q<atklevel>`DESCRIPTION) [u(u(cobj,agedb)/OFF`%q<off>)])]%B[if(strlen(%q<atkname>),%q<atkname>,attack)] at [u(itemize,iter(u(sortname,%q<targets>),ansi(hw,name(%i0)),%B,\,|),|,and,\,)]!;@attach %!/INC`PRIVATE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] attacked you! Respond with [ansi(hw,+defend %n=<choice>)],%q<targets>;@attach %!/INC`DRIVE=%#,mul(%q<dcost>,-1),attack costs!,1,1;@select/inline gt(u(setr,overe,u(overexert,%#)),0)=1,{@attach %!/INC`DAMAGE=%#,floor(mul(get(%#/D`COMBAT`HEALTH),%q<overe>)),Exhaustion!};@select/inline u(setr,dot,round(u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DOT))),0))=>0,{@attach %!/INC`DAMAGE=%#,%q<dot>,Damage Over Time}};
+&INC`COMBAT`ATTACK`MAIN`LAUNCH [u(cobj,age)]=th [u(setq,fullname,[if(strlen(%q<atkname>),'%q<atkname>' \([get(u(cobj,agedb)/OFF`%q<off>)] Level %q<atklevel>\),[get(u(cobj,agedb)/OFF`%q<off>)] Level %q<atklevel>)])];th u(setq,boss,default(%#/D`COMBAT`BOSS,1));@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS)={@attach %!/STATUS`[before(%i0,$)]`ATTACK_BEFORE_LAUNCH=%#,%i0};@select/inline u(setr,dafter,add(get(%#/D`COMBAT`DRIVE),mul(u(setr,dcost,add(u(CUST,ATTACKS,%q<atklevel>`COST),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DRIVE_COST))))),-1)))=<-25,{@attach %!/INC`DRIVE=%#,mul(%q<dcost>,-1),attack costs!,1;@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] tries to launch a [ansi(u(scalecolor,%q<atklevel>),u(u(cobj,agedb)/ATTACKS`%q<atklevel>`DESCRIPTION) [u(u(cobj,agedb)/OFF`%q<off>)])]%B[if(strlen(%q<atkname>),%q<atkname>,attack)] at [u(itemize,iter(u(sortname,%q<targets>),ansi(hw,name(%i0)),%B,\,|),|,and,\,)]! ... but can't summon the strength!;@select/inline gt(u(setr,overe,u(overexert,%#)),0)=1,{@attach %!/INC`DAMAGE=%#,floor(mul(get(%#/D`COMBAT`HEALTH),%q<overe>)),Exhaustion!}},{@dolist/inline/nobreak %q<targets>={@attach %!/INC`COMBAT`ATTACK`LAUNCH=%#,%i0,%q<extargeffs>,%q<fullname>};&D`COMCHECK`ATTACKED %#=%q<targets>;@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] launched a [ansi(u(scalecolor,%q<atklevel>),u(u(cobj,agedb)/ATTACKS`%q<atklevel>`DESCRIPTION) [u(u(cobj,agedb)/OFF`%q<off>)])]%B[if(strlen(%q<atkname>),%q<atkname>,attack)] at [u(itemize,iter(u(sortname,%q<targets>),ansi(hw,name(%i0)),%B,\,|),|,and,\,)]!;@attach %!/INC`PRIVATE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] attacked you! Respond with [ansi(hw,+defend %n=<choice>)],%q<targets>;@attach %!/INC`DRIVE=%#,mul(%q<dcost>,-1),attack costs!,1,1;@select/inline gt(u(setr,overe,u(overexert,%#)),0)=1,{@attach %!/INC`DAMAGE=%#,floor(mul(get(%#/D`COMBAT`HEALTH),%q<overe>)),Exhaustion!};@select/inline u(setr,dot,round(u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DOT))),0))=>0,{@attach %!/INC`DAMAGE=%#,%q<dot>,Damage Over Time}};
 
 &INC`COMBAT`ATTACK`LAUNCH [u(cobj,age)]=th u(attrib_set,%1,u(setr,atkattr,D`COMBAT`Q`%0),%3);@dolist/inline edit(u(lattr,%#/D`COMBAT`STATS`*),D`COMBAT`STATS`,)={th u(attrib_set,%1,%q<atkattr>`STATS`%i0,get(%#/D`COMBAT`STATS`%i0));th u(attrib_set,%1,%q<atkattr>`STATS`%i0`MOD,u(calcstatmod,%#,%i0,ATTACK,%q<off>))};&%q<atkattr>`ATK %1=%q<atklevel>;&%q<atkattr>`OFF %1=%q<off>;&%q<atkattr>`ARCHETYPE %1=get(%0/D`COMBAT`ARCHETYPE);&%q<atkattr>`WEIGHT %1=get(%0/D`COMBAT`WEIGHT);&%q<atkattr>`TIMESTAMP %1=secs();@attach %!/INC`CPTREE=%#,D`COMBAT`STATUS,%1,%q<atkattr>`STATUS;@attach %!/INC`CPTREE=%#,D`COMBAT`ACTIVE,%1,%q<atkattr>`ACTIVE;@dolist/inline SELL HARDSELL PULL KEEPS RESTRAIN WEIGHT={@cpattr %#/D`COMBAT`##=%1/%q<atkattr>`##};th u(attrib_set,%1,%q<atkattr>`DRIVESTATUS,u(drivestatus,%#));@attach %!/INC`CPTREE=%0,D`COMBAT`DRIVE,%1,%q<atkattr>`DRIVE
 
@@ -3031,7 +3031,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`COMBAT`DEFEND`MAIN`STRIKE [u(cobj,age)]=th u(setq,boss,default(%#/D`COMBAT`BOSS,1));@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] [ansi(118,get(u(cobj,agedb)/DEF`%q<def>`ACTION))] against [ansi(hw,name(%q<atker>))]! [ansi(118,if(%q<hitmul>,if(gte(%q<hitmul>,1.0),A Critical Hit![u(setq,htype,CRITICAL)],if(gte(%q<hitmul>,0.7),A Solid Hit![u(setq,htype,SOLID)],A Close Call![u(setq,htype,CLOSE)])),It Missed![u(setq,htype,MISS)]))];@attach %!/INC`ANNOUNCE=[u(u(cobj,agedb)/DEF`%q<def>`%q<htype>,%q<atklevel>,ansi(hw,%n),ansi(hw,name(%q<atker>)),ansi(,u(u(cobj,agedb)/OFF`[get(%#/%q<atk>`OFF)]`DESCRIPTION,%q<atklevel>)))]%B[ansi(226,%q<damage>)] [ansi(hw,damage)]![if(%q<dot>,%B[ansi(hr,%q<dot>)] more from Damage over Time!)];@attach %!/INC`DAMAGE=%#,add(%q<damage>,%q<dot>),Normal Combat,,1;@select/inline gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=1,{@attach %!/INC`ANNOUNCE=[ansi(hr,%n has been defeated!)]};th u(setq,trgbons,iter(0 1 2 3,u(calcstatmod,%#,%i0,DEFENSE,%q<def>)));
 
-&INC`COMBAT`DEFEND`MAIN`ENDTURN [u(cobj,age)]=&D`COMBAT`HISTORY`LAST_DEF_CHOICE %#=%q<def>;th u(addto,%#,D`COMBAT`NUMBERS`TIMES_DEFENDED,1);@attach %!/INC`DRIVE=%#,add(get(%#/D`COMBAT`DRIVE`GAIN),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,BONUS`DRIVE_GAIN)))),Passive Gain,1,,5;@attach %!/INC`HYPE=%#,get(%#/D`COMBAT`HYPE`GAIN),Passive Gain,1;th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_HITMUL,%q<hitmul>);th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE,%q<damage>);@dolist/inline edit(lattr(%0/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_PRE_BONUS=%#,%i0};@select/inline u(setr,ftb,cand(not(get(%#/D`COMBAT`NO_FIRST_BONUS)),eq(get(%#/D`COMBAT`NUMBERS`TIMES_DEFENDED),1),not(get(%#/D`COMBAT`NUMBERS`TIMES_ATTACKED))))=1,{@attach %!/INC`DRIVE=%#,15,First Turn Bonus,1};@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] passively gains [ansi(118,if(%q<ftb>,add(get(%#/D`COMBAT`DRIVE`GAIN),15),get(%#/D`COMBAT`DRIVE`GAIN)))] [ansi(118,Drive)] [if(%q<ftb>,\(First Turn Defense Bonus!\)%B)]and [ansi(118,get(%#/D`COMBAT`HYPE`GAIN))] [ansi(118,Hype)]!;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_END_TURN=%#,%i0};@dolist/inline get(%#/%q<atk>`ACTIVE`STATUS`ATTACK)={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_DEFENSE_ENDTURN=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`ENDTURN`STATUS=%#;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_FINAL_ENDTURN=%#,%i0};&D`COMBAT`HYPE`USED %#=0;&D`COMBAT`SELL %#=0;&D`COMBAT`HARDSELL %#=0;@attach %!/INC`CPTREE=%#,D`COMBAT,%#,D`COMBACK
+&INC`COMBAT`DEFEND`MAIN`ENDTURN [u(cobj,age)]=&D`COMBAT`HISTORY`LAST_DEF_CHOICE %#=%q<def>;th u(addto,%#,D`COMBAT`NUMBERS`TIMES_DEFENDED,1);@attach %!/INC`DRIVE=%#,add(get(%#/D`COMBAT`DRIVE`GAIN),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,BONUS`DRIVE_GAIN)))),Passive Gain,1,,5;@attach %!/INC`HYPE=%#,get(%#/D`COMBAT`HYPE`GAIN),Passive Gain,1;th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_HITMUL,%q<hitmul>);th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE,%q<damage>);@dolist/inline edit(lattr(%0/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_PRE_BONUS=%#,%i0};@select/inline u(setr,ftb,cand(not(get(%#/D`COMBAT`NO_FIRST_BONUS)),eq(get(%#/D`COMBAT`NUMBERS`TIMES_DEFENDED),1),not(get(%#/D`COMBAT`NUMBERS`TIMES_ATTACKED))))=1,{@attach %!/INC`DRIVE=%#,15,First Turn Bonus,,1};@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] passively gains [ansi(118,if(%q<ftb>,add(get(%#/D`COMBAT`DRIVE`GAIN),15),get(%#/D`COMBAT`DRIVE`GAIN)))] [ansi(118,Drive)] [if(%q<ftb>,\(First Turn Defense Bonus!\)%B)]and [ansi(118,get(%#/D`COMBAT`HYPE`GAIN))] [ansi(118,Hype)]!;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_END_TURN=%#,%i0};@dolist/inline get(%#/%q<atk>`ACTIVE`STATUS`ATTACK)={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_DEFENSE_ENDTURN=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`ENDTURN`STATUS=%#;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_FINAL_ENDTURN=%#,%i0};&D`COMBAT`HYPE`USED %#=0;&D`COMBAT`SELL %#=0;&D`COMBAT`HARDSELL %#=0;@attach %!/INC`CPTREE=%#,D`COMBAT,%#,D`COMBACK
 
 &INC`COMBAT`DEFEND`MAIN`ENDTURN`STATUS [u(cobj,age)]=@dolist/inline/nobreak u(setr,sall,get(%0/D`COMBAT`ACTIVE`STATUS`DEFENSE))={th u(addto,%0,D`COMBAT`STATUS`%i0`INCREMENT,1);@select/inline u(setr,srem,get(%0/D`COMBAT`STATUS`%i0`DEFENSE_TURNS))=X,{},>0,{th u(attrib_set,%0,D`COMBAT`STATUS`%i0`DEFENSE_TURNS,sub(%q<srem>,1));@stop get(%0/D`COMBAT`STATUS`%i0`DEFENSE_TURNS);th u(attrib_set,%0,D`COMBAT`ACTIVE`STATUS`DEFENSE,setdiff(get(%0/D`COMBAT`ACTIVE`STATUS`DEFENSE),%i0));@stop cor(strmatch(get(%0/D`COMBAT`STATUS`%i0`ATTACK_TURNS),X),gt(u(lmax,iter(ATTACK DEFENSE,get(%0/D`COMBAT`STATUS`%i1`%i0_TURNS))),0));@attach %!/KILLSTATUS=%0,%i0}};
 
@@ -3042,7 +3042,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &OVEREXERT [u(cobj,age)]=localize(mul(get(%0/D`COMBAT`DRIVE`EXHAUSTION_MULTIPLIER),get(u(cobj,agedb)/DRIVES`[get(%0/D`COMBAT`DRIVE`STATUS)]`DAMAGE)))
 
 @@ PUSH CODE
-&INC`COMBAT`PUSH`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat ready.;@stop gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=@attach %!/INC`MSG=ERROR: The defeated can do no such thing!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: No Push entered to activate.;@check strlen(u(setr,push,u(FIND_MULTI,PUSH,%0)))=@attach %!/INC`MSG=ERROR: Push not found!;@stop gt(words(%q<push>),1)=@attach %!/INC`MSG=ERROR: That matches Pushes: [iter(%q<push>,get(u(cobj,agedb)/PUSH`%i0),%b,\,%b)]. Please be more specific.;@select/inline words(u(setr,hypecost,get(u(cobj,agedb)/PUSH`%q<push>`CHOICES)),|)=>1,{@check strlen(%1)=@attach %!/INC`MSG=ERROR: No cost chosen!;@attach %!/INC`PARTIAL=%1,%q<hypecost>,|,hypecost};@check gte(u(setr,starthype,get(%#/D`COMBAT`HYPE)),%q<hypecost>)=@attach %!/INC`MSG=ERROR: Not enough Hype!;@attach [u(cobj,agedb)]/PUSH`%q<push>`ACTIVATE=%#,%2;th u(addto,%#,D`COMBAT`HYPE,mul(-1,%q<hypecost>));th u(setq,afterhype,get(%#/D`COMBAT`HYPE));@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>%B))][ansi(hw,%n)] uses a [ansi(118,Push)]!;@pemit %#=[ansi(90,COMBAT:)] You used [ansi(118,Push)]: [get(u(cobj,agedb)/PUSH`%q<push>)];th u(setq,testers,u(filter,TESTER,lplayers(%l)));@pemit/list %q<testers>=[ansi(90,COMBAT:)] [ansi(177,MATRIX:)]%b%n used: [get(u(cobj,agedb)/PUSH`%q<push>)][if(%q<pushchoice>,%B\(%q<pushchoice>\))];@dolist/inline edit(lattr(%#/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`PUSH_ON_ACTIVATE=%#,%i0,%q<push>,%q<statid>};th u(addto,%#,D`COMBAT`HYPE`USED,%q<hypecost>)
+&INC`COMBAT`PUSH`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat ready.;@stop gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=@attach %!/INC`MSG=ERROR: The defeated can do no such thing!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: No Push entered to activate.;@check strlen(u(setr,push,u(FIND_MULTI,PUSH,%0)))=@attach %!/INC`MSG=ERROR: Push not found!;@stop gt(words(%q<push>),1)=@attach %!/INC`MSG=ERROR: That matches Pushes: [iter(%q<push>,get(u(cobj,agedb)/PUSH`%i0),%b,\,%b)]. Please be more specific.;@select/inline words(u(setr,hypecost,get(u(cobj,agedb)/PUSH`%q<push>`CHOICES)),|)=>1,{@check strlen(%1)=@attach %!/INC`MSG=ERROR: No cost chosen!;@attach %!/INC`PARTIAL=%1,%q<hypecost>,|,hypecost};@check gte(u(setr,starthype,get(%#/D`COMBAT`HYPE)),%q<hypecost>)=@attach %!/INC`MSG=ERROR: Not enough Hype!;@attach [u(cobj,agedb)]/PUSH`%q<push>`ACTIVATE=%#,%2;th u(addto,%#,D`COMBAT`HYPE,mul(-1,%q<hypecost>));th u(setq,afterhype,get(%#/D`COMBAT`HYPE));@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>%B))][ansi(hw,%n)] uses a [ansi(118,Push)]!;@attach %!/INC`EPRIVATE=PUSH,You used [ansi(118,Push)]: [get(u(cobj,agedb)/PUSH`%q<push>)];th u(setq,testers,u(filter,TESTER,lplayers(%l)));@attach %!/INC`DEBUG=PUSH,%n used: [get(u(cobj,agedb)/PUSH`%q<push>)][if(%q<pushchoice>,%B\(%q<pushchoice>\))];@dolist/inline edit(lattr(%#/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`PUSH_ON_ACTIVATE=%#,%i0,%q<push>,%q<statid>};th u(addto,%#,D`COMBAT`HYPE`USED,%q<hypecost>)
 
 
 &INC`COMBAT`PUSH`LIST [u(cobj,age)]=@pemit %#=u(header,Available Pushes);@dolist/inline u(sortattr,u(lattr,u(cobj,agedb)/PUSH`*))={@pemit %#=u(separator,get(u(cobj,agedb)/%i0));@dolist/inline/delimit | [get(u(Cobj,agedb)/%i0`CHOICES)]={@pemit %#=[ansi(h,%i0 Hype:)]%B[get(u(cobj,agedb)/%i1`%i0)]}};@pemit %#=u(footer)
