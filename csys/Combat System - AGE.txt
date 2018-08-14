@@ -277,7 +277,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &ATTACKS`2`DESCRIPTION [u(cobj,agedb)]=Standard
 
 &ATTACKS`3 [u(cobj,agedb)]=3.0
-&ATTACKS`3`COST [u(cobj,agedb)]=30
+&ATTACKS`3`COST [u(cobj,agedb)]=25
 &ATTACKS`3`PERCENTAGE [u(cobj,agedb)]=0.225
 &ATTACKS`3`DESCRIPTION [u(cobj,agedb)]=Heavy
 
@@ -783,7 +783,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`CHARGEN`SELECT`MANTLE [u(cobj,age)]=@attach %!/INC`SELECT`PLAYER;@attach %!/INC`FINDMANTLELINK=%q<t1id>,%2;&D`SELECT`MANTLE %#=%q<mantle_id>;&D`SELECT`MODE %#=MANTLE;@attach %!/INC`SHOWSELECT
 
-&INC`FINDMANTLELINK [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: No mantle selected!;@select/inline isint(%1)=1,{@check u(setr,mantle_id,first(u(setr,res,u(mysql,SELECT`MANTLE_LINK_ID`EXACT,%0,%1))))=@attach %!/INC`MSG=ERROR: Mantle '%1' not found.},0,{@check cor(u(setr,mantle_id,first(u(setr,res,u(mysql,SELECT`MANTLE_LINK_NAME`EXACT,%0,%1)))),u(setr,mantle_id,first(u(setr,res,u(mysql,SELECT`MANTLE_LINK_NAME`WILD,%0,%1)))))=@attach %!/INC`MSG=ERROR: Mantle '%1' not found!};th u(setq,link_id,elements(%q<res>,2));th u(setq,link_locked,elements(%q<res>,3));th u(setq,archetype_id,elements(%q<res>,4))
+&INC`FINDMANTLELINK [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: No mantle selected!;@select/inline isint(%1)=1,{@check u(setr,mantle_id%2,first(u(setr,res,u(mysql,SELECT`MANTLE_LINK_ID`EXACT,%0,%1))))=@attach %!/INC`MSG=ERROR: Mantle '%1' not found.},0,{@check cor(u(setr,mantle_id%2,first(u(setr,res,u(mysql,SELECT`MANTLE_LINK_NAME`EXACT,%0,%1)))),u(setr,mantle_id%2,first(u(setr,res,u(mysql,SELECT`MANTLE_LINK_NAME`WILD,%0,%1)))))=@attach %!/INC`MSG=ERROR: Mantle '%1' not found!};th u(setq,link_id%2,elements(%q<res>,2));th u(setq,link_locked%2,elements(%q<res>,3));th u(setq,archetype_id%2,elements(%q<res>,4))
 
 &INC`CHARGEN`VIEW`MAIN [u(cobj,age)]=@attach %!/INC`SELECT`PLAYER;@attach %!/INC`SELECT`MANTLE;@attach %!/INC`SHOWSELECT
 
@@ -805,9 +805,9 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`SELECT`MANTLE [u(cobj,age)]=@attach %!/INC`LOAD`MANTLE=get(%#/D`SELECT`MANTLE),%0
 
-&INC`LOAD`MANTLE [u(cobj,age)]=th u(setq,m%1id,%0);th u(setq,mdat,u(mysql3,LOAD`MANTLE_LINK,r(m%1id),%q<t1id>));th iter(linkid displaynum owner approved parent id name creation version stats archetype type lock,u(setq,m%1%i0,elements(%q<mdat>,inum(0),chr(177))));
+&INC`LOAD`MANTLE [u(cobj,age)]=th u(setq,m%1id,%0);th u(setq,mdat,u(mysql3,LOAD`MANTLE_LINK,r(m%1id),u(strfirstof,%2,%q<t1id>)));th iter(linkid displaynum owner approved parent id name creation version stats archetype type lock,u(setq,m%1%i0,elements(%q<mdat>,inum(0),chr(177))));
 
-&Q`LOAD`MANTLE_LINK [u(cobj,age)]=SELECT mantle_link_id,mantle_link_display_num,character_id,mantle_link_approved,mantle_link_parent_id,mantle_id,mantle_name,mantle_date_created_secs,mantle_version,mantle_stats,mantle_archetype FROM volv_mantle_link WHERE mantle_id=? AND character_id=?
+&Q`LOAD`MANTLE_LINK [u(cobj,age)]=SELECT mantle_link_id,mantle_link_display_num,character_id,mantle_link_approved,mantle_link_parent_id,mantle_id,mantle_name,mantle_date_created_secs,mantle_version,mantle_stats,mantle_archetype,mantle_link_type,mantle_link_locked FROM volv_mantle_link WHERE mantle_id=? AND character_id=?
 
 @@ --------- SECTION FOR +CREATE
 
@@ -817,7 +817,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &Q`EXIST`MANTLE [u(cobj,age)]=SELECT mantle_id FROM volv_mantle_link WHERE character_id=? AND mantle_name=?
 
-&INC`CHARGEN`CREATE`MANTLE`DO [u(cobj,age)]=@attach %!/INC`DOSQL=NEW`MANTLE/mantle_id,%0;@attach %!/INC`DOSQL=NEW`MANTLE2,%q<mantle_id>,u(VERSION,%#);@dolist/inline u(lattr,u(cobj,agedb)/ENTITY`0`STAT`*)={@attach %!/INC`DOSQL=NEW`MANTLE_TRAIT,%q<mantle_id>,last(%i0,`),0,get(u(cobj,agedb)/%i0`DEFAULT)};@attach %!/INC`DOSQL=NEW`MANTLE_LINK,%1,%q<mantle_id>,u(mysql,COUNT`MANTLE_LINKS,%1),0;
+&INC`CHARGEN`CREATE`MANTLE`DO [u(cobj,age)]=@attach %!/INC`DOSQL=NEW`MANTLE/mantle_id,%0;@attach %!/INC`DOSQL=NEW`MANTLE2,%q<mantle_id>,u(VERSION,%#);@dolist/inline u(lattr,u(cobj,agedb)/ENTITY`0`STAT`*)={@attach %!/INC`DOSQL=NEW`MANTLE_TRAIT,%q<mantle_id>,last(%i0,`),0,get(u(cobj,agedb)/%i0`DEFAULT)};@attach %!/INC`DOSQL=NEW`MANTLE_LINK,%1,%q<mantle_id>,u(mysql,COUNT`MANTLE_LINKS,%1),0,NULL,0;
 
 &Q`COUNT`MANTLE_LINKS [u(cobj,age)]=SELECT MAX(mantle_link_display_num)+1 FROM volv_mantle_link WHERE character_id=?
 
@@ -827,7 +827,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &Q`NEW`MANTLE_TRAIT [u(cobj,age)]=INSERT INTO vol_ctrait (centity_id,trait_id,trait_type,trait_value) VALUES (?,?,?,?)
 
-&Q`NEW`MANTLE_LINK [u(cobj,age)]=INSERT INTO vol_clink (character_id,centity_id,clink_display_num,clink_type) VALUES (?,?,?,?)
+&Q`NEW`MANTLE_LINK [u(cobj,age)]=INSERT INTO vol_clink (character_id,centity_id,clink_display_num,clink_type,clink_parent,clink_locked) VALUES (?,?,?,?,!,?)
 
 @@ ------ +DELETE SECTION
 &INC`CHARGEN`DELETE`MAIN [u(cobj,age)]=@check strlen(%0)=@attach %!/INC`MSG=What will you delete?;@attach %!/INC`PARTIAL=%0,MANTLE,|,type;@attach %!/INC`CHARGEN`DELETE`%q<type>
@@ -1074,7 +1074,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &PUSH`7`3 [u(cobj,agedb)]=You are cured of all Debuff or Damage Over Time effects of Moderate/Small severity or lower.
 &PUSH`7`5 [u(cobj,agedb)]=You are cured of all Debuff or Damage Over Time effects of Significant/Standard severity or lower.
 &PUSH`7`7 [u(cobj,agedb)]=You are cured of all Debuff or Damage Over Time effects of Superior/Substantial severity or lower.
-&PUSH`7`ACTIVATE [u(cobj,agedb)]=@attach %!/INC`SETSTATUS=%#,%#,PUSH_CURE,COST=%q<hypecost>,0,0
+&PUSH`7`ACTIVATE [u(cobj,agedb)]=@check words(u(setr,tocure,u(filter,COSTCOMPARE,setunion(get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`DEBUFF),get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`DOT)),%b,%b,CURE,switch(get(%0/D`COMBAT`STATUS`%1`COST),3,Moderate,5,Significant,7,Superior),switch(get(%0/D`COMBAT`STATUS`%1`COST),3,Small,5,Standard,7,Substantial),%0)))=@attach %!/INC`MSG=ERROR: Nothing to cure! Either no applicable Statuses found or existing Statuses are too potent.;@dolist/inline %q<tocure>={@attach %!/KILLSTATUS=%0,%i0,1};@attach %!/INC`EANNOUNCE=CURE,[ansi(hw,%n)] shrugs off negative Status Effects!
 
 &PUSH`8 [u(cobj,agedb)]=Break
 &PUSH`8`CHOICES [u(cobj,agedb)]=3|5|7
@@ -2789,18 +2789,19 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 @@ Cancel
 
-&INC`COMBAT`CANCEL`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBACK`**)=@attach %!/INC`MSG=ERROR: You cannot restore a previous state now.;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will restore combat state before launching any attacks or using Pushes. Are you sure? Enter the same command again to verify.,COMBAT RESTORE;@dolist/inline get(%#/D`COMCHECK`ATTACKED)={@attach %!/WIPE=%i0,D`COMBAT`Q`%#;@pemit %i0=[ansi(90,COMBAT:)]%B[ansi(hw,%n)] withdrew their attack against you!};@attach %!/WIPE=%#,D`COMCHECK`ATTACKED;@attach %!/WIPE=%#,D`COMBAT;@attach %!/INC`MVTREE=%#,D`COMBACK,%#,D`COMBAT:@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] undid canceled all combat actions!
+&INC`COMBAT`CANCEL`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBACK`**)=@attach %!/INC`MSG=ERROR: You cannot restore a previous state now.;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will restore combat state before launching any attacks or using Pushes. Are you sure? Enter the same command again to verify.,COMBAT RESTORE;@dolist/inline get(%#/D`COMCHECK`ATTACKED)={@attach %!/WIPE=%i0,D`COMBAT`Q`%#;@pemit %i0=[ansi(90,COMBAT:)]%B[ansi(hw,%n)] withdrew their attack against you!};@attach %!/WIPE=%#,D`COMCHECK`ATTACKED;@attach %!/WIPE=%#,D`COMBAT;@attach %!/INC`MVTREE=%#,D`COMBACK,%#,D`COMBAT;@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] undid canceled all combat actions!
 
 @@ Scan
 &INC`COMBAT`SCAN`MAIN [u(cobj,age)]=@pemit %#=u(header,Combatants);@pemit %#=ansi(u(color,%#,COLUMN_NAMES),align(15 15 10 10 10 12,Name,Archetype,Weight,Drive,HP,Consequences));@pemit %#=u(separator);@dolist/inline u(filter,COMBATREADY,lplayers(%l))={@pemit %#=align(15 15 10 10 10 12,u(moniker,%i0),u(GET`ARCHETYPE,%i0)[if(get(%i0/D`COMBAT`MANTLE`LOCKED),\(P\))],ansi(u(scalecolor,get(%i0/D`COMBAT`STATS`4)),u(fancyweight,%i0)),get(%i0/D`COMBAT`DRIVE`STATUS),ansi(u(ryg,sub(100,bound(u(setr,hp,round(mul(u(percent,%i0),100),0)),0))),%q<hp>\%),u(fancycon,%i0))};@pemit %#=u(footer)
 
-&FANCYCON [u(cobj,age)]=switch(get(%0/D`CONSEQUENCES),1,ansi(228,Mild),2,ansi(215,Moderate),3,ansi(202,Severe),ansi(hx,None))
+&FANCYCON [u(cobj,age)]=switch(if(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES),0),1,ansi(228,Mild),2,ansi(215,Moderate),3,ansi(202,Severe),ansi(hx,None))
+&FANCYCON2 [u(cobj,age)]=switch(if(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES),0),1,ansi(228,Mild Consequences),2,ansi(215,Moderate Consequences),3,ansi(202,Severe Consequences),ansi(hx,No Consequences))
 
 &FIL`COMBATREADY [u(cobj,age)]=cand(hasflag(%0,CONNECTED),nattr(%0/D`COMBAT`**))
 
 @@ MANTLE SELECT
-&COMBAT`MANTLE`PLAYER [u(cobj,age)]=CLAIM|RELEASE|LOAN|REVOKE
-&COMBAT`MANTLE`ADMIN [u(cobj,age)]=PUBLISH|RAWPUBLISH|UNPUBLISH
+&COMBAT`MANTLE`PLAYER [u(cobj,age)]=CLAIM|RELEASE
+&COMBAT`MANTLE`ADMIN [u(cobj,age)]=PUBLISH|RAWPUBLISH|UNPUBLISH|LOAN|REVOKE
 
 &INC`COMBAT`MANTLE`PUBLISH [u(cobj,age)]=@attach %!/INC`FINDMANTLELINK=%q<t1id>,%0;@attach %!/INC`LOAD`MANTLE=%q<mantle_id>,1;@attach %!/INC`VALID`GROUPLOCK=%2;th u(call`3,volp_lock,0,%q<mantle_id>,'LOAN','[sqlescape(%q<value>)]');@attach %!/INC`MSG=You have published Mantle %q<m1displaynum> '%q<m1name>' to: %q<value> (%q<valueformat)
 
@@ -2816,7 +2817,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`FINDGLOBAL [u(cobj,age)]=@check strlen(%0)=@attach %!/INC`MSG=ERROR: No mantle selected!;@select/inline t(match(%1,%0))=1,{th u(setq,mantle_id,%0)},0,{@check cor(u(setr,mantle_id,u(mysql,SELECT`MANTLE_GLOBAL_NAME`EXACT,%0,u(sql`in`number,%1))),u(setr,mantle_id,u(mysql,SELECT`MANTLE_GLOBAL_NAME`WILD,sqlescape(%0),u(SQL`IN`NUMBER,%1))))=@attach %!/INC`MSG=ERROR: Mantle '%1' not found!};
 
-&INC`LINKGLOBAL [u(cobj,age)]=@attach %!/INC`DOSQL=NEW`MANTLE_LINK,%0,%1,u(mysql,COUNT`MANTLE_LINKS,%0),1;
+&INC`LINKGLOBAL [u(cobj,age)]=@attach %!/INC`DOSQL=NEW`MANTLE_LINK,%0,%1,u(mysql,COUNT`MANTLE_LINKS,%0),1,NULL,1;
 
 &Q`SELECT`MANTLE_GLOBAL_NAME`EXACT [u(cobj,age)]=SELECT mantle_id FROM volv_mantle WHERE mantle_name=? AND mantle_id IN (!) LIMIT 1
 &Q`SELECT`MANTLE_GLOBAL_NAME`WILD [u(cobj,age)]=SELECT mantle_id FROM volv_mantle WHERE mantle_name LIKE '!%%' AND mantle_id IN (!)
@@ -2843,6 +2844,18 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &Q`FIND`MANTLE [u(cobj,age)]=SELECT mantle_id from volv_mantle_link WHERE character_id=? AND (mantle_name=? OR mantle_link_display_num=?) ORDER BY mantle_name LIMIT 1
 &Q`FIND`MANTLE`PARTIAL [u(cobj,age)]=SELECT mantle_id from volv_mantle_link WHERE character_id=? AND mantle_name LIKE '!%%' ORDER BY mantle_name LIMIT 1
 
+&INC`COMBAT`MANTLE`LOAN [u(cobj,age)]=@attach %!/INC`FINDMANTLELINK=%q<t1id>,%0;@attach %!/INC`LOAD`MANTLE=%q<mantle_id>,1;@attach %!/INC`CHECKPC=%2,2;@stop u(mysql,SELECT`CONFLICT_LINK,%q<t2id>,%q<m1name>,%q<m1id>)=@attach %!/INC`MSG=ERROR: %q<t2name> either has this already or would suffer a name conflict.;@attach %!/INC`DOSQL=NEW`MANTLE_LINK,%q<t2id>,%q<m1id>,u(mysql,COUNT`MANTLE_LINKS,%q<t2id>),1,%q<m1linkid>,1;@attach %!/INC`MSG=Loaned %q<t2name> the %q<m1name> Mantle!;@attach %!/INC`MSG`CHAN=Loaned %q<t2name> the %q<m1name> Mantle!;@attach %!/INC`MSG=%n loaned you the %q<m1name> mantle!,%q<t2>
+
+&Q`SELECT`CONFLICT_LINk [u(cobj,age)]=SELECT mantle_id FROM volv_mantle_link WHERE character_id=? AND (mantle_name=? OR mantle_id=?)
+
+&INC`COMBAT`MANTLE`RELEASE [u(Cobj,age)]=@attach %!/INC`FINDMANTLELINK=%q<t1id>,%0;@attach %!/INC`LOAD`MANTLE=%q<mantle_id>,1;@check %q<m1type>=@attach %!/INC`MSG=ERROR: That Mantle is yours!;@attach %!/INC`DOSQL=DELETE`MANTLE_LINK,%q<m1linkid>;@attach %!/INC`MSG=Mantle released!
+
+&Q`DELETE`MANTLE_LINK [u(cobj,age)]=DELETE FROM vol_clink WHERE clink_id=?
+
+&INC`COMBAT`MANTLE`REVOKE [u(cobj,age)]=@attach %!/INC`CHECKPC=%0,2;@attach %!/INC`FINDMANTLELINK=%q<t2id>,%2;@attach %!/INC`LOAD`MANTLE=%q<mantle_id>,1,%q<t2id>;@check %q<m1type>=@attach %!/INC`MSG=ERROR: Cannot revoke an innate Mantle!;@check cor(u(isadmin,%#),match(u(mysql,SELECT`MY_LINKS,%q<t1id>),%q<m1owner>))=@attach %!/INC`MSG=ERROR: Permission denied.;@attach %!/INC`DOSQL=DELETE`MANTLE_LINK,%q<m1linkid>;@attach %!/INC`MSG=Mantle revoked!;@attach %!/INC`MSG=Your %q<m1name> Mantle was revoked by %n!,%q<t2>;@attach %!/INC`MSG`CHAN=Revoked %q<t2name>'s %q<m1name> Mantle!
+
+&Q`SELECT`MY_LINKS [u(cobj,age)]=SELECT mantle_id FROM volv_mantle_link WHERE character_id=? AND mantle_link_type=0 AND mantle_link_locked=0
+
 @@ CSETUP
 
 &INC`CHARGEN`CSETUP`MAIN [u(cobj,age)]=@check u(tester,%#)=@attach %!/INC`MSG=ERROR: Permission denied.;@attach %!/INC`CHECKPC=%0,1;@attach %!/INC`FINDMANTLELINK=%q<t1id>,%q<t1name>;&D`CSYS`MANTLE %q<t1>=%q<mantle_id>;&D`CSYS`MANTLE`LINK %q<t1>=%q<link_id>;&D`CSYS`MANTLE`LOCKED %q<t1>=%q<link_locked>;&D`CSYS`MANTLE`ARCHETYPE %q<t1>=%q<archetype_id>;@attach %!/INC`COMBAT`READYCHARACTER=%q<t1objid>,%q<mantle_id>,get(%q<t1>/D`CSYS`MANTLE`LINK),get(%q<t1>/D`CSYS`MANTLE`LOCKED);@attach %!/INC`MSG=You have setup %q<t1name> for battle!
@@ -2866,7 +2879,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &Q`READY`MANTLE [u(cobj,age)]=SELECT mantle_stats,mantle_archetype,mantle_accolades FROM volv_mantle WHERE mantle_id=? LIMIT 1
 &Q`READY`QUIRKS [u(cobj,age)]=SELECT trait_id FROM vol_clink_trait WHERE clink_id=? AND trait_type=2 AND trait_value>0
 
-&INC`COMBAT`READYCHARACTER`FINISH [u(cobj,age)]=@attach %!/INC`COMBAT`READYCHARACTER`FINISH`STARTING;@attach %!/INC`COMBAT`READYCHARACTER`FINISH`WEIGHT;@dolist/inline get(%0/D`COMBAT`QUIRKS)={@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/QRK`%i0`STATUS),,X,X};@attach/localize %!/INC`COMBAT`READYCHARACTER`FINISH`STATIC;th u(attrib_set,%0,D`COMBAT`HEALTH`ORIGINAL,get(%0/D`COMBAT`HEALTH));@select/inline t(get(%0/D`CONSEQUENCES))=1,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),switch(get(%0/D`CONSEQUENCES),1,0.9,2,0.75,3,0.6),default(%0/D`CSYS`TANK,1)),0))},0,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),default(%0/D`CSYS`TANK,1)),0))};&D`CSYS`TANK %0=1
+&INC`COMBAT`READYCHARACTER`FINISH [u(cobj,age)]=@attach %!/INC`COMBAT`READYCHARACTER`FINISH`STARTING;@attach %!/INC`COMBAT`READYCHARACTER`FINISH`WEIGHT;@dolist/inline get(%0/D`COMBAT`QUIRKS)={@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/QRK`%i0`STATUS),,X,X};@attach/localize %!/INC`COMBAT`READYCHARACTER`FINISH`STATIC;th u(attrib_set,%0,D`COMBAT`HEALTH`ORIGINAL,get(%0/D`COMBAT`HEALTH));@select/inline cand(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES))=1,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),switch(get(%0/D`CONSEQUENCES),1,0.9,2,0.75,3,0.6),default(%0/D`CSYS`TANK,1)),0))},0,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),default(%0/D`CSYS`TANK,1)),0))};th u(attrib_set,%0,D`COMBAT`DRIVE`MAXIMUM,mul(get(%0/D`COMBAT`DRIVE`MAXIMUM),default(%0/D`CSYS`TANK,1)));th u(attrib_set,%0,D`COMBAT`HYPE`MAXIMUM,mul(get(%0/D`COMBAT`HYPE`MAXIMUM),default(%0/D`CSYS`TANK,1)));&D`CSYS`TANK %0=1
 
 @@ @attach %!/INC`COMBAT`READYCHARACTER`FINISH`CALC;@attach %!/INC`COMBAT`READYCHARACTER`FINISH`STATS;
 
@@ -2895,7 +2908,9 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &Q`SCENE`ACTORS [u(cobj,age)]=SELECT character_objid FROM volv_actor_agg WHERE scene_id=? AND action_count>0
 
 @@ - KEEPS
-&INC`COMBAT`KEEPS`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not readied for battle.;@check get(%#/D`COMBAT`ARCHETYPE)=@attach %!/INC`MSG=ERROR: Unshaped Mantles may not use +keeps.;@stop get(%#/D`COMBAT`KEEPS)=@attach %!/INC`MSG=ERROR: Keeps is already active! Go the distance!;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] Consequences await. Are you SURE you want to use Keeps this fight? Type +keeps again to verify!,KEEPS;th u(attrib_set,%#,D`COMBAT`PULL,0);th u(attrib_set,%#,D`COMBAT`WEIGHT,u(setr,newwt,u(WEIGHT`UPGRADE,get(%#/D`COMBAT`WEIGHT`ORIGINAL))));th u(attrib_set,%#,D`COMBAT`KEEPS,1);@attach %!/INC`SETSTATUS=%#,%#,SPC_KEEPS,,1,1;@attach %!/INC`EANNOUNCE=KEEPS,Look out! [ansi(hw,%n)] is fighting for Keeps! Weight upgraded to [ansi(hw,capstr(%q<newwt>))]
+&INC`COMBAT`KEEPS`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not readied for battle.;@check get(%#/D`COMBAT`ARCHETYPE)=@attach %!/INC`MSG=ERROR: Unshaped Mantles may not use +keeps.;@stop get(%#/D`COMBAT`KEEPS)=@attach %!/INC`MSG=ERROR: Keeps is already active! Go the distance!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Reason empty!;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] Consequences await. Are you SURE you want to use Keeps this fight? Type +keeps again to verify!,KEEPS;th u(attrib_set,%#,D`COMBAT`PULL,0);th u(attrib_set,%#,D`COMBAT`WEIGHT,u(setr,newwt,u(WEIGHT`UPGRADE,get(%#/D`COMBAT`WEIGHT`ORIGINAL))));th u(attrib_set,%#,D`COMBAT`KEEPS,1);@attach %!/INC`SETSTATUS=%#,%#,SPC_KEEPS,,1,1;@attach %!/INC`EANNOUNCE=KEEPS,Look out! [ansi(hw,%n)] is fighting for Keeps! Weight upgraded to [ansi(hw,capstr(%q<newwt>))];@attach %!/INC`MSG`CHAN=%n is fighting for Keeps! (%0);@attach %!/INC`DOSQL=LOG`KEEPS,get(%#/D`ID),%0
+
+&Q`LOG`KEEPS [u(Cobj,age)]=INSERT INTO vol_clog (character_id,clog_date_created,clog_type,clog_text) VALUES (?,UTC_TIMESTAMP(),0,?)
 
 &KEEPBONUS [u(Cobj,age)]=3
 
@@ -2904,6 +2919,8 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`SPC_KEEPS`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=mul(v(KEEPBONUS),default(%0/D`COMBAT`NUMBERS`TIMES_DEFENDED,0))
 &STATUS`SPC_KEEPS`ATTACK`BONUS`STAT`2 [u(cobj,age)]=mul(v(KEEPBONUS),default(%0/D`COMBAT`NUMBERS`TIMES_ATTACKED,0))
 &STATUS`SPC_KEEPS`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=mul(v(KEEPBONUS),default(%0/D`COMBAT`NUMBERS`TIMES_DEFENDED,0))
+
+&INC`COMBAT`KEEPS`CHECK [u(cobj,age)]=
 
 @@ - STATS
 
@@ -2930,7 +2947,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &INC`COMBAT`STATS`MAIN [u(cobj,age)]=@attach %!/INC`CHECKPC=u(strfirstof,if(u(tester,%#),%0),%#),1;@check nattr(%q<t1>/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: %q<t1name> is not readied for battle.;@pemit %#=u(header,%q<t1name> - Stats);@attach %!/INC`COMBAT`STATS`DISPLAY;@pemit %#=u(footer)
 
 
-&INC`COMBAT`STATS`DISPLAY [u(cobj,age)]=@pemit %#=align(1. 50 1. 23 1.,ansi(u(color,%#,BORDER),|),u(setr,startsec,u(fancyweight,%q<t1>)[repeat(*,get(%q<t1>/D`COMBAT`STATS`5`ORIG))]%b[ansi(hw,default(u(cobj,agedb)/ARC`[default(%q<t1>/D`COMBAT`ARCHETYPE,0)],Unpublished))]%B[ansi(220,repeat(*,get(%q<t1>/D`COMBAT`ACCOLADES)))])[rjust(u(fancycon,%q<t1>),sub(50,strlen(%q<startsec>),10))]%R[rjust(ansi(h,HP:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(u(setr,perc,mul(%i0,5)),100),u(percent,%q<t1>)),ansi(u(ryg,sub(100,%q<perc>)),|),%B),%b,)][ansi(h,>>)]%B[ansi(h,[sub(get(%q<t1>/D`COMBAT`HEALTH),get(%q<t1>/D`COMBAT`DAMAGE))]/[get(%q<t1>/D`COMBAT`HEALTH)]%B\([before(round(mul(u(percent,%q<t1>),100),0),.)]\%\))]%R[rjust(ansi(h,Drive:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`DRIVE),get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM))),ansi(u(drivebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`DRIVE)]/[get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM)]%B\([get(%q<t1>/D`COMBAT`DRIVE`STATUS)]\))]%R[rjust(ansi(h,Hype:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`HYPE),get(%q<t1>/D`COMBAT`HYPE`MAXIMUM))),ansi(u(hypebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`HYPE)]/[get(%q<t1>/D`COMBAT`HYPE`MAXIMUM)])],ansi(u(color,%#,BORDER),|),center(ansi(%q<qcolor>,Quirks),23)%R[iter(get(%q<t1>/D`COMBAT`QUIRKS),ansi(hw,default(u(cobj,agedb)/QRK`%i0,<unknown>)),%B,%R)],ansi(u(color,%#,BORDER),|));@pemit %#=u(separator);@pemit %#=align(1. 76 1.,ansi(u(color,%#,BORDER),|),u(SHEET`STAT,%q<t1>,POW,0)[u(SHEET`STAT,%q<t1>,PRE,2)]%R[u(SHEET`STAT,%q<t1>,END,1)][u(SHEET`STAT,%q<t1>,MIT,3)],ansi(u(color,%#,BORDER),|));
+&INC`COMBAT`STATS`DISPLAY [u(cobj,age)]=@pemit %#=align(1. 50 1. 23 1.,ansi(u(color,%#,BORDER),|),u(setr,startsec,u(fancyweight,%q<t1>)[repeat(*,get(%q<t1>/D`COMBAT`STATS`5`ORIG))]%b[ansi(hw,default(u(cobj,agedb)/ARC`[default(%q<t1>/D`COMBAT`ARCHETYPE,0)],Unpublished))]%B[ansi(220,repeat(*,get(%q<t1>/D`COMBAT`ACCOLADES)))])[rjust(u(fancycon2,%q<t1>),sub(60,strlen(%q<startsec>),10))]%R[rjust(ansi(h,HP:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(u(setr,perc,mul(%i0,5)),100),u(percent,%q<t1>)),ansi(u(ryg,sub(100,%q<perc>)),|),%B),%b,)][ansi(h,>>)]%B[ansi(h,[sub(get(%q<t1>/D`COMBAT`HEALTH),get(%q<t1>/D`COMBAT`DAMAGE))]/[get(%q<t1>/D`COMBAT`HEALTH)]%B\([before(round(mul(u(percent,%q<t1>),100),0),.)]\%\))]%R[rjust(ansi(h,Drive:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`DRIVE),get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM))),ansi(u(drivebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`DRIVE)]/[get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM)]%B\([get(%q<t1>/D`COMBAT`DRIVE`STATUS)]\))]%R[rjust(ansi(h,Hype:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`HYPE),get(%q<t1>/D`COMBAT`HYPE`MAXIMUM))),ansi(u(hypebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`HYPE)]/[get(%q<t1>/D`COMBAT`HYPE`MAXIMUM)])],ansi(u(color,%#,BORDER),|),center(ansi(%q<qcolor>,Quirks),23)%R[iter(get(%q<t1>/D`COMBAT`QUIRKS),ansi(hw,default(u(cobj,agedb)/QRK`%i0,<unknown>)),%B,%R)],ansi(u(color,%#,BORDER),|));@pemit %#=u(separator);@pemit %#=align(1. 76 1.,ansi(u(color,%#,BORDER),|),u(SHEET`STAT,%q<t1>,POW,0)[u(SHEET`STAT,%q<t1>,PRE,2)]%R[u(SHEET`STAT,%q<t1>,END,1)][u(SHEET`STAT,%q<t1>,MIT,3)],ansi(u(color,%#,BORDER),|));
 
 &DRIVEBAR [u(cobj,age)]=switch(1,t(match(1 2 3 4,%0)),27,t(match(5 6 7 8 9 10,%0)),75,t(match(11 12 13 14 15 16,%0)),117,t(match(17 18 19 20,%0)),159)
 

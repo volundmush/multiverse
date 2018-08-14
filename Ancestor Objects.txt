@@ -5,7 +5,7 @@
 
 &PLAYERS`MCM u(cobj,ancestor_room)=u(SEPARATOR,Players)%R[ansi(vol_color(%#,COLUMN_NAMES),align(19 19 15 10 4 5,Name,Faction,Desc,Combat,Idle,Scene))]%R[trim(iter(vol_sortname(lvplayers(%!)),align(19 19 15 10 4 5,vol_pueblize(moniker(%i0),look [name(%i0)]),strfirstof(if(vol_isadmin(%i0),Admin),vol_getproperty(%i0,Faction),Unaffiliated),vol_getproperty(%i0,DESCNAME),vol_getproperty(%i0,COMBAT),vol_hideidle(%i0),vol_getproperty(%i0,CURSCENE)),%b,%R),%r)]
 
-&GETPROPERTY`COMBAT [u(cobj,ccp)]=if(nattr(%0/D`COMBAT`**),ansi(u(ryg,bound(sub(100,u(setr,perc,round(mul(u(u(cobj,age)/percent,%0),100),0))),0)),%q<perc>\%)%b[u(u(cobj,age)/FANCYWEIGHT,%0,1)][ansi(220,repeat(*,get(%0/D`COMBAT`ACCOLADES)))])
+&GETPROPERTY`COMBAT [u(cobj,ccp)]=if(nattr(%0/D`COMBAT`**),ansi(u(ryg,bound(sub(100,bound(u(setr,perc,round(mul(u(u(cobj,age)/percent,%0),100),0)),0)),0)),%q<perc>\%)%b[u(u(cobj,age)/FANCYWEIGHT,%0,1)][ansi(220,repeat(*,get(%0/D`COMBAT`ACCOLADES)))])
 
 &GETPROPERTY`DESCNAME [u(cobj,ccp)]=get(%0/V`DESCRIBE)
 
