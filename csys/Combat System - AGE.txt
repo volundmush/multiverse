@@ -90,30 +90,35 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &DRIVES [u(cobj,agedb)]=Primed|Ready|Lagging|Overextended|Wavering|Spent
 
-&DRIVES`PRIMED [u(cobj,agedb)]=81
+&DRIVES`PRIMED [u(cobj,agedb)]=80
 &DRIVES`PRIMED`DEFENSE`BONUS`STAT`1 [u(cobj,agedb)]=Moderate
 &DRIVES`PRIMED`DEFENSE`BONUS`STAT`3 [u(cobj,agedb)]=Moderate
+&DRIVES`PRIMED`CHECK [u(cobj,agedb)]=gt(get(%0/D`COMBAT`DRIVE),mul(bound(get(%0/D`COMBAT`TANK),1),u(u(cobj,age)/cust,DRIVES,PRIMED))
 
-&DRIVES`READY [u(cobj,agedb)]=56
+&DRIVES`READY [u(cobj,agedb)]=55
+&DRIVES`READY`CHECK [u(cobj,agedb)]=gt(get(%0/D`COMBAT`DRIVE),mul(bound(get(%0/D`COMBAT`TANK),1),u(u(cobj,age)/cust,DRIVES,READY))
 
-&DRIVES`LAGGING [u(cobj,agedb)]=21
+&DRIVES`LAGGING [u(cobj,agedb)]=20
 &DRIVES`LAGGING`DEFENSE`PENALTY`STAT`0 [u(cobj,agedb)]=Minor
 &DRIVES`LAGGING`DEFENSE`PENALTY`STAT`1 [u(cobj,agedb)]=Minor
 &DRIVES`LAGGING`DEFENSE`PENALTY`STAT`2 [u(cobj,agedb)]=Minor
 &DRIVES`LAGGING`DEFENSE`PENALTY`STAT`3 [u(cobj,agedb)]=Minor
+&DRIVES`LAGGING`CHECK [u(cobj,agedb)]=gt(get(%0/D`COMBAT`DRIVE),mul(bound(get(%0/D`COMBAT`TANK),1),u(u(cobj,age)/cust,DRIVES,LAGGING))
 
 &DRIVES`OVEREXTENDED [u(cobj,agedb)]=0
 &DRIVES`OVEREXTENDED`DEFENSE`PENALTY`STAT`0 [u(cobj,agedb)]=Solid
 &DRIVES`OVEREXTENDED`DEFENSE`PENALTY`STAT`1 [u(cobj,agedb)]=Solid
 &DRIVES`OVEREXTENDED`DEFENSE`PENALTY`STAT`2 [u(cobj,agedb)]=Solid
 &DRIVES`OVEREXTENDED`DEFENSE`PENALTY`STAT`3 [u(cobj,agedb)]=Solid
+&DRIVES`OVEREXTENDED`CHECK [u(cobj,agedb)]=gt(get(%0/D`COMBAT`DRIVE),mul(bound(get(%0/D`COMBAT`TANK),1),u(u(cobj,age)/cust,DRIVES,OVEREXTENDED))
 
-&DRIVES`WAVERING [u(cobj,agedb)]=-24
+&DRIVES`WAVERING [u(cobj,agedb)]=-25
 &DRIVES`WAVERING`DEFENSE`PENALTY`STAT`0 [u(cobj,agedb)]=Solid
 &DRIVES`WAVERING`DEFENSE`PENALTY`STAT`1 [u(cobj,agedb)]=Solid
 &DRIVES`WAVERING`DEFENSE`PENALTY`STAT`2 [u(cobj,agedb)]=Solid
 &DRIVES`WAVERING`DEFENSE`PENALTY`STAT`3 [u(cobj,agedb)]=Solid
 &DRIVES`WAVERING`DAMAGE [u(cobj,agedb)]=0.2
+&DRIVES`WAVERING`CHECK [u(cobj,agedb)]=gt(get(%0/D`COMBAT`DRIVE),mul(bound(get(%0/D`COMBAT`TANK),1),u(u(cobj,age)/cust,DRIVES,WAVERING))
 
 &DRIVES`SPENT [u(cobj,agedb)]=-1000
 &DRIVES`SPENT`DEFENSE`PENALTY`STAT`0 [u(cobj,agedb)]=Solid
@@ -121,8 +126,9 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &DRIVES`SPENT`DEFENSE`PENALTY`STAT`2 [u(cobj,agedb)]=Solid
 &DRIVES`SPENT`DEFENSE`PENALTY`STAT`3 [u(cobj,agedb)]=Solid
 &DRIVES`SPENT`DAMAGE [u(cobj,agedb)]=1000
+&DRIVES`SPENT`CHECK [u(Cobj,agedb)]=1
 
-&DRIVESTATUS [u(cobj,age)]=first(squish(iter(get(u(cobj,agedb)/DRIVES),if(gte(get(%0/D`COMBAT`DRIVE),u(cust,DRIVES,%i0)),%i0[ibreak()]),|,|),|),|)
+&DRIVESTATUS [u(cobj,age)]=first(squish(iter(get(u(cobj,agedb)/DRIVES),if(u(u(cobj,agedb)/DRIVES`%i0`CHECK,%0),%i0[ibreak()]),|,|),|),|)
 
 @@ Damage Age Config --
 
@@ -795,11 +801,12 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`SHOWSELECT [u(cobj,age)]=@pemit %#=u(header,Character Editor: %q<t1name>);@pemit %#=ansi(u(color,%#,COMBAT,COLUMN_NAMES),align(2 19 6 6 6 6 12 16,ID,Name,Pow,End,Pre,Mit,Weight,Archetype));@dolist/inline/delimit [chr(176)] [u(mysql3,VIEW`MANTLE_LINKS,%q<t1id>)]={th u(setq,row,u(choosegame,%i0,%d0));th u(setq,stats,elements(%q<row>,3,chr(177)));th u(setq,accs,elements(%q<row>,6,chr(177)));th u(setq,arc,elements(%q<row>,4,chr(177)));@pemit %#=align(2 19 6 6 6 6 12 16,elements(%q<row>,1,chr(177)),elements(%q<row>,2,chr(177)),elements(%q<stats>,1)[u(FUN`ACC,elements(%q<accs>,1))],elements(%q<stats>,2)[u(FUN`ACC,elements(%q<accs>,2))],elements(%q<stats>,3)[u(FUN`ACC,elements(%q<accs>,3))],elements(%q<stats>,4)[u(FUN`ACC,elements(%q<accs>,4))],u(VIEW`WEIGHT,elements(%q<stats>,5)),if(cand(%q<arc>,hasattr(u(cobj,agedb)/ARC`%q<arc>)),default(u(cobj,agedb)/ARC`%q<arc>,Unshaped),ansi(hx,N/A)))};@pemit %#=u(footer)
 
+
 &VIEW`WEIGHT [u(cobj,age)]=switch(%0,1,Light,2,Medium,3,Heavy,4,Superheavy,5,Boss,<Unset>)
 
 &FUN`ACC [u(Cobj,age)]=if(gte(%0,3),*%0,repeat(*,%0))
 
-&Q`VIEW`MANTLE_LINKS [u(cobj,age)]=SELECT mantle_link_display_num,mantle_name,mantle_stats,mantle_archetype,mantle_link_approved,mantle_accolades FROM volv_mantle_link WHERE character_id=? AND mantle_link_parent_id IS NULL
+&Q`VIEW`MANTLE_LINKS [u(cobj,age)]=SELECT mantle_link_display_num,mantle_name,mantle_stats,mantle_archetype,mantle_link_approved,mantle_accolades,mantle_link_locked FROM volv_mantle_link WHERE character_id=? AND mantle_link_parent_id IS NULL
 
 &INC`SELECT`PLAYER [u(cobj,age)]=@check isobjid(get(%#/D`SELECT`PLAYER))=@attach %!/INC`MSG=ERROR: No player selected.;@attach %!/INC`CHECKPC=get(%#/D`SELECT`PLAYER),1
 
@@ -1009,7 +1016,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 @@ +matrix section
 &INC`CHARGEN`MATRIX`MAIN [u(cobj,age)]=@check u(tester,%#)=@attach %!/INC`MSG=ERROR: Try as you might\, you cannot see the Matrix.;&D`MATRIX %#=not(get(%#/D`MATRIX));@attach %!/INc`MSG=You [if(get(%#/D`MATRIX),will now,will no longer)] see the Matrix.
 
-&INC`CHARGEN`ROLLFORCE`MAIN [u(cobj,age)]=@check u(tester,%#)=@attach %!/INC`MSG=ERROR: Try as you might\, you cannot see the Matrix.;@attach %!/INC`VALID`INT=%0;&D`ROLLFORCE %#=%q<value>;@attach %!/INC`MSG=Okay! Your next defense roll will be: %q<value>
+&INC`CHARGEN`ROLLFORCE`MAIN [u(cobj,age)]=@check u(tester,%#)=@attach %!/INC`MSG=ERROR: Try as you might\, you cannot see the Matrix.;@attach %!/INC`CHECKPC=%0,1;@check nattr(%q<t1>/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: %q<t1name> is not battle-ready!;@attach %!/INC`VALID`INT=%2;&D`ROLLFORCE %q<t1>=%q<value>;@attach %!/INC`MSG=Okay! %q<t1name>'s' next defense roll will be: %q<value>
 
 &INC`CHARGEN`HYPEFORCE`MAIN [u(cobj,age)]=@check u(tester,%#)=@attach %!/INC`MSG=ERROR: Try as you might\, you cannot see the Matrix.;@attach %!/INC`CHECKPC=%0,1;@check nattr(%q<t1>/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: %q<t1name> is not battle-ready!;@attach %!/INC`VALID`INT=%2;&D`COMBAT`HYPE %q<t1>=%q<value>;@attach %!/INC`MSG=Okay! %q<t1name>'s current Hype is %q<value>. Are you hype about that?
 
@@ -1308,7 +1315,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_ASPIRANT`OFF`3`ACTIVATE [u(Cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_ASPIRANT_DRIVE,,0,2;
 &STATUS`ARC_ASPIRANT`OFF`4`ACTIVATE [u(Cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_ASPIRANT_HYPE,,0,2;
 &STATUS`ARC_ASPIRANT`STATIC`START`HYPE [u(cobj,age)]=2
-&STATUS`ARC_ASPIRANT`ON_ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_ASPIRANT_FIRST,,1,1;
+&STATUS`ARC_ASPIRANT`ON_ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_ASPIRANT_FIRST,,mul(1,bound(get(%0/D`COMBAT`TANK),1)),mul(1,bound(get(%0/D`COMBAT`TANK),1));
 
 &STATUS`ARC_ASPIRANT_FIRST [u(Cobj,age)]=Aspirant-FirstTurn
 &STATUS`ARC_ASPIRANT_FIRST`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Minor
@@ -1407,7 +1414,8 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_DESTROYER_FORCEFUL`DESCRIPTION [u(cobj,age)]=Moderate Penalty to Endurance and Mitigation
 &STATUS`ARC_DESTROYER_FORCEFUL`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=Moderate
 &STATUS`ARC_DESTROYER_FORCEFUL`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Moderate
-&STATUS`ARC_DESTROYER_FORCEFUL`CURE`ADJECTIVE [u(cobj,age)]=Moderate
+&STATUS`ARC_DESTROYER_FORCEFUL`CURE`INTENSITY [u(cobj,age)]=Moderate
+
 
 &STATUS`ARC_DESTROYER_DOT [u(Cobj,age)]=Destroyer-DOT
 &STATUS`ARC_DESTROYER_DOT`DESCRIPTION [u(cobj,age)]=Inflicts DoT on Defense Phase
@@ -1478,7 +1486,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_GRAPPLER_PUSH`ATTACK`BONUS`STAT`2 [u(cobj,age)]=Minor
 &STATUS`ARC_GRAPPLER_PUSH`TAGS [u(cobj,age)]=BUFF DISPLAY
 &STATUS`ARC_GRAPPLER_PUSH`DESCRIPTION [u(cobj,age)]=Minor Buff to Precision
-&STATUS`ARC_GRAPPLER_PUSH`BREAK`ADJECTIVE [u(cobj,age)]=Minor
+&STATUS`ARC_GRAPPLER_PUSH`BREAK`INTENSITY [u(cobj,age)]=Minor
 
 &STATUS`ARC_GRAPPLER_READY [u(cobj,age)]=Grappler-Ready
 &STATUS`ARC_GRAPPLER_READY`ATTACK_INFLICT_STATUS [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%q<atker>,ARC_GRAPPLER_[get(%0/%q<atk>`STATUS`%1`STAT)],,get(%0/%q<atk>`STATUS`%1`A_TURNS),get(%0/%q<atk>`STATUS`%1`D_TURNS);@attach %!/INC`EANNOUNCE=GRAPPLER,[ansi(hw,%n)] suffers a [capstr(get(%0/%q<atk>`STATUS`%1`STAT))] debuff!
@@ -1516,7 +1524,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_GHOST_BUFF`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Major
 &STATUS`ARC_GHOST_BUFF`TAGS [u(cobj,age)]=DISPLAY BUFF
 &STATUS`ARC_GHOST_BUFF`DESCRIPTION [u(cobj,age)]=Major Bonus to Power
-&STATUS`ARC_GHOST_BUFF`BREAK`ADJECTIVE [u(Cobj,age)]=Major
+&STATUS`ARC_GHOST_BUFF`BREAK`INTENSITY [u(Cobj,age)]=Major
 
 &STATUS`ARC_GLASSCANNON [u(cobj,age)]=Glass Cannon
 &STATUS`ARC_GLASSCANNON`STATIC`MAXIMUM`HP [u(cobj,age)]=-100
@@ -1531,7 +1539,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_GLASSCANNON_FOCUS`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=Minor
 &STATUS`ARC_GLASSCANNON_FOCUS`TAGS [u(cobj,age)]=BUFF DISPLAY
 &STATUS`ARC_GLASSCANNON_FOCUS`DESCRIPTION [u(cobj,age)]=Minor Bonus to Power and Precision, Minor Penalty to Endurance
-&STATUS`ARC_GLASSCANNON_FOCUS`BREAK`ADJECTIVE [u(Cobj,age)]=Minor
+&STATUS`ARC_GLASSCANNON_FOCUS`BREAK`INTENSITY [u(Cobj,age)]=Minor
 
 &STATUS`ARC_GLASSCANNON_BOLSTER [u(Cobj,age)]=Glass Cannon-Bolster
 &STATUS`ARC_GLASSCANNON_BOLSTER`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Minor
@@ -1539,10 +1547,10 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_GLASSCANNON_BOLSTER`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Minor
 &STATUS`ARC_GLASSCANNON_BOLSTER`TAGS [u(cobj,age)]=BUFF DISPLAY
 &STATUS`ARC_GLASSCANNON_BOLSTER`DESCRIPTION [u(cobj,age)]=Minor Bonus to Power and Precision, Minor Penalty to Mitigation
-&STATUS`ARC_GLASSCANNON_BOLSTER`BREAK`ADJECTIVE [u(Cobj,age)]=Minor
+&STATUS`ARC_GLASSCANNON_BOLSTER`BREAK`INTENSITY [u(Cobj,age)]=Minor
 
 &STATUS`ARC_HOTBLOODED [u(Cobj,age)]=Hot Blooded
-&STATUS`ARC_HOTBLOODED`ATTACK`BONUS`STAT`0 [u(cobj,age)]=if(gte(get(%0/D`COMBAT`DRIVE),0),switch(get(%0/D`COMBAT`DRIVE`STATUS),PRIMED,Moderate,READY,Significant,LAGGING,Major,OVEREXTENDED,Superior,0),0)
+&STATUS`ARC_HOTBLOODED`ATTACK`BONUS`STAT`0 [u(cobj,age)]=if(not(lt(get(%0/D`COMBAT`DRIVE),1)),switch(get(%0/D`COMBAT`DRIVE`STATUS),PRIMED,Moderate,READY,Significant,LAGGING,Major,OVEREXTENDED,Superior,0),0)
 &STATUS`ARC_HOTBLOODED`OFF`1`ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_HOTBLOODED_CONSISTENT,,1,0
 &STATUS`ARC_HOTBLOODED`OFF`2`ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_HOTBLOODED_FORCEFUL,,1,0
 
@@ -1606,14 +1614,14 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_OPERATOR_DEBUFF_OFFENSE`ATTACK`PENALTY`STAT`2 [u(cobj,age)]=Significant
 &STATUS`ARC_OPERATOR_DEBUFF_OFFENSE`TAGS [u(cobj,age)]=DEBUFF DISPLAY
 &STATUS`ARC_OPERATOR_DEBUFF_OFFENSE`DESCRIPTION [u(cobj,age)]=Significant Penalty to Power and Precision
-&STATUS`ARC_OPERATOR_DEBUFF_OFFENSE`CURE`ADJECTIVE [u(cobj,age)]=Significant
+&STATUS`ARC_OPERATOR_DEBUFF_OFFENSE`CURE`INTENSITY [u(cobj,age)]=Significant
 
 &STATUS`ARC_OPERATOR_DEBUFF_DEFENSE [u(cobj,age)]=Operator-DebuffDefense
 &STATUS`ARC_OPERATOR_DEBUFF_DEFENSE`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=Significant
 &STATUS`ARC_OPERATOR_DEBUFF_DEFENSE`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Significant
 &STATUS`ARC_OPERATOR_DEBUFF_DEFENSE`DESCRIPTION [u(cobj,age)]=Significant Penalty to Endurance and Mitigation
 &STATUS`ARC_OPERATOR_DEBUFF_DEFENSE`TAGS [u(cobj,age)]=DISPLAY DEBUFF
-&STATUS`ARC_OPERATOR_DEBUFF_DEFENSE`CURE`ADJECTIVE [u(cobj,age)]=Significant
+&STATUS`ARC_OPERATOR_DEBUFF_DEFENSE`CURE`INTENSITY [u(cobj,age)]=Significant
 
 &STATUS`ARC_PREDATOR [u(cobj,age)]=Predator
 &STATUS`ARC_PREDATOR`DEF`1`ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_PREDATOR_INFLICT,,1,0
@@ -1638,7 +1646,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_PREDATOR_MANEUVER`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=Moderate
 &STATUS`ARC_PREDATOR_MANEUVER`DESCRIPTION [u(cobj,age)]=Significant Bonus to Precision
 &STATUS`ARC_PREDATOR_MANEUVER`TAGS [u(cobj,age)]=BUFF DISPLAY
-&STATUS`ARC_PREDATOR_MANEUVER`BREAK`ADJECTIVE [u(cobj,age)]=Significant
+&STATUS`ARC_PREDATOR_MANEUVER`BREAK`INTENSITY [u(cobj,age)]=Significant
 
 &STATUS`ARC_PREDATOR_RALLY [u(cobj,age)]=Predator-Rally
 &STATUS`ARC_PREDATOR_RALLY`DEFENSE`BONUS`DRIVE_GAIN [u(cobj,age)]=5
@@ -1652,7 +1660,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_SHOWOFF`OFF`2`ACTIVATE [u(cobj,age)]=@attach %!/STATUS`ARC_SHOWOFF`OFF`1`ACTIVATE
 &STATUS`ARC_SHOWOFF`OFF`3`ACTIVATE [u(cobj,age)]=@attach %!/STATUS`ARC_SHOWOFF`OFF`1`ACTIVATE
 &STATUS`ARC_SHOWOFF`OFF`4`ACTIVATE [u(cobj,age)]=@attach %!/STATUS`ARC_SHOWOFF`OFF`1`ACTIVATE
-&STATUS`ARC_SHOWOFF`DEFENSE_DECREASE_DAMAGE [u(cobj,age)]=@select/inline gt(u(setr,showdef,round(switch(get(%0/D`COMBAT`HYPE),>=20,80,>=15,85,>=10,90,>=5,95),0)),0)=1,{th u(setq,damage,mul(%q<damage>,u(scatter,%q<showdef>)))}
+&STATUS`ARC_SHOWOFF`DEFENSE_DECREASE_DAMAGE [u(cobj,age)]=@select/inline gt(u(setr,showdef,round(switch(get(%0/D`COMBAT`HYPE),>=[mul(20,bound(get(%0/D`COMBAT`TANK),1))],80,>=[mul(15,bound(get(%0/D`COMBAT`TANK),1))],85,>=[mul(10,bound(get(%0/D`COMBAT`TANK),1))],90,>=[mul(5,bound(get(%0/D`COMBAT`TANK),1))],95),0)),0)=1,{th u(setq,damage,mul(%q<damage>,u(scatter,%q<showdef>)))}
 &STATUS`ARC_SHOWOFF`PUSH_ON_ACTIVATE [u(cobj,age)]=@select/inline %q<starthype>=>4,{th u(setq,showoffmul,0);@dolist/inline sort(squish(switchall(%q<starthype>,>=5,%B5%B,>=10,%B10%B,>=15,%B15%B)),-n)={@select/inline lt(%i0,%q<afterhype>)=1,{th u(setq,showoffmul,add(%q<showoffmul>,switch(%i0,5,18,10,14,15,10)))}};@select/inline gt(%q<showoffmul>,0)=1,{@attach %!/INC`SETSTATUS=%0,%0,ARC_SHOWOFF_HYPEBOOST,MULTIPLIER=%q<showoffmul>,1,0;@attach %!/INC`EANNOUNCE=SHOWOFF,Oh yeah! [ansi(hw,%n)] is feeling it! Bonus to damage!}}
 
 &STATUS`ARC_SHOWOFF_HYPEBOOST [u(cobj,age)]=Showoff-HypeBoost
@@ -1687,7 +1695,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_SNIPER_DEBUFF`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Moderate
 &STATUS`ARC_SNIPER_DEBUFF`TAGS [u(Cobj,age)]=DEBUFF DISPLAY
 &STATUS`ARC_SNIPER_DEBUFF`DESCRIPTION [u(cobj,age)]=Moderate Penalty to All
-&STATUS`ARC_SNIPER_DEBUFF`CURE`ADJECTIVE [u(cobj,age)]=Moderate
+&STATUS`ARC_SNIPER_DEBUFF`CURE`INTENSITY [u(cobj,age)]=Moderate
 
 &STATUS`ARC_SURVIVOR [u(cobj,age)]=Survivor
 &STATUS`ARC_SURVIVOR`DEF`1`ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_SURVIVOR_FOCUS,,0,1
@@ -1738,7 +1746,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`ARC_UNCONTROLLABLE`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Minor
 &STATUS`ARC_UNCONTROLLABLE`ATTACK`BONUS`STAT`2 [u(cobj,age)]=Minor
 &STATUS`ARC_UNCONTROLLABLE`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=Minor
-&STATUS`ARC_UNCONTROLLABLE`ATTACK_END_TURN [u(cobj,age)]=@attach %!/INC`DAMAGE=%0,bound(round(mul(get(%0/D`COMBAT`HEALTH),0.1),0),0),Uncontrollable
+&STATUS`ARC_UNCONTROLLABLE`ATTACK_END_TURN [u(cobj,age)]=@attach %!/INC`DAMAGE=%0,bound(round(mul(get(%0/D`COMBAT`HEALTH`ORIGINAL),0.1),0),0),Uncontrollable
 
 &STATUS`ARC_UNCONTROLLABLE_BOLSTER [u(cobj,age)]=Uncontrollable-Bolster
 &STATUS`ARC_UNCONTROLLABLE_BOLSTER`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Massive
@@ -2161,7 +2169,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`QRK_MOMENTUM_BONUS [u(cobj,age)]=Momentum-Bonus
 &STATUS`QRK_MOMENTUM_BONUS`TAGS [u(cobj,age)]=DISPLAY BUFF
 &STATUS`QRK_MOMENTUM_BONUS`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Significant
-&STATUS`QRK_MOMENTUM_BONUS`BREAK`ADJECTIVE [u(cobj,age)]=Significant
+&STATUS`QRK_MOMENTUM_BONUS`BREAK`INTENSITY [u(cobj,age)]=Significant
 
 &STATUS`QRK_PREDICTIVETARGETING [u(Cobj,age)]=Predictive Targeting
 &STATUS`QRK_PREDICTIVETARGETING`ATTACK_ON_CALCULATE [u(Cobj,age)]=@select/inline eq(%q<def>,get(%0/D`COMBAT`HISTORY`LAST_DEF_CHOICE))=1,{@attach %!/INC`SETSTATUS=%0,%q<atker>,QRK_PREDICTIVETARGETING_ACTIVE,,0,1;@attach %!/INC`EANNOUNCE=PREDICTIVE TARGETING,[ansi(118,name(%q<atker>))] saw through [ansi(118,%n)]'s repeated defense!}
@@ -2602,28 +2610,28 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`PUSH_BUFF_POWER`ATTACK`BONUS`STAT`0 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior)
 &STATUS`PUSH_BUFF_POWER`DESCRIPTION [u(cobj,age)]=u(STATUS`PUSH_BUFF_POWER`ATTACK`BONUS`STAT`0,%0,%1) Bonus to Power
 &STATUS`PUSH_BUFF_POWER`ATTACK_TURNS [u(cobj,age)]=2
-&STATUS`PUSH_BUFF_POWER`BREAK`ADJECTIVE [u(cobj,age)]=u(STATUS`PUSH_BUFF_POWER`ATTACK`BONUS`STAT`0,%0,%1)
+&STATUS`PUSH_BUFF_POWER`BREAK`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_BUFF_POWER`ATTACK`BONUS`STAT`0,%0,%1)
 
 &STATUS`PUSH_BUFF_ENDURANCE [u(cobj,age)]=Buff-Endurance
 &STATUS`PUSH_BUFF_ENDURANCE`TAGS [u(cobj,age)]=BUFF PUSH DISPLAY
 &STATUS`PUSH_BUFF_ENDURANCE`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior)
 &STATUS`PUSH_BUFF_ENDURANCE`DESCRIPTION [u(cobj,age)]=u(STATUS`PUSH_BUFF_ENDURANCE`DEFENSE`BONUS`STAT`1,%0,%1) Bonus to Endurance
 &STATUS`PUSH_BUFF_ENDURANCE`DEFENSE_TURNS [u(cobj,age)]=2
-&STATUS`PUSH_BUFF_ENDURANCE`BREAK`ADJECTIVE [u(cobj,age)]=u(STATUS`PUSH_BUFF_ENDURANCE`DEFENSE`BONUS`STAT`1,%0,%1)
+&STATUS`PUSH_BUFF_ENDURANCE`BREAK`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_BUFF_ENDURANCE`DEFENSE`BONUS`STAT`1,%0,%1)
 
 &STATUS`PUSH_BUFF_PRECISION [u(cobj,age)]=Buff-Precision
 &STATUS`PUSH_BUFF_PRECISION`TAGS [u(cobj,age)]=BUFF PUSH DISPLAY
 &STATUS`PUSH_BUFF_PRECISION`ATTACK`BONUS`STAT`2 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior)
 &STATUS`PUSH_BUFF_PRECISION`DESCRIPTION [u(cobj,age)]=u(STATUS`PUSH_BUFF_PRECISION`DEFENSE`BONUS`STAT`2,%0,%1) Bonus to Precision
 &STATUS`PUSH_BUFF_PRECISION`ATTACK_TURNS [u(cobj,age)]=2
-&STATUS`PUSH_BUFF_PRECISION`BREAK`ADJECTIVE [u(cobj,age)]=u(STATUS`PUSH_BUFF_PRECISION`ATTACK`BONUS`STAT`2,%0,%1)
+&STATUS`PUSH_BUFF_PRECISION`BREAK`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_BUFF_PRECISION`ATTACK`BONUS`STAT`2,%0,%1)
 
 &STATUS`PUSH_BUFF_MITIGATION [u(cobj,age)]=Buff-Mitigation
 &STATUS`PUSH_BUFF_MITIGATION`TAGS [u(cobj,age)]=BUFF PUSH DISPLAY
 &STATUS`PUSH_BUFF_MITIGATION`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior)
 &STATUS`PUSH_BUFF_MITIGATION`DESCRIPTION [u(cobj,age)]=u(STATUS`PUSH_BUFF_MITIGATION`DEFENSE`BONUS`STAT`3,%0,%1) Bonus to Mitigation
 &STATUS`PUSH_BUFF_MITIGATION`DEFENSE_TURNS [u(cobj,age)]=2
-&STATUS`PUSH_BUFF_MITIGATION`BREAK`ADJECTIVE [u(cobj,age)]=u(STATUS`PUSH_BUFF_MITIGATION`DEFENSE`BONUS`STAT`3,%0,%1)
+&STATUS`PUSH_BUFF_MITIGATION`BREAK`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_BUFF_MITIGATION`DEFENSE`BONUS`STAT`3,%0,%1)
 
 &STATUS`PUSH_INFLICT_DEBUFF_POWER [u(cobj,age)]=Inflict-Debuff-Power
 &STATUS`PUSH_INFLICT_DEBUFF_POWER`ATTACK_ON_STRIKE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%#,%q<atker>,PUSH_DEBUFF_POWER,COST=[get(%#/%q<atk>`STATUS`%1`COST)]|DISPLAY=[get(%#/%q<atk>`STATUS`%1`DISPLAY)],2,0;@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] now suffers from a [ansi(hw,Power Debuff)]!
@@ -2634,7 +2642,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`PUSH_DEBUFF_POWER`TAGS [u(cobj,age)]=DEBUFF PUSH DISPLAY
 &STATUS`PUSH_DEBUFF_POWER`ATTACK`PENALTY`STAT`0 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior)
 &STATUS`PUSH_DEBUFF_POWER`DESCRIPTION [u(cobj,age)]=u(switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior),%0,%1) Penalty to Power
-&STATUS`PUSH_DEBUFF_POWER`CURE`ADJECTIVE [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_POWER`ATTACK`PENALTY`STAT`0,%0,%1)
+&STATUS`PUSH_DEBUFF_POWER`CURE`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_POWER`ATTACK`PENALTY`STAT`0,%0,%1)
 
 &STATUS`PUSH_INFLICT_DEBUFF_ENDURANCE [u(cobj,age)]=Inflict-Debuff-Endurance
 &STATUS`PUSH_INFLICT_DEBUFF_ENDURANCE`ATTACK_ON_STRIKE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%#,%q<atker>,PUSH_DEBUFF_ENDURANCE,COST=[get(%#/%q<atk>`STATUS`%1`COST)]|DISPLAY=[get(%#/%q<atk>`STATUS`%1`DISPLAY)],0,2;@attach %!/INC`EANNOUNCE=DEBUFF,[ansi(hw,%n)] now suffers from an [ansi(hw,Endurance Debuff)]!
@@ -2646,7 +2654,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`PUSH_DEBUFF_ENDURANCE`TAGS [u(cobj,age)]=DEBUFF PUSH DISPLAY
 &STATUS`PUSH_DEBUFF_ENDURANCE`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior)
 &STATUS`PUSH_DEBUFF_ENDURANCE`DESCRIPTION [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_ENDURANCE`DEFENSE`PENALTY`STAT`1,%0,%1) Penalty to Endurance
-&STATUS`PUSH_DEBUFF_ENDURANCE`CURE`ADJECTIVE [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_ENDURANCE`DEFENSE`PENALTY`STAT`1,%0,%1)
+&STATUS`PUSH_DEBUFF_ENDURANCE`CURE`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_ENDURANCE`DEFENSE`PENALTY`STAT`1,%0,%1)
 
 &STATUS`PUSH_INFLICT_DEBUFF_PRECISION [u(cobj,age)]=Inflict-Debuff-Precision
 &STATUS`PUSH_INFLICT_DEBUFF_PRECISION`ATTACK_ON_STRIKE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%#,%q<atker>,PUSH_DEBUFF_PRECISION,COST=[get(%#/%q<atk>`STATUS`%1`COST)]|DISPLAY=[get(%#/%q<atk>`STATUS`%1`DISPLAY)],2,0;@attach %!/INC`EANNOUNCE=DEBUFF,[ansi(hw,%n)] now suffers from a [ansi(hw,Precision Debuff)]!
@@ -2658,7 +2666,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`PUSH_DEBUFF_PRECISION`TAGS [u(cobj,age)]=DEBUFF PUSH DISPLAY
 &STATUS`PUSH_DEBUFF_PRECISION`ATTACK`PENALTY`STAT`2 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior)
 &STATUS`PUSH_DEBUFF_PRECISION`DESCRIPTION [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_PRECISION`ATTACK`PENALTY`STAT`2,%0,%1) Penalty to Precision
-&STATUS`PUSH_DEBUFF_PRECISION`CURE`ADJECTIVE [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_PRECISION`ATTACK`PENALTY`STAT`2,%0,%1)
+&STATUS`PUSH_DEBUFF_PRECISION`CURE`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_PRECISION`ATTACK`PENALTY`STAT`2,%0,%1)
 
 &STATUS`PUSH_INFLICT_DEBUFF_MITIGATION [u(cobj,age)]=Inflict-Debuff-Mitigation
 &STATUS`PUSH_INFLICT_DEBUFF_MITIGATION`ATTACK_ON_STRIKE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%#,%q<atker>,PUSH_DEBUFF_MITIGATION,COST=[get(%#/%q<atk>`STATUS`%1`COST)]|DISPLAY=[get(%#/%q<atk>`STATUS`%1`DISPLAY)],0,2;@attach %!/INC`EANNOUNCE=DEBUFF,[ansi(hw,%n)] now suffers from a [ansi(hw,Mitigation Debuff)]!
@@ -2668,7 +2676,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`PUSH_DEBUFF_MITIGATION`TAGS [u(cobj,age)]=DEBUFF PUSH DISPLAY
 &STATUS`PUSH_DEBUFF_MITIGATION`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=switch(get(%0/D`COMBAT`STATUS`%1`COST),1,Minor,3,Solid,5,Major,7,Superior)
 &STATUS`PUSH_DEBUFF_MITIGATION`DESCRIPTION [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_MITIGATION`DEFENSE`PENALTY`STAT`3,%0,%1) Penalty to Mitigation
-&STATUS`PUSH_DEBUFF_MITIGATION`CURE`ADJECTIVE [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_MITIGATION`DEFENSE`PENALTY`STAT`3,%0,%1)
+&STATUS`PUSH_DEBUFF_MITIGATION`CURE`INTENSITY [u(cobj,age)]=u(STATUS`PUSH_DEBUFF_MITIGATION`DEFENSE`PENALTY`STAT`3,%0,%1)
 
 
 &STATUS`PUSH_INFLICT_DOT [u(cobj,age)]=Inflict-Damage Over Time
@@ -2694,7 +2702,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &STATUS`PUSH_CURE [u(Cobj,age)]=Cure
 &STATUS`PUSH_CURE`ON_ACTIVATE [u(cobj,age)]=@dolist/inline u(filter,COSTCOMPARE,setunion(get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`DEBUFF),get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`DOT)),%b,%b,CURE,switch(get(%0/D`COMBAT`STATUS`%1`COST),3,Moderate,5,Significant,7,Superior),switch(get(%0/D`COMBAT`STATUS`%1`COST),3,Small,5,Standard,7,Substantial),%0)={@attach %!/KILLSTATUS=%0,%i0,1};@attach %!/INC`EANNOUNCE=CURE,[ansi(hw,%n)] shrugs off negative Status Effects!
 
-&FIL`COSTCOMPARE [u(Cobj,age)]=cor(cand(hasattr(u(cobj,age)/STATUS`%0`%1`ADJECTIVE),lte(u(adj,u(u(cobj,age)/STATUS`%0`%1`ADJECTIVE,%0,%4)),u(adj,%2))),cand(hasattr(u(cobj,age)/STATUS`%0`%1`INTENSITY),lte(get(u(cobj,agedb)/INTENSITY`[u(u(cobj,age)/STATUS`%0`%1`INTENSITY,%0,%4)]),get(u(cobj,agedb)/INTENSITY`%3))))
+&FIL`COSTCOMPARE [u(Cobj,age)]=cor(cand(hasattr(u(cobj,age)/STATUS`%0`%1`ADJECTIVE),lte(u(adj,u(u(cobj,age)/STATUS`[before(%0,$)]`%1`ADJECTIVE,%0,%4)),u(adj,%2))),cand(hasattr(u(cobj,age)/STATUS`[before(%0,$)]`%1`INTENSITY),lte(get(u(cobj,agedb)/INTENSITY`[u(u(cobj,age)/STATUS`[before(%0,$)]`%1`INTENSITY,%0,%4)]),get(u(cobj,agedb)/INTENSITY`%3))))
 
 &STATUS`PUSH_BREAK [u(cobj,age)]=Inflict-Break
 &STATUS`PUSH_BREAK`ATTACK_ON_STRIKE [u(cobj,age)]=@dolist/inline u(filter,COSTCOMPARE,get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`BUFF),%b,%b,BREAK,switch(get(%0/D`COMBAT`STATUS`%1`COST),3,Moderate,5,Significant,7,Superior),switch(get(%0/D`COMBAT`STATUS`%1`COST),3,Small,5,Standard,7,Substantial),%0)={@attach %!/KILLSTATUS=%0,%i0,1};@attach %!/INC`EANNOUNCE=BREAK,[ansi(hw,%n)] has suffered a Break! Positive Status Effects removed!
@@ -2748,11 +2756,14 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &COMBAT`PUSH`ADMIN [u(cobj,age)]=
 
 @@ Takehit
-&INC`COMBAT`TAKEHIT`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat-ready!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Consequences severity field empty.;@attach %!/INC`PARTIAL=%0,MILD|MODERATE|SEVERE|NONE,|,severity;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will guarantee at least %q<severity> Consequences after this fight. Did you enter the right grade? Enter this command again within ten seconds to verify.,TAKEHIT %q<severity>;&D`COMBAT`TAKEHIT %#=switch(%q<severity>,NONE,0,MILD,1,MODERATE,2,SEVERE,3);&D`COMBAT`TAKEHIT`TIMESTAMP %#=secs();@attach %!/INC`EANNOUNCE=TAKEHIT,[ansi(hw,%n)] will voluntarily take [capstr(lcstr(switch(%q<severity>,NONE,No,%q<severity>)))] Consequences this day!
+&INC`COMBAT`TAKEHIT`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat-ready!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Consequences severity field empty.;@attach %!/INC`PARTIAL=%0,MILD|MODERATE|SEVERE|NONE,|,severity;@check gt(u(setr,newcon,switch(%q<severity>,NONE,0,MILD,1,MODERATE,2,SEVERE,3)),get(%#/D`CONSEQUENCES))=@attach %!/INC`MSG=ERROR: You can only Takehit for more intense Consequences than you already have.;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will guarantee at least %q<severity> Consequences after this fight. Did you enter the right grade? Enter this command again within ten seconds to verify.,TAKEHIT %q<severity>;@attach %!/INC`EANNOUNCE=TAKEHIT,[ansi(hw,%n)] will voluntarily take [capstr(lcstr(switch(%q<severity>,NONE,No,%q<severity>)))] Consequences this day!;@attach %!/INC`CONSEQUENCES`SET=%#,%q<newcon>,,setunion(get(%#/D`CONSEQUENCES`SCENE),get(%#/D`SCENE))
 
 @@ Tank
 
-&INC`COMBAT`TANK`MAIN [u(cobj,age)]=@attach %!/INC`VALID`POSINT=%0;@attach %!/INC`MSG=You will Tank %q<value> opponents when you next +reset!;&D`CSYS`TANK %#=%q<value>
+&INC`COMBAT`TANK`MAIN [u(cobj,age)]=@check isint(get(%#/D`CSYS`MANTLE))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@stop get(%#/D`CSYS`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: Can only use +tank with your own Mantles.;@attach %!/INC`VALID`POSINT=%0;@stop lt(%q<value>,2)=@attach %!/INC`MSG=ERROR: Tank requires a value 2 or greater!;@attach %!/INC`MSG=You will Tank %q<value> opponents when you next +reset!;&D`CSYS`TANK %#=%q<value>;&D`CSYS`MODE %#=TANK;@select/inline get(%#/D`CSYS`BOSS)=>0,{&D`CSYS`BOSS %#=0;@attach %!/INC`MSG=[ansi(hr,NOTICE:)] +boss and +tank are mutually exclusive. Disabling +boss}
+
+@@ Boss
+&INC`COMBAT`BOSS`MAIN [u(cobj,age)]=@check isint(get(%#/D`CSYS`MANTLE))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@check get(%#/D`CSYS`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: Can only use +boss with loaner Mantles.;@attach %!/INC`VALID`POSINT=%0;@stop lt(%q<value>,2)=@attach %!/INC`MSG=ERROR: Boss requires a value 2 or greater!;@attach %!/INC`MSG=You will Boss for %q<value> opponents when you next +reset!;&D`CSYS`BOSS %#=%q<value>;;&D`CSYS`MODE %#=BOSS;@select/inline get(%#/D`CSYS`TANK)=>0,{&D`CSYS`TANK %#=0;@attach %!/INC`MSG=[ansi(hr,NOTICE:)] +boss and +tank are mutually exclusive. Disabling +tank}
 
 @@ Quirk
 &COMBAT`QUIRk`PLAYER [u(cobj,age)]=ADD|REMOVE|WIPE
@@ -2795,7 +2806,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &INC`COMBAT`SCAN`MAIN [u(cobj,age)]=@pemit %#=u(header,Combatants);@pemit %#=ansi(u(color,%#,COLUMN_NAMES),align(15 15 10 10 10 12,Name,Archetype,Weight,Drive,HP,Consequences));@pemit %#=u(separator);@dolist/inline u(filter,COMBATREADY,lplayers(%l))={@pemit %#=align(15 15 10 10 10 12,u(moniker,%i0),u(GET`ARCHETYPE,%i0)[if(get(%i0/D`COMBAT`MANTLE`LOCKED),\(P\))],ansi(u(scalecolor,get(%i0/D`COMBAT`STATS`4)),u(fancyweight,%i0)),get(%i0/D`COMBAT`DRIVE`STATUS),ansi(u(ryg,sub(100,bound(u(setr,hp,round(mul(u(percent,%i0),100),0)),0))),%q<hp>\%),u(fancycon,%i0))};@pemit %#=u(footer)
 
 &FANCYCON [u(cobj,age)]=switch(if(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES),0),1,ansi(228,Mild),2,ansi(215,Moderate),3,ansi(202,Severe),ansi(hx,None))
-&FANCYCON2 [u(cobj,age)]=switch(if(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES),0),1,ansi(228,Mild Consequences),2,ansi(215,Moderate Consequences),3,ansi(202,Severe Consequences),ansi(hx,No Consequences))
+&FANCYCON2 [u(cobj,age)]=switch(if(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES),0),1,ansi(228,Mild),2,ansi(215,Moderate),3,ansi(202,Severe),ansi(hx,No Consequences))
 
 &FIL`COMBATREADY [u(cobj,age)]=cand(hasflag(%0,CONNECTED),nattr(%0/D`COMBAT`**))
 
@@ -2822,7 +2833,12 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &Q`SELECT`MANTLE_GLOBAL_NAME`EXACT [u(cobj,age)]=SELECT mantle_id FROM volv_mantle WHERE mantle_name=? AND mantle_id IN (!) LIMIT 1
 &Q`SELECT`MANTLE_GLOBAL_NAME`WILD [u(cobj,age)]=SELECT mantle_id FROM volv_mantle WHERE mantle_name LIKE '!%%' AND mantle_id IN (!)
 
-&INC`COMBAT`MANTLE`CLAIM`LIST [u(cobj,age)]=@check words(u(setr,mantles,u(filter,GLOBAL_LOCK,u(mysql3,LIST`GLOBAL`CLAIMS),chr(176),chr(176),%#)),chr(176))=@attach %!/INC`MSG=ERROR: No Global Mantles to assume!;@pemit %#=u(header,Global Mantles);@pemit %#=ansi(u(color,%#,COMBAT,COLUMN_NAMES),align(4 14 9 9 9 9 8 11,ID,Name,Power,Endurance,Precision,Mitigatio,Weight,Archetype));@pemit %#=u(separator);@dolist/inline/delimit [chr(176)] %q<mantles>={th u(setq,row,u(choosegame,%i0,%d0));th u(setq,stats,elements(%q<row>,3,chr(177)));th u(setq,arc,elements(%q<row>,4,chr(177)));@pemit %#=align(4 14 9 9 9 9 8 11,elements(%q<row>,1,chr(177)),elements(%q<row>,2,chr(177)),u(VIEW`STAT,elements(%q<stats>,1)),u(VIEW`STAT,elements(%q<stats>,2)),u(VIEW`STAT,elements(%q<stats>,3)),u(VIEW`STAT,elements(%q<stats>,4)),u(VIEW`WEIGHT,elements(%q<stats>,5)),if(cand(%q<arc>,hasattr(u(cobj,agedb)/ARC`%q<arc>)),default(u(cobj,agedb)/ARC`%q<arc>,Unpublished),ansi(hx,N/A)))};@pemit %#=u(footer)
+&INC`COMBAT`MANTLE`CLAIM`LIST [u(cobj,age)]=@check words(u(setr,mantles,u(filter,GLOBAL_LOCK,u(mysql3,LIST`GLOBAL`CLAIMS),chr(176),chr(176),%#)),chr(176))=@attach %!/INC`MSG=ERROR: No Global Mantles to assume!;@pemit %#=u(header,Global Mantles);@pemit %#=ansi(u(color,%#,COMBAT,COLUMN_NAMES),align(4 14 9 9 9 9 8 11,ID,Name,Power,Endurance,Precision,Mitigatio,Weight,Archetype));@pemit %#=u(separator);@dolist/inline/delimit [chr(176)] %q<mantles>={th u(setq,row,u(choosegame,%i0,%d0));th u(setq,stats,elements(%q<row>,3,chr(177)));th u(setq,arc,elements(%q<row>,4,chr(177)));@pemit %#=align(4 14 9 9 9 9 8 11,elements(%q<row>,1,chr(177)),elements(%q<row>,2,chr(177)),if(u(isadmin,%#),u(VIEW`STAT,elements(%q<stats>,1)),Public),if(u(isadmin,%#),u(VIEW`STAT,elements(%q<stats>,2)),Public),if(u(isadmin,%#),u(VIEW`STAT,elements(%q<stats>,3)),Public),if(u(isadmin,%#),u(VIEW`STAT,elements(%q<stats>,4)),Public),u(VIEW`WEIGHT,elements(%q<stats>,5)),if(cand(%q<arc>,hasattr(u(cobj,agedb)/ARC`%q<arc>)),default(u(cobj,agedb)/ARC`%q<arc>,Unpublished),ansi(hx,N/A)))};@pemit %#=u(footer)
+
+
+
+
+
 
 &FIL`GLOBAL_LOCK [u(Cobj,age)]=cor(u(tester,%1),u(isadmin,%1),testlock(elements(%0,5,chr(177)),%1))
 
@@ -2834,11 +2850,17 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`COMBAT`MANTLE`MAIN [u(cobj,age)]=@select/inline strlen(%0)=0,{@attach %!/INC`COMBAT`MANTLE`SHOWMANTLES},{@attach %!/INC`COMBAT`MANTLE`SELECT}
 
-&INC`COMBAT`MANTLE`SHOWMANTLES [u(cobj,age)]=@check words(u(setr,mantles,u(mysql3,VIEW`MANTLE_LINKS,%q<t1id>)),chr(176))=@attach %!/INC`MSG=ERROR: No mantles to list.;@pemit %#=u(header,Character Editor: %q<t1name>);@pemit %#=ansi(u(color,%#,COMBAT,COLUMN_NAMES),align(2 12 9 9 9 9 8 11 3,ID,Name,Power,Endurance,Precision,Mititigat,Weight,Archetype,Acl));@dolist/inline/delimit [chr(176)] %q<mantles>={th u(setq,row,u(choosegame,%i0,%d0));th u(setq,stats,elements(%q<row>,3,chr(177)));th u(setq,arc,elements(%q<row>,4,chr(177)));@pemit %#=align(2 12 9 9 9 9 8 11 3,elements(%q<row>,1,chr(177)),elements(%q<row>,2,chr(177)),u(VIEW`STAT,elements(%q<stats>,1)),u(VIEW`STAT,elements(%q<stats>,2)),u(VIEW`STAT,elements(%q<stats>,3)),u(VIEW`STAT,elements(%q<stats>,4)),u(VIEW`WEIGHT,elements(%q<stats>,5)),if(cand(%q<arc>,hasattr(u(cobj,agedb)/ARC`%q<arc>)),default(u(cobj,agedb)/ARC`%q<arc>,Unpublished),ansi(hx,N/A)),elements(%q<stats>,6))};@pemit %#=u(footer)
+&INC`COMBAT`MANTLE`SHOWMANTLES [u(cobj,age)]=@check words(u(setr,mantles,u(mysql3,VIEW`MANTLE_LINKS,%q<t1id>)),chr(176))=@attach %!/INC`MSG=ERROR: No mantles to list.;@pemit %#=u(header,Character Editor: %q<t1name>);@pemit %#=ansi(u(color,%#,COMBAT,COLUMN_NAMES),align(2 12 9 9 9 9 8 11 3,ID,Name,Power,Endurance,Precision,Mititigat,Weight,Archetype,Acl));@dolist/inline/delimit [chr(176)] %q<mantles>={th u(setq,row,u(choosegame,%i0,%d0));th u(setq,stats,elements(%q<row>,3,chr(177)));th u(setq,arc,elements(%q<row>,4,chr(177)));@pemit %#=align(2 12 9 9 9 9 8 11 3,elements(%q<row>,1,chr(177)),elements(%q<row>,2,chr(177)),if(elements(%q<row>,7,chr(177)),Public,u(VIEW`STAT,elements(%q<stats>,1))),if(elements(%q<row>,7,chr(177)),Public,u(VIEW`STAT,elements(%q<stats>,2))),if(elements(%q<row>,7,chr(177)),Public,u(VIEW`STAT,elements(%q<stats>,3))),if(elements(%q<row>,7,chr(177)),Public,u(VIEW`STAT,elements(%q<stats>,4))),u(VIEW`WEIGHT,elements(%q<stats>,5)),if(cand(%q<arc>,hasattr(u(cobj,agedb)/ARC`%q<arc>)),default(u(cobj,agedb)/ARC`%q<arc>,Unpublished),ansi(hx,N/A)),elements(%q<stats>,6))};@pemit %#=u(footer)
+
+
+
+
+
+
 
 &VIEW`STAT [u(Cobj,age)]=switch(%0,1,Poor,2,Average,3,Good,4,Great,5,Excellent,?)
 
-&INC`COMBAT`MANTLE`SELECT [u(cobj,age)]=@stop cand(gt(get(%#/D`COMBAT`DAMAGE),0),not(get(%#/D`COMBAT`MANTLE`LOCKED)))=@attach %!/INC`MSG=ERROR: Your current Mantle has damage and must be checked for Consequences. Please use +reset before changing mantles.;@attach %!/INC`FINDMANTLELINK=%q<t1id>,%0;&D`CSYS`MANTLE %#=%q<mantle_id>;&D`CSYS`MANTLE`LINK %#=%q<link_id>;&D`CSYS`MANTLE`LOCKED %#=%q<link_locked>;&D`CSYS`MANTLE`ARCHETYPE %#=%q<archetype_id>;@attach %!/INC`MSG=Mantle selected.
+&INC`COMBAT`MANTLE`SELECT [u(cobj,age)]=@stop t(get(%#/D`COMBAT`DAMAGE))=@select/inline t(get(%#/D`COMBAT`MANTLE`LOCKED))=1,{@attach %!/INC`MSG=ERROR: You are currently using a damaged locked Mantle. Please +reset to clear damage first.},0,{@attach %!/INC`MSG=ERROR: You are currently using a personal Mantle. Use +reset to clear status and apply any Consequences before swapping Mantles!};@attach %!/INC`FINDMANTLELINK=%q<t1id>,%0;&D`CSYS`MANTLE %#=%q<mantle_id>;&D`CSYS`MANTLE`LINK %#=%q<link_id>;&D`CSYS`MANTLE`LOCKED %#=%q<link_locked>;&D`CSYS`MANTLE`ARCHETYPE %#=%q<archetype_id>;@attach %!/INC`MSG=Mantle selected.
 
 &Q`MANTLE`APPROVED [u(cobj,age)]=SELECT link.approved from csys_player_pilots as link LEFT JOIN csys_pilots as pilot on link.pilot_id=pilot.id where pilot.id=? AND link.player_id=? LIMIT 1
 &Q`FIND`MANTLE [u(cobj,age)]=SELECT mantle_id from volv_mantle_link WHERE character_id=? AND (mantle_name=? OR mantle_link_display_num=?) ORDER BY mantle_name LIMIT 1
@@ -2872,22 +2894,25 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 @@ READY CHARACTER
 
-&INC`COMBAT`READYCHARACTER [u(cobj,age)]=@attach %!/WIPE=%0,D`COMBAT;@attach %!/WIPE=%0,D`COMBACK;@attach %!/INC`COMBAT`READYCHARACTER`MANTLE;@attach %!/INC`COMBAT`READYCHARACTER`FINISH
+&INC`COMBAT`READYCHARACTER [u(cobj,age)]=@attach %!/WIPE=%0,D`COMBAT;@attach %!/WIPE=%0,D`COMBACK;@dolist/inline MODE TANK BOSS SCALE={th u(attrib_set,%0,D`COMBAT`%i0,default(%0/D`CSYS`%i0,0));@attach %!/WIPE=%0,D`CSYS`%i0};@attach %!/INC`COMBAT`READYCHARACTER`MANTLE;@attach %!/INC`COMBAT`READYCHARACTER`FINISH
 
-&INC`COMBAT`READYCHARACTER`MANTLE [u(cobj,age)]=th u(setq,mdata,u(mysql3,READY`MANTLE,%1));&D`COMBAT`MANTLE`LOCKED %0=%3;th u(setq,mstats,elements(%q<mdata>,1,chr(177)));&D`COMBAT`WEIGHT %0=u(setr,wt,elements(get(u(cobj,agedb)/WEIGHTS),elements(%q<mstats>,5),|));&D`COMBAT`WEIGHT`ORIGINAL %0=%q<wt>;@dolist/inline %q<mstats>={&D`COMBAT`STATS`[sub(inum(0),1)] %0=add(default(u(cobj,agedb)/ENTITY`0`STAT`[sub(inum(0),1)]`MAPPING`%i0,%i0),mul(default(u(cobj,agedb)/ENTITY`0`STAT`[sub(inum(0),1)]`ACCWORTH,0),u(setr,accol,elements(elements(%q<mdata>,3,chr(177)),sub(inum(0),1)))));&D`COMBAT`STATS`[sub(inum(0),1)]`ACC %0=%q<accol>;th u(addto,%0,D`COMBAT`ACCOLADES,%q<accol>);&D`COMBAT`STATS`[sub(inum(0),1)]`DISPLAY %0=%i0};&D`COMBAT`ARCHETYPE %0=u(setr,arcid,elements(%q<mdata>,2,chr(177)));@select/inline strlen(u(setr,arcname,get(u(cobj,agedb)/ARC`%q<arcid>`STATUS)))=>0,{@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/ARC`%q<arcid>`STATUS),,X,X;@select/inline strlen(u(setr,supname,get(u(cobj,age)/STATUS`%q<arcname>`SUPPORT)))=>0,{@attach %!/INC`SETSTATUS=%0,%0,%q<supname>,,X,X;&D`COMBAT`SUPPORTING %0=%0;&D`COMBAT`SUPPORT %0=%q<supname>}};&D`COMBAT`QUIRKS %0=sortkey(#lambda/get(u(cobj,agedb)/QRK`\%0),u(mysql,READY`QUIRKS,%2),i)
+&INC`COMBAT`READYCHARACTER`MANTLE [u(cobj,age)]=th u(setq,mdata,u(mysql3,READY`MANTLE,%1));&D`COMBAT`MANTLE`LOCKED %0=%3;th u(setq,mstats,elements(%q<mdata>,1,chr(177)));&D`COMBAT`WEIGHT %0=u(setr,wt,elements(get(u(cobj,agedb)/WEIGHTS),elements(%q<mstats>,5),|));&D`COMBAT`WEIGHT`ORIGINAL %0=%q<wt>;@dolist/inline %q<mstats>={&D`COMBAT`STATS`[sub(inum(0),1)] %0=add(default(u(cobj,agedb)/ENTITY`0`STAT`[sub(inum(0),1)]`MAPPING`%i0,%i0),mul(default(u(cobj,agedb)/ENTITY`0`STAT`[sub(inum(0),1)]`ACCWORTH,0),u(setr,accol,elements(elements(%q<mdata>,3,chr(177)),inum(0)))));&D`COMBAT`STATS`[sub(inum(0),1)]`ACC %0=%q<accol>;th u(addto,%0,D`COMBAT`ACCOLADES,%q<accol>);&D`COMBAT`STATS`[sub(inum(0),1)]`DISPLAY %0=%i0};&D`COMBAT`ARCHETYPE %0=u(setr,arcid,elements(%q<mdata>,2,chr(177)));@select/inline strlen(u(setr,arcname,get(u(cobj,agedb)/ARC`%q<arcid>`STATUS)))=>0,{@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/ARC`%q<arcid>`STATUS),,X,X;@select/inline strlen(u(setr,supname,get(u(cobj,age)/STATUS`%q<arcname>`SUPPORT)))=>0,{@attach %!/INC`SETSTATUS=%0,%0,%q<supname>,,X,X;&D`COMBAT`SUPPORTING %0=%0;&D`COMBAT`SUPPORT %0=%q<supname>}};&D`COMBAT`QUIRKS %0=sortkey(#lambda/get(u(cobj,agedb)/QRK`\%0),u(strfirstof,u(mysql,PUBLIC`QUIRKS,%1),u(mysql,READY`QUIRKS,%2)),i)
 
 &Q`READY`MANTLE [u(cobj,age)]=SELECT mantle_stats,mantle_archetype,mantle_accolades FROM volv_mantle WHERE mantle_id=? LIMIT 1
 &Q`READY`QUIRKS [u(cobj,age)]=SELECT trait_id FROM vol_clink_trait WHERE clink_id=? AND trait_type=2 AND trait_value>0
+&Q`PUBLIC`QUIRKS [u(cobj,age)]=SELECT trait_id FROM vol_ctrait WHERE centity_id=? AND trait_type=2 AND trait_value>0
 
-&INC`COMBAT`READYCHARACTER`FINISH [u(cobj,age)]=@attach %!/INC`COMBAT`READYCHARACTER`FINISH`STARTING;@attach %!/INC`COMBAT`READYCHARACTER`FINISH`WEIGHT;@dolist/inline get(%0/D`COMBAT`QUIRKS)={@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/QRK`%i0`STATUS),,X,X};@attach/localize %!/INC`COMBAT`READYCHARACTER`FINISH`STATIC;th u(attrib_set,%0,D`COMBAT`HEALTH`ORIGINAL,get(%0/D`COMBAT`HEALTH));@select/inline cand(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES))=1,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),switch(get(%0/D`CONSEQUENCES),1,0.9,2,0.75,3,0.6),default(%0/D`CSYS`TANK,1)),0))},0,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),default(%0/D`CSYS`TANK,1)),0))};th u(attrib_set,%0,D`COMBAT`DRIVE`MAXIMUM,mul(get(%0/D`COMBAT`DRIVE`MAXIMUM),default(%0/D`CSYS`TANK,1)));th u(attrib_set,%0,D`COMBAT`HYPE`MAXIMUM,mul(get(%0/D`COMBAT`HYPE`MAXIMUM),default(%0/D`CSYS`TANK,1)));&D`CSYS`TANK %0=1
+&INC`COMBAT`READYCHARACTER`FINISH [u(cobj,age)]=@attach %!/INC`COMBAT`READYCHARACTER`FINISH`STARTING;@attach %!/INC`COMBAT`READYCHARACTER`FINISH`WEIGHT;@dolist/inline get(%0/D`COMBAT`QUIRKS)={@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/QRK`%i0`STATUS),,X,X};@attach/localize %!/INC`COMBAT`READYCHARACTER`FINISH`STATIC;th u(attrib_set,%0,D`COMBAT`HEALTH`ORIGINAL,get(%0/D`COMBAT`HEALTH));@select/inline cand(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES))=1,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),switch(get(%0/D`CONSEQUENCES),1,0.9,2,0.75,3,0.6)),0))};@select/inline hasattrval(%0/D`COMBAT`MODE)=1,{@attach %!/INC`COMBAT`READYCHARACTER`FINISH`[get(%0/D`COMBAT`MODE)]};&D`COMBAT`DRIVE`STATUS %0=u(drivestatus,%0)
 
-@@ @attach %!/INC`COMBAT`READYCHARACTER`FINISH`CALC;@attach %!/INC`COMBAT`READYCHARACTER`FINISH`STATS;
+&INC`COMBAT`READYCHARACTER`FINISH`TANK [u(cobj,age)]=th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),default(%0/D`COMBAT`TANK,1)),0));th u(attrib_set,%0,D`COMBAT`DRIVE`MAXIMUM,mul(get(%0/D`COMBAT`DRIVE`MAXIMUM),get(%0/D`COMBAT`TANK)));th u(attrib_set,%0,D`COMBAT`DRIVE,mul(get(%0/D`COMBAT`DRIVE),get(%0/D`COMBAT`TANK)));th u(attrib_set,%0,D`COMBAT`HYPE`MAXIMUM,mul(get(%0/D`COMBAT`HYPE`MAXIMUM),get(%0/D`COMBAT`TANK)))
+
+&INC`COMBAT`READYCHARACTER`FINISH`BOSS [u(cobj,age)]=th u(addto,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH`ORIGINAL),sub(get(%#/D`COMBAT`BOSS),1),switch(%q<wt>,LIGHT,0.8,MEDIUM,0.7,HEAVY,0.6,SUPERHEAVY,0.6,BOSS,0.5)),0));th u(attrib_set,%0,D`COMBAT`HYPE`MAXIMUM,mul(get(%0/D`COMBAT`HYPE`MAXIMUM),get(%0/D`COMBAT`BOSS)));th u(addto,%0,D`COMBAT`DRIVE`MAXIMUM,round(mul(100,get(%#/D`COMBAT`BOSS),switch(%q<wt>,LIGHT,0.8,MEDIUM,0.7,HEAVY,0.6,SUPERHEAVY,0.6,BOSS,0.5)),0))
 
 &INC`COMBAT`READYCHARACTER`FINISH`STARTING [u(cobj,age)]=&D`COMBAT`HEALTH %0=1000;&D`COMBAT`DRIVE %0=70;&D`COMBAT`DRIVE`GAIN %0=5;&D`COMBAT`DRIVE`MAXIMUM %0=100;&D`COMBAT`DRIVE`COST %0=0;&D`COMBAT`DRIVE`EXHAUSTION_MULTIPLIER %0=1;&D`COMBAT`DRIVE`PENALTY_MULTIPLIER %0=1;&D`COMBAT`DRIVE`BONUS_MULTIPLIER %0=1;&D`COMBAT`DAMAGE %0=0;&D`COMBAT`HYPE %0=0;&D`COMBAT`HYPE`MAXIMUM %0=10;&D`COMBAT`HYPE`GAIN %0=2
 
 &INC`COMBAT`READYCHARACTER`FINISH`WEIGHT [u(cobj,age)]=
 
-&INC`COMBAT`READYCHARACTER`FINISH`STATIC [u(cobj,age)]=@dolist/inline edit(u(lattr,%0/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={th u(addto,%0,D`COMBAT`HEALTH,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`MAXIMUM`HP));th u(addto,%0,D`COMBAT`DRIVE`GAIN,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`GAIN`DRIVE));th u(addto,%0,D`COMBAT`DRIVE,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`START`DRIVE));th u(addto,%0,D`COMBAT`DRIVE`MAXIMUM,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`MAXIMUM`DRIVE));th u(addto,%0,D`COMBAT`HYPE`GAIN,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`GAIN`HYPE));th u(addto,%0,D`COMBAT`HYPE,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`START`HYPE));th u(addto,%0,D`COMBAT`HYPE`MAXIMUM,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`MAXIMUM`HYPE));th u(attrib_set,%0,D`COMBAT`BANNED`OFF,setunion(get(%0/D`COMBAT`BANNED`OFF),get(u(cobj,age)/STATUS`[before(%i0,$)]`BANNED`OFF)));th u(attrib_set,%0,D`COMBAT`BANNED`DEF,setunion(get(%0/D`COMBAT`BANNED`DEF),get(u(cobj,age)/STATUS`[before(%i0,$)]`BANNED`DEF)));th u(attrib_set,%0,D`COMBAT`BANNED`PUSH,setunion(get(%0/D`COMBAT`BANNED`PUSH),get(u(cobj,age)/STATUS`[before(%i0,$)]`BANNED`PUSH)));@dolist/inline EXHAUSTION PENALTY BONUS={th u(addto,%0,D`COMBAT`DRIVE`%i0_MULTIPLIER,get(u(cobj,age)/STATUS`[before(%i1,$)]`DRIVE`%i0_MULTIPLIER))}};&D`COMBAT`DRIVE`STATUS %0=u(drivestatus,%0)
+&INC`COMBAT`READYCHARACTER`FINISH`STATIC [u(cobj,age)]=@dolist/inline edit(u(lattr,%0/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={th u(addto,%0,D`COMBAT`HEALTH,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`MAXIMUM`HP));th u(addto,%0,D`COMBAT`DRIVE`GAIN,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`GAIN`DRIVE));th u(addto,%0,D`COMBAT`DRIVE,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`START`DRIVE));th u(addto,%0,D`COMBAT`DRIVE`MAXIMUM,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`MAXIMUM`DRIVE));th u(addto,%0,D`COMBAT`HYPE`GAIN,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`GAIN`HYPE));th u(addto,%0,D`COMBAT`HYPE,mul(get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`START`HYPE),bound(get(%0/D`COMBAT`TANK),1)));th u(addto,%0,D`COMBAT`HYPE`MAXIMUM,get(u(cobj,age)/STATUS`[before(%i0,$)]`STATIC`MAXIMUM`HYPE));th u(attrib_set,%0,D`COMBAT`BANNED`OFF,setunion(get(%0/D`COMBAT`BANNED`OFF),get(u(cobj,age)/STATUS`[before(%i0,$)]`BANNED`OFF)));th u(attrib_set,%0,D`COMBAT`BANNED`DEF,setunion(get(%0/D`COMBAT`BANNED`DEF),get(u(cobj,age)/STATUS`[before(%i0,$)]`BANNED`DEF)));th u(attrib_set,%0,D`COMBAT`BANNED`PUSH,setunion(get(%0/D`COMBAT`BANNED`PUSH),get(u(cobj,age)/STATUS`[before(%i0,$)]`BANNED`PUSH)));@dolist/inline EXHAUSTION PENALTY BONUS={th u(addto,%0,D`COMBAT`DRIVE`%i0_MULTIPLIER,get(u(cobj,age)/STATUS`[before(%i1,$)]`DRIVE`%i0_MULTIPLIER))}};
 
 &ADDTO [u(cobj,age)]=u(attrib_set,%0,%1,add(%2,default(%0/%1,0)))
 
@@ -2895,15 +2920,23 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 @@ - RESET
 &INC`COMBAT`RESET`MAIN [u(cobj,age)]=@check isint(u(setr,m1id,get(%#/D`CSYS`MANTLE)))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@select/inline t(nattr(%#/D`COMBAT`**))=1,{@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will reset you to base combat readiness\, clear any attacks\, and apply Consequences as applicable. ARE YOU SURE? Enter the same command again within ten seconds to continue.,RESET CSYS};@select/inline cand(hasattr(%#/D`COMBAT`SUPPORTING),not(strmatch(get(%#/D`COMBAT`SUPPORTING),%:)))=1,{@attach %!/KILLSTATUS=get(%#/D`COMBAT`SUPPORTING),first(get(get(%#/D`COMBAT`SUPPORTING)/D`COMBAT`ACTIVE`STATUS`[get(%#/D`COMBAT`SUPPORT)]))};@select/inline cand(nattr(%#/D`COMBAT`**),not(get(%#/D`CSYS`MANTLE`LOCKED)))=>0,{@attach %!/INC`COMBAT`RESET`MAIN`CONSEQUENCES};@select/inline default(%#/D`CSYS`TANK,1)=>1,{@attach %!/INC`EANNOUNCE=TANK,[ansi(hw,%n)] resets! Ready to Tank [default(%#/D`CSYS`TANK,1)] opponents!},{@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] has reset!};@attach %!/INC`COMBAT`READYCHARACTER=%:,%q<m1id>,get(%#/D`CSYS`MANTLE`LINK),get(%#/D`CSYS`MANTLE`LOCKED)
 
-&INC`CONSEQUENCES`SET [u(cobj,age)]=@attach %!/WIPE=%#,D`CONSEQUENCES;th u(attrib_set,%#,D`CONSEQUENCES,%1);th u(attrib_set,%#,D`CONSEQUENCES`TIMEOUT,add(max(get(%#/D`COMBAT`DAMAGE`TIMESTAMP),get(%#/D`COMBAT`TAKEHIT`TIMESTAMP)),mul(60,60,24,switch(%1,1,7,2,14,3,28))));th u(addto,%#,D`CONSEQUENCES`SCENES,add(1,switch(%1,1,1,2,1,3,2,0)));@attach %!/INC`EPRIVATE=CONSEQUENCES,You now suffer [switch(%1,1,Mild,2,Moderate,3,Severe)] Consequences! Maximum HP temporarily reduced!,%#
+&INC`CONSEQUENCES [u(cobj,age)]=@select/inline default(%0/D`COMBAT`KEEPS,0)=0,{th u(setq,newcon,if(lte(u(percent,%0),0.35),1,0))},1,{th u(setq,newcon,if(lt(u(percent,%0),0.25),3,if(lt(u(percent,%0),0.5),2,1)))};th u(setq,newcon,max(%q<newcon>,default(%0/D`COMBAT`TAKEHIT,0)));@select/inline gt(%q<newcon>,default(%0/D`CONSEQUENCES,0))=1,{@attach %!/INC`CONSEQUENCES`SET=%0,%q<newcon>,,setunion(get(%0/D`CONSEQUENCES`SCENE),get(%0/D`SCENE))}
 
-&INC`COMBAT`RESET`MAIN`CONSEQUENCES [u(cobj,age)]=@select/inline default(%#/D`COMBAT`KEEPS,0)=0,{th u(setq,newcon,if(lte(u(percent,%#),0.35),1,0))},1,{th u(setq,newcon,if(lt(u(percent,%#),0.25),3,if(lt(u(percent,%#),0.5),2,1)))};th u(setq,newcon,max(%q<newcon>,default(%#/D`COMBAT`TAKEHIT,0)));@select/inline gt(%q<newcon>,default(%#/D`CONSEQUENCES,0))=1,{@attach %!/INC`CONSEQUENCES`SET=%#,%q<newcon>};@attach %!/INC`CONSEQUENCES`DOWNGRADE;
+&INC`CONSEQUENCES`SET [u(cobj,age)]=@attach %!/WIPE=%0,D`CONSEQUENCES;th u(attrib_set,%0,D`CONSEQUENCES,%1);th u(attrib_set,%0,D`CONSEQUENCES`GAINED,u(setr,gained,if(%2,%2,secs())));th u(attrib_set,%0,D`CONSEQUENCES`TIMEOUT,add(%q<gained>,mul(60,60,24,7,switch(%1,1,1,2,3,3,6)),if(not(%4),mul(60,60,12,-1),0)));th u(attrib_set,%0,D`CONSEQUENCES`SCENE,%3);@attach %!/INC`EPRIVATE=CONSEQUENCES,You now suffer [switch(%1,1,Mild,2,Moderate,3,Severe)] Consequences! Maximum HP will be reduced next +reset!,%0
 
-&INC`CONSEQUENCES`DOWNGRADE [u(cobj,age)]=@select/inline t(hasattr(%#/D`CONSEQUENCES))=1,{@select/inline gte(u(setr,overtime,sub(add(secs(),%q<overtime>),get(%#/D`CONSEQUENCES`TIMEOUT))),0)=1,{@attach %!/INC`CONSEQUENCES`DOWNGRADE`DO},0,{@select/inline gte(sub(get(%#/D`FINISHED),get(%#/D`FINISHED`SPENT)),get(%#/D`CONSEQUENCES`SCENES))=1,{th u(addto,%#,D`FINISHED`SPENT,get(%#/D`CONSEQUENCES`SCENES));@attach %!/INC`CONSEQUENCES`DOWNGRADE`DO}}}
+&INC`COMBAT`RESET`MAIN`CONSEQUENCES [u(cobj,age)]=@attach %!/INC`CONSEQUENCES`DOWNGRADE;
 
-&INC`CONSEQUENCES`DOWNGRADE`DO [u(cobj,age)]=@select/inline get(%#/D`CONSEQUENCES)=1,{@attach %!/INC`MSG=You no longer suffer any combat Consequences. Full HP restored!;@attach %!/WIPE=%#,D`CONSEQUENCES},{@attach %!/INC`CONSEQUENCES`SET=%#,sub(get(%#/D`CONSEQUENCES),1);@attach %!/INC`CONSEQUENCES`DOWNGRADE}
+&INC`CONSEQUENCES`REDUCE [u(cobj,age)]=@select/inline cand(get(%0/D`CONSEQUENCES),not(match(get(%0/D`CONSEQUENCES`SCENE),%1)),gte(%2,get(%0/D`CONSEQUENCES`GAINED)))=1,{th u(addto,%0,D`CONSEQUENCES`TIMEOUT,mul(60,60,24,7,-1));@attach %!/INC`EPRIVATE=CONSEQUENCES,Consequences duration was reduced by one week from Scene %1 being marked Finished!,%0;@attach %!/INC`CONSEQUENCES`DOWNGRADE=%0}
 
-&SCENE`CHANGE_STATUS [u(cobj,age)]=@select/inline cand(eq(%2,3),t(%4))=1,{@dolist/inline [u(filter,ISOBJID,u(mysql,SCENE`ACTORS,%0))]={th u(addto,%i0,D`FINISHED,1)}}
+&INC`CONSEQUENCES`DOWNGRADE [u(cobj,age)]=@select/inline t(hasattr(%0/D`CONSEQUENCES))=1,{@select/inline gte(u(setr,overtime,sub(add(secs(),%q<overtime>),get(%0/D`CONSEQUENCES`TIMEOUT))),0)=1,{@attach %!/INC`CONSEQUENCES`DOWNGRADE`DO=%0,get(%0/D`CONSEQUENCES`SCENE)}}
+
+&INC`CONSEQUENCES`DOWNGRADE`DO [u(cobj,age)]=@select/inline get(%0/D`CONSEQUENCES)=1,{@attach %!/INC`EPRIVATE=CONSEQUENCES,You no longer suffer any combat Consequences. Full HP restored next +reset!,%0;@attach %!/WIPE=%0,D`CONSEQUENCES},{@attach %!/INC`CONSEQUENCES`SET=%0,sub(get(%0/D`CONSEQUENCES),1),get(%0/D`CONSEQUENCES`TIMEOUT),%1,0;@attach %!/INC`CONSEQUENCES`DOWNGRADE=%0}
+
+&STARTUP [u(cobj,age)]=@trigger %!/LOOP`CONSEQUENCES
+
+&LOOP`CONSEQUENCES [u(cobj,age)]=@dolist/inline lsearch(all,type,player,elock,D`CONSEQUENCES:>0)={@attach/localize %!/INC`CONSEQUENCES`DOWNGRADE=%i0};@wait 60={@trigger %!/LOOP`CONSEQUENCES}
+
+&SCENE`CHANGE_STATUS [u(cobj,age)]=@select/inline cand(eq(%2,3),t(%4))=1,{@dolist/inline [u(filter,ISOBJID,u(mysql,SCENE`ACTORS,%0))]={@attach %!/INC`CONSEQUENCES`REDUCE=%i0,%0,%5}}
 
 &Q`SCENE`ACTORS [u(cobj,age)]=SELECT character_objid FROM volv_actor_agg WHERE scene_id=? AND action_count>0
 
@@ -2947,13 +2980,13 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 &INC`COMBAT`STATS`MAIN [u(cobj,age)]=@attach %!/INC`CHECKPC=u(strfirstof,if(u(tester,%#),%0),%#),1;@check nattr(%q<t1>/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: %q<t1name> is not readied for battle.;@pemit %#=u(header,%q<t1name> - Stats);@attach %!/INC`COMBAT`STATS`DISPLAY;@pemit %#=u(footer)
 
 
-&INC`COMBAT`STATS`DISPLAY [u(cobj,age)]=@pemit %#=align(1. 50 1. 23 1.,ansi(u(color,%#,BORDER),|),u(setr,startsec,u(fancyweight,%q<t1>)[repeat(*,get(%q<t1>/D`COMBAT`STATS`5`ORIG))]%b[ansi(hw,default(u(cobj,agedb)/ARC`[default(%q<t1>/D`COMBAT`ARCHETYPE,0)],Unpublished))]%B[ansi(220,repeat(*,get(%q<t1>/D`COMBAT`ACCOLADES)))])[rjust(u(fancycon2,%q<t1>),sub(60,strlen(%q<startsec>),10))]%R[rjust(ansi(h,HP:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(u(setr,perc,mul(%i0,5)),100),u(percent,%q<t1>)),ansi(u(ryg,sub(100,%q<perc>)),|),%B),%b,)][ansi(h,>>)]%B[ansi(h,[sub(get(%q<t1>/D`COMBAT`HEALTH),get(%q<t1>/D`COMBAT`DAMAGE))]/[get(%q<t1>/D`COMBAT`HEALTH)]%B\([before(round(mul(u(percent,%q<t1>),100),0),.)]\%\))]%R[rjust(ansi(h,Drive:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`DRIVE),get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM))),ansi(u(drivebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`DRIVE)]/[get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM)]%B\([get(%q<t1>/D`COMBAT`DRIVE`STATUS)]\))]%R[rjust(ansi(h,Hype:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`HYPE),get(%q<t1>/D`COMBAT`HYPE`MAXIMUM))),ansi(u(hypebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`HYPE)]/[get(%q<t1>/D`COMBAT`HYPE`MAXIMUM)])],ansi(u(color,%#,BORDER),|),center(ansi(%q<qcolor>,Quirks),23)%R[iter(get(%q<t1>/D`COMBAT`QUIRKS),ansi(hw,default(u(cobj,agedb)/QRK`%i0,<unknown>)),%B,%R)],ansi(u(color,%#,BORDER),|));@pemit %#=u(separator);@pemit %#=align(1. 76 1.,ansi(u(color,%#,BORDER),|),u(SHEET`STAT,%q<t1>,POW,0)[u(SHEET`STAT,%q<t1>,PRE,2)]%R[u(SHEET`STAT,%q<t1>,END,1)][u(SHEET`STAT,%q<t1>,MIT,3)],ansi(u(color,%#,BORDER),|));
+&INC`COMBAT`STATS`DISPLAY [u(cobj,age)]=@pemit %#=align(1. 50 1. 23 1.,ansi(u(color,%#,BORDER),|),u(setr,startsec,u(fancyweight,%q<t1>)[repeat(*,get(%q<t1>/D`COMBAT`STATS`5`ORIG))]%b[ansi(hw,default(u(cobj,agedb)/ARC`[default(%q<t1>/D`COMBAT`ARCHETYPE,0)],Unpublished))]%B[ansi(220,repeat(*,get(%q<t1>/D`COMBAT`ACCOLADES)))])[rjust(u(fancycon2,%q<t1>)[if(get(%q<t1>/D`CONSEQUENCES),%B\([squish(etime(sub(get(%q<t1>/D`CONSEQUENCES`TIMEOUT),secs()),6))]\))],sub(60,strlen(%q<startsec>),10))]%R[rjust(ansi(h,HP:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(u(setr,perc,mul(%i0,5)),100),u(percent,%q<t1>)),ansi(u(ryg,sub(100,%q<perc>)),|),%B),%b,)][ansi(h,>>)]%B[ansi(h,[sub(get(%q<t1>/D`COMBAT`HEALTH),get(%q<t1>/D`COMBAT`DAMAGE))]/[get(%q<t1>/D`COMBAT`HEALTH)]%B\([before(round(mul(u(percent,%q<t1>),100),0),.)]\%\))]%R[rjust(ansi(h,Drive:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`DRIVE),get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM))),ansi(u(drivebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`DRIVE)]/[get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM)]%B\([get(%q<t1>/D`COMBAT`DRIVE`STATUS)]\))]%R[rjust(ansi(h,Hype:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`HYPE),get(%q<t1>/D`COMBAT`HYPE`MAXIMUM))),ansi(u(hypebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`HYPE)]/[get(%q<t1>/D`COMBAT`HYPE`MAXIMUM)])],ansi(u(color,%#,BORDER),|),center(ansi(%q<qcolor>,Quirks),23)%R[iter(get(%q<t1>/D`COMBAT`QUIRKS),ansi(hw,default(u(cobj,agedb)/QRK`%i0,<unknown>)),%B,%R)],ansi(u(color,%#,BORDER),|));@pemit %#=u(separator);@pemit %#=align(1. 76 1.,ansi(u(color,%#,BORDER),|),u(SHEET`STAT,%q<t1>,POW,0)[u(SHEET`STAT,%q<t1>,PRE,2)]%R[u(SHEET`STAT,%q<t1>,END,1)][u(SHEET`STAT,%q<t1>,MIT,3)],ansi(u(color,%#,BORDER),|));
 
-&DRIVEBAR [u(cobj,age)]=switch(1,t(match(1 2 3 4,%0)),27,t(match(5 6 7 8 9 10,%0)),75,t(match(11 12 13 14 15 16,%0)),117,t(match(17 18 19 20,%0)),159)
+&DRIVEBAR [u(cobj,age)]=switch(1,t(match(1 2 3 4,%0)),27,t(match(5 6 7 8 9 10 11,%0)),75,t(match(12 13 14 15 16,%0)),117,t(match(17 18 19 20,%0)),159)
 
 &HYPEBAR [u(cobj,age)]=switch(1,t(match(1 2,%0)),56,t(match(3 4,%0)),93,t(match(5 6,%0)),129,t(match(7 8,%0)),165,t(match(9 10,%0)),201,t(match(11 12,%0)),207,t(match(13 14,%0)),213,t(match(15 16,%0)),219,t(match(17 18,%0)),225,t(match(19 20,%0)),231)
 
-&SHEET`STAT [u(cobj,age)]=localize(ansi(hw,%1:)%B[ljust(ansi(switch(u(setr,val,get(%0/D`COMBAT`STATS`%2`DISPLAY)),1,208,2,191,3,76,4,39,5,141),u(VIEW`STAT,%q<val>)%B[repeat(*,get(%0/D`COMBAT`STATS`%2`ACC))]),20)])
+&SHEET`STAT [u(cobj,age)]=localize(ansi(hw,%1:)%B[ljust(if(get(%0/D`COMBAT`MANTLE`LOCKED),Public,ansi(switch(u(setr,val,get(%0/D`COMBAT`STATS`%2`DISPLAY)),1,208,2,191,3,76,4,39,5,141),u(VIEW`STAT,%q<val>)%B[repeat(*,get(%0/D`COMBAT`STATS`%2`ACC))])),20)])
 
 
 @@ - ATTACK
@@ -2983,7 +3016,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`COMBAT`ATTACK`MAIN`ENDTURN`STATUS [u(cobj,age)]=@dolist/inline/nobreak get(%0/D`COMBAT`ACTIVE`STATUS`ATTACK)={@select/inline u(setr,srem,get(%0/D`COMBAT`STATUS`%i0`ATTACK_TURNS))=X,{},>0,{th u(attrib_set,%0,D`COMBAT`STATUS`%i0`ATTACK_TURNS,sub(%q<srem>,1));@stop get(%0/D`COMBAT`STATUS`%i0`ATTACK_TURNS);th u(attrib_set,%0,D`COMBAT`ACTIVE`STATUS`ATTACK,setdiff(get(%0/D`COMBAT`ACTIVE`STATUS`ATTACK),%i0));@stop cor(strmatch(get(%0/D`COMBAT`STATUS`%i0`DEFENSE_TURNS),X),gt(u(lmax,iter(ATTACK DEFENSE,get(%0/D`COMBAT`STATUS`%i1`%i0_TURNS))),0));@attach %!/KILLSTATUS=%0,%i0}};
 
-&INC`DAMAGE [u(cobj,age)]=@select/inline not(%4)=1,{@attach %!/INC`ANNOUNCE=[if(%3,%3,[u(moniker,%0)] took [ansi(h,%1)] damage from %2!)]};th u(setq,predam,get(%0/D`COMBAT`DAMAGE));th u(setq,prebon,u(healthbonus,%0));th u(addto,%0,D`COMBAT`DAMAGE,%1);th u(setq,postbon,u(healthbonus,%0));th u(setq,afterper,u(percent,%0));@dolist/inline/nobreak iter(revwords(lnum(0,19)),mul(%i0,5))={@attach %!/INC`DAMAGETIER=%0,%i0};@select/inline cand(lte(%q<afterper>,0),not(%4))=1,{@attach %!/INC`ANNOUNCE=[ansi(hr,name(%0) has been Defeated! *BOOM*)]};&D`COMBAT`DAMAGE`TIMESTAMP %0=secs()
+&INC`DAMAGE [u(cobj,age)]=@select/inline not(%4)=1,{@attach %!/INC`ANNOUNCE=[if(%3,%3,[u(moniker,%0)] took [ansi(h,%1)] damage from %2!)]};th u(setq,predam,get(%0/D`COMBAT`DAMAGE));th u(setq,prebon,u(healthbonus,%0));th u(addto,%0,D`COMBAT`DAMAGE,%1);th u(setq,postbon,u(healthbonus,%0));th u(setq,afterper,u(percent,%0));@dolist/inline/nobreak iter(revwords(lnum(0,19)),mul(%i0,5))={@attach %!/INC`DAMAGETIER=%0,%i0};@select/inline cand(lte(%q<afterper>,0),not(%4))=1,{@attach %!/INC`ANNOUNCE=[ansi(hr,name(%0) has been Defeated! *BOOM*)]};&D`COMBAT`DAMAGE`TIMESTAMP %0=secs();@select/inline t(get(%0/D`COMBAT`MANTLE`LOCKED))=0,{@attach %!/INC`CONSEQUENCES=%0}
 
 &INC`DAMAGETIER [u(cobj,age)]=@select/inline cand(lte(%q<afterper>,fdiv(%1,100)),not(hasattr(%0/D`COMBAT`PERCENT`%1)))=1,{&D`COMBAT`PERCENT`%1 %0=1;@dolist/inline/nobreak get(%0/D`COMBAT`ACTIVE`STATUS)={@attach %!/STATUS`[before(%i0,$)]`BELOW_%1_HEALTH=%0,%i0}};
 
@@ -3048,7 +3081,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &INC`COMBAT`DEFEND`MAIN`STRIKE [u(cobj,age)]=th u(setq,boss,default(%#/D`COMBAT`BOSS,1));@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] [ansi(118,get(u(cobj,agedb)/DEF`%q<def>`ACTION))] against [ansi(hw,name(%q<atker>))]! [ansi(118,if(%q<hitmul>,if(gte(%q<hitmul>,1.0),A Critical Hit![u(setq,htype,CRITICAL)],if(gte(%q<hitmul>,0.7),A Solid Hit![u(setq,htype,SOLID)],A Close Call![u(setq,htype,CLOSE)])),It Missed![u(setq,htype,MISS)]))];@attach %!/INC`ANNOUNCE=[u(u(cobj,agedb)/DEF`%q<def>`%q<htype>,%q<atklevel>,ansi(hw,%n),ansi(hw,name(%q<atker>)),ansi(,u(u(cobj,agedb)/OFF`[get(%#/%q<atk>`OFF)]`DESCRIPTION,%q<atklevel>)))]%B[ansi(226,%q<damage>)] [ansi(hw,damage)]![if(%q<dot>,%B[ansi(hr,%q<dot>)] more from Damage over Time!)];@attach %!/INC`DAMAGE=%#,add(%q<damage>,%q<dot>),Normal Combat,,1;@select/inline gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=1,{@attach %!/INC`ANNOUNCE=[ansi(hr,%n has been defeated!)]};th u(setq,trgbons,iter(0 1 2 3,u(calcstatmod,%#,%i0,DEFENSE,%q<def>)));
 
-&INC`COMBAT`DEFEND`MAIN`ENDTURN [u(cobj,age)]=&D`COMBAT`HISTORY`LAST_DEF_CHOICE %#=%q<def>;th u(addto,%#,D`COMBAT`NUMBERS`TIMES_DEFENDED,1);@attach %!/INC`DRIVE=%#,add(get(%#/D`COMBAT`DRIVE`GAIN),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,BONUS`DRIVE_GAIN)))),Passive Gain,1,,5;@attach %!/INC`HYPE=%#,get(%#/D`COMBAT`HYPE`GAIN),Passive Gain,1;th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_HITMUL,%q<hitmul>);th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE,%q<damage>);@dolist/inline edit(lattr(%0/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_PRE_BONUS=%#,%i0};@select/inline u(setr,ftb,cand(not(get(%#/D`COMBAT`NO_FIRST_BONUS)),eq(get(%#/D`COMBAT`NUMBERS`TIMES_DEFENDED),1),not(get(%#/D`COMBAT`NUMBERS`TIMES_ATTACKED))))=1,{@attach %!/INC`DRIVE=%#,15,First Turn Bonus,,1};@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] passively gains [ansi(118,if(%q<ftb>,add(get(%#/D`COMBAT`DRIVE`GAIN),15),get(%#/D`COMBAT`DRIVE`GAIN)))] [ansi(118,Drive)] [if(%q<ftb>,\(First Turn Defense Bonus!\)%B)]and [ansi(118,get(%#/D`COMBAT`HYPE`GAIN))] [ansi(118,Hype)]!;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_END_TURN=%#,%i0};@dolist/inline get(%#/%q<atk>`ACTIVE`STATUS`ATTACK)={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_DEFENSE_ENDTURN=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`ENDTURN`STATUS=%#;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_FINAL_ENDTURN=%#,%i0};&D`COMBAT`HYPE`USED %#=0;&D`COMBAT`SELL %#=0;&D`COMBAT`HARDSELL %#=0;@attach %!/WIPE=%#,D`COMBACK
+&INC`COMBAT`DEFEND`MAIN`ENDTURN [u(cobj,age)]=&D`COMBAT`HISTORY`LAST_DEF_CHOICE %#=%q<def>;th u(addto,%#,D`COMBAT`NUMBERS`TIMES_DEFENDED,1);@attach %!/INC`DRIVE=%#,add(get(%#/D`COMBAT`DRIVE`GAIN),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,BONUS`DRIVE_GAIN)))),Passive Gain,1,,5;@attach %!/INC`HYPE=%#,get(%#/D`COMBAT`HYPE`GAIN),Passive Gain,1;th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_HITMUL,%q<hitmul>);th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE,%q<damage>);@dolist/inline edit(lattr(%0/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_PRE_BONUS=%#,%i0};@select/inline u(setr,ftb,cand(not(get(%#/D`COMBAT`NO_FIRST_BONUS)),eq(get(%#/D`COMBAT`NUMBERS`TIMES_DEFENDED),1),not(get(%#/D`COMBAT`NUMBERS`TIMES_ATTACKED))))=1,{@attach %!/INC`DRIVE=%#,15,First Turn Bonus,1,1};@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] passively gains [ansi(118,if(%q<ftb>,add(get(%#/D`COMBAT`DRIVE`GAIN),15),get(%#/D`COMBAT`DRIVE`GAIN)))] [ansi(118,Drive)] [if(%q<ftb>,\(First Turn Defense Bonus!\)%B)]and [ansi(118,get(%#/D`COMBAT`HYPE`GAIN))] [ansi(118,Hype)]!;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_END_TURN=%#,%i0};@dolist/inline get(%#/%q<atk>`ACTIVE`STATUS`ATTACK)={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_DEFENSE_ENDTURN=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`ENDTURN`STATUS=%#;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_FINAL_ENDTURN=%#,%i0};&D`COMBAT`HYPE`USED %#=0;&D`COMBAT`SELL %#=0;&D`COMBAT`HARDSELL %#=0;@attach %!/WIPE=%#,D`COMBACK
 
 &INC`COMBAT`DEFEND`MAIN`ENDTURN`STATUS [u(cobj,age)]=@dolist/inline/nobreak u(setr,sall,get(%0/D`COMBAT`ACTIVE`STATUS`DEFENSE))={th u(addto,%0,D`COMBAT`STATUS`%i0`INCREMENT,1);@select/inline u(setr,srem,get(%0/D`COMBAT`STATUS`%i0`DEFENSE_TURNS))=X,{},>0,{th u(attrib_set,%0,D`COMBAT`STATUS`%i0`DEFENSE_TURNS,sub(%q<srem>,1));@stop get(%0/D`COMBAT`STATUS`%i0`DEFENSE_TURNS);th u(attrib_set,%0,D`COMBAT`ACTIVE`STATUS`DEFENSE,setdiff(get(%0/D`COMBAT`ACTIVE`STATUS`DEFENSE),%i0));@stop cor(strmatch(get(%0/D`COMBAT`STATUS`%i0`ATTACK_TURNS),X),gt(u(lmax,iter(ATTACK DEFENSE,get(%0/D`COMBAT`STATUS`%i1`%i0_TURNS))),0));@attach %!/KILLSTATUS=%0,%i0}};
 
