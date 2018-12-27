@@ -1,0 +1,78 @@
+Note that when I say 'X_Y_Z is run' this is referring to looping over EVERY STATUS affecting a person and then calling arbitrary code under that hook.
+
+* ATTACK * (ignoring the 'you drive exploded' outcome)
+1) Choose target and define your attack. Pick level, type of offense, name it, etc.
+1a) run the ATTACK ACTIVATE hooks such as 'ON FORCEFUL' or 'ON CONSISTENT.' This is used to activate any STATUSes which gain additional effects when doing XYZ.
+1b) Run the ATTACK_BEFORE_LAUNCH hook. Currently used by Indomitability.
+Proceed to Step 2
+
+2) Launch attack! the Attacker's stats are calculated, bonuses applied, results saved.
+2a) Fancy text is displayed to the room covering the attack.
+2b) A crapload of data consisting of the attack, the attacker's stats, drive, hype, combat statistics, and the ENTIRETY of their status data (archetypes, quirks, pushes, whatever) are copied wholesale to the target. This allows the defense to operate independently of the attacker from here on.
+2b) Drive use/award is applied to the attacker.
+2c) ATTACK-TURN Damage-over-time is calculated and applied, if applicable.
+Proceed to Step 3
+
+3) Finish turn and cleanup.
+3a) The ATTACK_END_TURN and <offense type>_END_TURN hooks are run. such as CONSISTENT_END_TURN. (I forget what uses 'em though...)
+3b) Status Effect Attack Durations are lowered by 1. Any that have reached 0 for both Attack and Defense are removed.
+3c) Current combat state is saved for +cancel usage.
+Finished with Attack.
+
+
+* DEFENSE *
+1) Choose incoming attack
+1a) Run the DEFENSE ACTIVATE hooks, such as 'ON GUARD' or 'ON MANEUVER'. This is used to activate any STATUSes which gain additional effects when doing XYZ.
+Proceed to Step 2
+
+2) Calculate Strike! Step by Step....
+2a) Run ATTACK_ON_CALCULATE and DEFENSE_ON_CALCULATE - these hooks are for anything that might need to happen before anything else takes place. ATTACK runs Status code stored on the ATTACK while DEFENSE runs STATUS code of the Defender.
+2b) The Defender's STATS are calculated and BALANCE is applied. (This was already done for the Attacker, with the results saved to the attack.)
+2c) Calculate DAMAGEMOD
+2d) Calculate ACCURACYMOD
+2e) Run ATTACK_ON_HITCHECK and DEFENSE_ON_HITCHECK - these are mostly used to modify accuracymod and damagemod directly.
+2f) The Threshold/Tier is figured out based on damagemod and accuracymod.
+2g) The 1d100 die is cast. ROLLFORCE is used if given. HITMUL (Miss, Close, Solid, Critical) is calculated for the first time.
+2h) DEFENSE_PRE_ROLL and ATTACK_PRE_REROLL are run for those rare things which use this hook. Which is currently just Archetype: Ghost. Mostly used for SHUTTING DOWN statuses that would re-roll.
+
+If REROLLS have not been disabled by this point:
+2h-1) ATTACK_REROLL is run. This runs the re-roll from the attack's perspective. HITMUL is recalculated.
+
+2i) ATTACK_MODIFY_HITMUL is run. This hook alters HITMUL from the Attack's perspective, such as Assassin upgrading Solids to Criticals.
+
+IF REROLLS have not been disabled by this point:
+2i-1) DEFENSE_REROLL is run. This re-rolls from the Defender's perspective. HITMUL is re-calculated.
+
+2j) DEFENSE_MODIFY_HITMUL is run. This alters HITMUL from the Defender's perspective. An example is Archetype: Fencer's Guard effect.
+
+IF the Attack STRIKES: Proceed to 3.
+ELSE: Run ATTACK_ON_MISS and DEFENSE_ON_MISS hooks, THEN proceed to step 4
+
+3) Calculate Damage! Step by Step...
+3a) run ATTACK_ON_<HITTYPE> such as ATTACK_ON_SOLID or ATTACK_ON_CRITICAL, then DEFENSE_ON_<HITTYPE>. Fury adding 5 Drive on a Critical is an example of ATTACK_ON_CRITICAL.
+3b) Run ATTACK_INCREASE DAMAGE and ATTACK_DECREASE_DAMAGE. Ten run DEFENSE_INCREASE_DAMAGE and DEFENSE_DECREASE_DAMAGE. These might operate directly on the DAMAGE value, or they might add to multiplier variables that are applied later.
+3c) Normalize Damage.
+3d) Run ATTACK_POST_DAMAGE and DEFENSE_POST_DAMAGE. Demoralizer makes use of ATTACK_POST_DAMAGE to run its Drive-damaging effect.
+3e) Run ATTACK_INFLICT_STATUS and DEFENSE_INFLICT_STATUS. This is what it says on the tin: if you have some kind of status effect to inflict on a target (or yourself) it happens here. The assumption is that 'the attack struck, you touched your opponent for touch effects, etc.'
+3f) Then ATTACK_NEGATE_DAMAGE and DEFENSE_NEGATE_DAMAGE runs. Archetype: Blaster and Saint uses these.
+Proceed to Step 4
+
+4) Strike!
+4a) Display fancy formatting about the attack! Whether it hit or miss, etc.
+4b) Inflict damage! If applicable.
+4c) Inflict Defense-DOT damage, if applicable.
+Proceed to Step 5: 
+
+5) Finish turn and cleanup.
+5a) Defense drive gain is calculated and awarded. (not the First Turn Bonus yet.)
+5b) Defense Hype gain is calculated and awarded.
+5c) Various combat statistics are recorded, such as recording last hitmul struck by and adding the attack's DAMAGE (if there was any) to the First-In-First-Out Damage (FIFO_DAMAGE) queues of various Statuses which calculate regen and etc based on it.
+5d) DEFENSE_PRE_BONUS is run. (unused)
+5e) DEFENSE_END_TURN is run. Frequently used for REGENERATION effects.
+5f) ATTACK_ON_DEFENSE_ENDTURN is run. Currently used by Sniper, Conspirator, Bloodthirsty, and a few others.
+5g) DEFENSE_FINAL_ENDTURN is run. This is used by Vanish and Improvisation.
+5h) Status Effect Defense Durations are lowered by 1. Any that have reached 0 for both Attack and Defense are removed.
+5i) Unless blocked by Honorbound, the First Turn Bonus to Drive is awarded.
+5j) More statistics are calculated/saved.
+5k) The combat state backup is wiped.
+Finished with Defense.
