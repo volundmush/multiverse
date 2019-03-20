@@ -11,12 +11,14 @@ th u(NEWCOBJ,MCM Compliance Check <COMPLY>,comply,,,,WIZARD SAFE !NO_COMMAND,INH
 
 &FIL`EXCLUDE [u(cobj,comply)]=ncor(orlflags(%0,wizard royalty),haspower(%0,Guest),strmatch(name(%0),Guest *),ncand(hasattrval(%0/D`FINGER`PROFILE),hasattrval(%0/D`FINGER`FUNCTION)))
 
-&INC`DBREFS [u(cobj,comply)]=@pemit %#=u(header,Compliance DBREFS);@dolist/inline/delimit | [v(VERSIONS)]={@pemit %#=u(separator,Advantages Version %i0);@pemit %#=iter(u(setr,list,u(filter,COMPLY,%q<all>,%b,%b,%i0)),%i0);@pemit %#=u(footer,Compliant: [words(%q<list>)]/[words(%q<all>)])};@pemit %#=u(footer)
+&INC`DBREFS [u(cobj,comply)]=@pemit %#=u(header,Compliance DBREFS);@attach %!/INC`CSYS=2;@dolist/inline/delimit | [v(VERSIONS)]={@pemit %#=u(separator,Advantages Version %i0);@pemit %#=iter(u(setr,list,u(filter,COMPLY,%q<all>,%b,%b,%i0)),%i0);@pemit %#=u(footer,Compliant: [words(%q<list>)]/[words(%q<all>)])};@pemit %#=u(footer)
 
-&INC`MAIN [u(cobj,comply)]=@pemit %#=u(header,Compliance Breakdown);@dolist/inline/delimit | [v(VERSIONS)]={@pemit %#=u(separator,Advantages Version %i0);@pemit %#=iter(u(setr,list,u(filter,COMPLY,%q<all>,%b,%b,%i0)),u(moniker,%i0),%b,\,%b);@pemit %#=u(footer,Compliant: [words(%q<list>)]/[words(%q<all>)])};@pemit %#=u(footer)
+&INC`MAIN [u(cobj,comply)]=@pemit %#=u(header,Compliance Breakdown);@attach %!/INC`CSYS=1;@dolist/inline/delimit | [v(VERSIONS)]={@pemit %#=u(separator,Advantages Version %i0);@pemit %#=iter(u(setr,list,u(filter,COMPLY,%q<all>,%b,%b,%i0)),u(getmoniker,%i0),%b,\,%b);@pemit %#=u(footer,Compliant: [words(%q<list>)]/[words(%q<all>)])};@pemit %#=u(footer)
 
 &SEARCH`ALL [u(cobj,comply)]=u(sortname,u(filter,EXCLUDE,lsearch(all,type,player)))
 
 &SWITCHES`ADMIN [u(cobj,comply)]=DBREFS
 
+&INC`CSYS [u(cobj,comply)]=@pemit %#=u(separator,Unshaped Combatants);th u(setq,allobj,iter(%q<all>,objid(%i0)));th u(setq,allid,iter(%q<all>,get(%i0/D`ID)));th u(setq,results,u(mysql3,SELECT`UNSHAPED,u(SQL`IN`NUMBER,%q<allid>)));@pemit %#=iter(%q<results>,switch(%0,1,u(getmoniker,%i0),2,num(%i0)),chr(176),\,%b)
 
+&Q`SELECT`UNSHAPED [u(cobj,comply)]=SELECT mantle_owner_objid FROM volv_mantle AS m WHERE m.mantle_archetype IS NULL AND m.mantle_owner_id IN (!) ORDER BY m.mantle_owner_name;

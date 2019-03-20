@@ -51,7 +51,7 @@ th u(NEWCOBJ,Adaptive Game Engine Database <AGEDB>,agedb,,age,1,WIZARD SAFE !NO_
 
 &CORE`BALANCE [u(cobj,agedb)]=1.15
 &CORE`NORMALIZE [u(cobj,agedb)]=1.3
-&CORE`BASEDAMAGE [u(cobj,agedb)]=120
+&CORE`BASEDAMAGE [u(cobj,agedb)]=110
 &CORE`FUDGESCATTER [u(cobj,agedb)]=5
 &CORE`SCATTER [u(cobj,agedb)]=10
 
@@ -934,19 +934,19 @@ Overwhelming
 &VERSION [u(cobj,age)]=default(%0/D`CSYS`VERSION,1)
 
 @@ ---- VIEWS
-@SQL CREATE OR REPLACE VIEW volv_centity AS SELECT c.centity_id AS centity_id,e.entity_name AS centity_name,c.centity_type as centity_type,c.centity_version AS centity_version,c.centity_owner AS centity_owner,e2.entity_name AS centity_owner_name,e2.entity_type AS centity_owner_type,e2.entity_objid AS centity_owner_objid,c.centity_date_created AS centity_date_created,UNIX_TIMESTAMP(c.centity_date_created) AS centity_date_created_secs,c.centity_lock AS centity_lock FROM vol_centity AS c LEFT JOIN vol_entity AS e ON c.centity_id=e.entity_id LEFT JOIN vol_entity AS e2 ON c.centity_owner=e2.entity_id
+@SQL CREATE OR REPLACE VIEW volv_centity AS SELECT c.centity_id AS centity_id,e.entity_name AS centity_name,c.centity_type as centity_type,c.centity_version AS centity_version,c.centity_owner AS centity_owner,e2.entity_name AS centity_owner_name,e2.entity_type AS centity_owner_type,e2.entity_objid AS centity_owner_objid,c.centity_date_created AS centity_date_created,UNIX_TIMESTAMP(c.centity_date_created) AS centity_date_created_secs,c.centity_claim_lock AS centity_claim_lock,c.centity_approved AS centity_approved FROM vol_centity AS c LEFT JOIN vol_entity AS e ON c.centity_id=e.entity_id LEFT JOIN vol_entity AS e2 ON c.centity_owner=e2.entity_id
 
-@SQl CREATE OR REPLACE VIEW volv_mantle AS SELECT c.centity_id AS mantle_id,e.entity_name AS mantle_name,c.centity_date_created AS mantle_date_created,UNIX_TIMESTAMP(c.centity_date_created) AS mantle_date_created_secs,c.centity_version AS mantle_version,s.mantle_stats,s.mantle_accolades,ct.trait_value AS mantle_archetype,l.lock_definition AS mantle_global_lock FROM vol_centity AS c LEFT JOIN vol_entity AS e ON c.centity_id=e.entity_id LEFT JOIN volv_mantle_stats AS s ON s.mantle_id=c.centity_id LEFT JOIN vol_ctrait AS ct ON ct.centity_id=c.centity_id AND trait_type=1 AND trait_id=0 LEFT JOIN volv_lock as l ON l.entity_id=c.centity_id AND l.lock_name='LOAN' WHERE c.centity_type=0
+@SQL CREATE OR REPLACE VIEW volv_clink AS SELECT cl.clink_id AS clink_id,cl.character_id AS character_id,e.entity_name AS character_name,e.entity_objid AS character_objid,cl.clink_approved AS clink_approved,cl.clink_loan_from AS clink_loan_from,e2.entity_name AS loan_from_name,e2.entity_objid AS loan_from_objid,cl.clink_type AS clink_type,cl.clink_locked AS clink_locked,cl.consequences_date_gained AS consequences_date_gained,UNIX_TIMESTAMP(cl.consequences_date_gained) AS consequences_date_gained_secs,cl.consequences_date_timeout AS consequences_date_timeout,UNIX_TIMESTAMP(cl.consequences_date_timeout) AS consequences_date_timeout_secs,cl.consequences_scenes AS consequences_scenes,cen.* FROM vol_clink AS cl LEFT JOIN volv_centity AS cen ON cen.centity_id=cl.centity_id LEFT JOIN vol_entity AS e ON cl.character_id=e.entity_id LEFT JOIN vol_entity AS e2 ON cl.clink_loan_from=e2.entity_id;
 
-@SQL CREATE OR REPLACE VIEW volv_mantle_link AS SELECT cl.clink_id AS mantle_link_id,cl.clink_display_num AS mantle_link_display_num,cl.character_id,cl.clink_approved AS mantle_link_approved,cl.clink_parent AS mantle_link_parent_id,cl.clink_loan_lock as mantle_link_loan_lock,cl.clink_type as mantle_link_type,cl.clink_locked AS mantle_link_locked,m.* FROM vol_clink AS cl LEFT JOIn volv_mantle AS m ON cl.centity_id=m.mantle_id ORDER BY cl.clink_display_num
+@SQl CREATE OR REPLACE VIEW volv_mantle AS SELECT c.centity_id AS mantle_id,c.centity_name AS mantle_name,c.centity_owner_name AS mantle_owner_name,c.centity_owner_objid AS mantle_owner_objid,c.centity_owner AS mantle_owner_id,c.centity_date_created AS mantle_date_created,c.centity_date_created_secs AS mantle_date_created_secs,c.centity_version AS mantle_version,s.mantle_stats,s.mantle_accolades,ct.trait_value AS mantle_archetype,c.centity_claim_lock AS mantle_claim_lock FROM volv_centity AS c LEFT JOIN volv_mantle_stats AS s ON s.mantle_id=c.centity_id LEFT JOIN vol_ctrait AS ct ON ct.centity_id=c.centity_id AND trait_type=1 AND trait_id=0 WHERE c.centity_type=0
 
 @@ ----- ARMORY
 
 &CMD`ARMORY [u(cobj,age)]=$^(?s)\+(mantle)(?\:/(\S+))?(?\: +(.+?))?(?\:=(.*))?$:th u(setq,sysname,ARMORY);th u(setq,command,u(capnames,%1));@attach %!/%1`INIT;@attach %!/INC`CHECKPC=%#,1;@attach %!/INC`GETSWITCH=%2;@attach %!/INC`%q<sysname>`[u(strfirstof,%q<switch>,MAIN)]=%3,%4
 @set [u(cobj,age)]/CMD`ARMORY=regexp
 
-&ARMORY`MANTLE`PLAYER [u(cobj,age)]=VIEW|CLAIM|RELEASE|GRANT|REVOKE
-&ARMORY`MANTLE`ADMIN [u(cobj,age)]=CREATE|DELETE|TRANSFER|SELECT|LIST|DELETE|ADD|REMOVE|SET|LOCK|RAWLOCK|UNLOCK
+&ARMORY`MANTLE`PLAYER [u(cobj,age)]=VIEW|CLAIM|RELEASE|GRANT|REVOKE|LIST
+&ARMORY`MANTLE`ADMIN [u(cobj,age)]=CREATE|DELETE|TRANSFER|SELECT|DELETE|ADD|REMOVE|SET|LOCK|RAWLOCK|UNLOCK
 
 &MANTLE`INIT [u(cobj,age)]=th u(setq,etype,MANTLE);th u(setq,eid,0)
 
@@ -957,19 +957,25 @@ Overwhelming
 
 &INC`VALID`CNAME [u(cobj,age)]=@attach %!/INC`VALID`ENAME=%0,Combat Entity
 
+&INC`VALID`CENTITY [u(cobj,age)]=@attach %!/INC`SEARCHSQL=%0,%q<etype>,CENTITY,%1,%2,%q<eid>,u(version,%#)
+&Q`FIND`CENTITY`LIST [u(cobj,age)]=SELECT centity_name FROM volv_centity WHERE centity_owner=? AND centity_type=? AND centity_version=?
+&Q`FIND`CENTITY`EXACT [u(cobj,age)]=SELECT centity_id,centity_name FROM volv_centity WHERE centity_name=? AND centity_owner=? AND centity_type=? AND centity_version=? LIMIT 1
+&Q`FIND`CENTITY`EXACT`ID [u(cobj,age)]=SELECT centity_id,centity_name FROM volv_centity WHERE centity_id=? AND centity_owner=? AND centity_type=? AND centity_version=? LIMIT 1
+&Q`FIND`CENTITY`WILD [u(cobj,age)]=SELECT centity_id,centity_name FROM volv_centity WHERE centity_name LIKE '!%' AND centity_owner=? AND centity_type=? AND centity_version=? LIMIT 1
+&Q`LOAD`CENTITY [u(cobj,age)]=SELECT centity_id,centity_name,centity_owner,centity_owner_name,centity_owner_objid,centity_owner_type,centity_date_created_secs,centity_type,centity_version,centity_claim_lock FROM volv_centity WHERE centity_id=?
+&FIELD`CENTITY [u(Cobj,age)]=id name owner ownername ownerobjid ownertype datecreated type version claimlock
+
 &INC`VALID`ETARGET [u(cobj,age)]=@select/inline isint(%0)=1,{th u(setq,value,%0)},0,{@attach %!/INC`VALID`ENAME=%0}
 
-&INC`CTARGET [u(cobj,age)]=@attach %!/INC`VALID`ETARGET=%0;@check u(setr,found,u(mysql2,EXIST`CENTITY_WILD,%q<eid>,u(VERSION,%#),%q<tar1id>,%q<value>,%q<value>,%q<value>))=@attach %!/INC`MSG=ERROR: A %q<etype> does not use that name or ID!;th u(setq,fid,elements(%q<found>,1,|));th u(setq,fname,elements(%q<found>,1,|));th unsetq(found)
-
-&Q`EXIST`CENTITY_WILD [u(cobj,age)]=SELECT centity_id,centity_name FROM volv_centity WHERE centity_type=? AND centity_version=? AND centity_owner=? AND ((centity_name=? OR centity_id=?) OR centity_name LIKE '!%') ORDER BY CHAR_LENGTH(centity_name) LIMIT 1
+&INC`CTARGET [u(cobj,age)]=@attach %!/INC`VALID`CENTITY=%0,%1,%2
 
 @@ --------- ARMORY SECTION FOR CREATE
 
-&INC`ARMORY`CREATE [u(cobj,age)]=@attach %!/INC`ATARGET=%0,1;@attach %!/INC`VALID`ENAME=%1;@stop u(mysql,EXIST`CENTITY,%q<eid>,u(VERSION,%#),%q<tar1id>,%q<value>,%q<value>)=@attach %!/INC`MSG=ERROR: Another %q<etype> already uses that name!;@attach %!/INC`DOSQL=CREATE`CENTITY`1/cid,%q<value>;@attach %!/INC`DOSQL=CREATE`CENTITY`2,%q<cid>,u(VERSION,%#),%q<tar1id>,%q<eid>;@dolist/inline u(lattr,u(cobj,agedb)/ENTITY`%q<eid>`STAT`*)={@attach %!/INC`DOSQL=NEW`CENTITY_TRAIT,%q<cid>,last(%i0,`),0,get(u(cobj,agedb)/%i0`DEFAULT)};@attach %!/INC`ARMORY`CREATE`%q<etype>;@attach %!/INC`ARMORY`CREATE`%q<etype>`%q<tar1type>;@attach %!/INC`MSG=Created %q<etype> '%q<cid>: %q<value>' for '%q<tar1type>: %q<tar1name>'. It is SELECTED for editing.;&D`ARMORY`%q<etype> %#=%q<cid>;@attach %!/INC`MSG`CHAN=Created %q<etype> '%q<cid>: %q<value>' for '%q<tar1type>: %q<tar1name>'
+&INC`ARMORY`CREATE [u(cobj,age)]=@attach %!/INC`ATARGET=%0,1;@attach %!/INC`VALID`ENAME=%1;@stop u(mysql,EXIST`CENTITY,%q<eid>,u(VERSION,%#),%q<tar1id>,%q<value>,%q<value>)=@attach %!/INC`MSG=ERROR: Another %q<etype> already uses that name!;@attach %!/INC`DOSQL=CREATE`CENTITY`1/cid,%q<value>;@attach %!/INC`DOSQL=CREATE`CENTITY`2,%q<cid>,u(VERSION,%#),%q<tar1id>,%q<eid>;@dolist/inline u(lattr,u(cobj,agedb)/ENTITY`%q<eid>`STAT`*)={@attach %!/INC`DOSQL=NEW`CENTITY_TRAIT,%q<cid>,last(%i0,`),0,get(u(cobj,agedb)/%i0`DEFAULT)};@attach %!/INC`ARMORY`CREATE`%q<etype>;@attach %!/INC`ARMORY`CREATE`%q<etype>`%q<tar1type>;@attach %!/INC`MSG=Created %q<etype> '%q<cid>: %q<value>' for '%q<tar1type>: %q<tar1name>'. It is SELECTED for editing.;&D`ARMORY`%q<etype> %#=%q<cid>;&D`ARMORY`%q<etype>`NAME %#=%q<value>;&D`ARMORY`%q<etype>`OWNER %#=%q<tar1name>;&D`ARMORY`%q<etype>`TYPE %#=%q<tar1type>;&D`ARMORY`%q<etype>`OWNER_ID %#=%q<tar1id>;@attach %!/INC`MSG`CHAN=Created %q<etype> '%q<cid>: %q<value>' for '%q<tar1type>: %q<tar1name>'
 
 &INC`ARMORY`CREATE`MANTLE [u(cobj,age)]=
 &INC`ARMORY`CREATE`MANTLE`GLOBAL [u(cobj,age)]=
-&INC`ARMORY`CREATE`MANTLE`CHARACTER [u(cobj,age)]=
+&INC`ARMORY`CREATE`MANTLE`CHARACTER [u(cobj,age)]=@attach %!/INC`DOSQL=NEW`CENTITY_LINK/clink_id,%q<tar1id>,%q<cid>,0,NULL,0
 &INC`ARMORY`CREATE`MANTLE`GROUP [u(cobj,age)]=
 
 &Q`EXIST`CENTITY [u(cobj,age)]=SELECT centity_id,centity_name FROM volv_centity WHERE centity_type=? AND centity_version=? AND centity_owner=? AND (centity_name=? OR centity_id=?)
@@ -979,10 +985,10 @@ Overwhelming
 
 &Q`NEW`CENTITY_TRAIT [u(cobj,age)]=INSERT INTO vol_ctrait (centity_id,trait_id,trait_type,trait_value) VALUES (?,?,?,?)
 
-&Q`NEW`CENTITY_LINK [u(cobj,age)]=INSERT INTO vol_clink (character_id,centity_id,clink_type,clink_parent,clink_locked) VALUES (?,?,?,?,!,?)
+&Q`NEW`CENTITY_LINK [u(cobj,age)]=INSERT INTO vol_clink (character_id,centity_id,clink_type,clink_loan_from,clink_locked) VALUES (?,?,?,!,?)
 
 @@ ---------- ARMORY SECTION FOR DELETE
-&INC`ARMORY`DELETE [u(cobj,age)]=@attach %!/INC`ATARGET=%0,1;@select/inline isint(%1)=1,{th u(setq,value,%1)},0,{@attach %!/INC`VALID`ENAME=%1};@check u(setr,found,u(mysql2,EXIST`CENTITY,%q<eid>,u(VERSION,%#),%q<tar1id>,%q<value>,%q<value>))=@attach %!/INC`MSG=ERROR: A %q<etype> does not use that name or ID! Deletions require EXACT MATCHES. (Name or ID);@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will DELETE the %q<etype> '[elements(%q<found>,1,|)]: [elements(%q<found>,2,|)]'. This will affect everyone who is linked to it. Enter the same command again to verify.,DELETE %q<etype> [elements(%q<found>,1,|)];@attach %!/INC`DOSQL=DELETE`CENTITY,elements(%q<found>,1,|);@attach %!/INC`ARMORY`DELETE`%q<etype>;@attach %!/INC`ARMORY`DELETE`%q<etype>`%q<tar1type>;@attach %!/INC`MSG=[ansi(hr,DELETED)] %q<etype> '[elements(%q<found>,1,|)]: [elements(%q<found>,2,|)]' for '%q<tar1type>: %q<tar1name>'.;@attach %!/INC`MSG`CHAN=[ansi(hr,DELETED)] %q<etype> '[elements(%q<found>,1,|)]: [elements(%q<found>,2,|)]' for '%q<tar1type>: %q<tar1name>'
+&INC`ARMORY`DELETE [u(cobj,age)]=@attach %!/INC`ATARGET=%0,1;@select/inline isint(%1)=1,{th u(setq,value,%1)},0,{@attach %!/INC`VALID`ENAME=%1};@check u(setr,found,u(mysql3,FIND`CENTITY`EXACT[if(isint(%q<value>),`ID)],%q<value>,%q<tar1id>,%q<eid>,u(VERSION,%#)))=@attach %!/INC`MSG=ERROR: A %q<etype> does not use that name or ID! Deletions require EXACT MATCHES. (Name or ID);@attach %!/INC`LOADSQL=CENTITY,elements(%q<found>,1,chr(177)),1,;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will DELETE the %q<etype> '%q<centity1.id>: %q<centity1.name>'. This will affect everyone who is linked to it. Enter the same command again to verify.,DELETE %q<etype> %q<centity1.id>];@attach %!/INC`DOSQL=DELETE`CENTITY,%q<centity1.id>;@attach %!/INC`ARMORY`DELETE`%q<etype>;@attach %!/INC`ARMORY`DELETE`%q<etype>`%q<tar1type>;@attach %!/INC`MSG=[ansi(hr,DELETED)] %q<etype> '%q<centity1.id>: %q<centity1.name>' for '%q<tar1type>: %q<tar1name>'.;@attach %!/INC`MSG`CHAN=[ansi(hr,DELETED)] %q<etype> '%q<centity1.id>: %q<centity1.name>' for '%q<tar1type>: %q<tar1name>'
 
 &Q`DELETE`CENTITY [u(cobj,age)]=DELETE FROM vol_entity WHERE entity_id=?
 
@@ -993,7 +999,7 @@ Overwhelming
 
 
 @@ ---------- ARMORY SECTION FOR SELECT
-&INC`ARMORY`SELECT [u(cobj,age)]=@attach %!/INC`ATARGET=%0,1;@attach %!/INC`CTARGET=%1;@attach %!/INC`MSG=Selected %q<etype> '%q<fid>: %q<fname>' for '%q<tar1type>: %q<tar1name>'.;&D`ARMORY`%q<etype> %#=%q<fid>;&D`ARMORY`%q<etype>`NAME %#=%q<fname>;&D`ARMORY`%q<etype>`OWNER %#=%q<tar1name>;&D`ARMORY`%q<etype>`TYPE %#=%q<tar1type>;&D`ARMORY`%q<etype>`OWNER_ID %#=%q<tar1id>;@attach %!/INC`ARMORY`SELECT`%q<etype>;@attach %!/INC`ARMORY`SELECT`%q<etype>`%q<tar1type>
+&INC`ARMORY`SELECT [u(cobj,age)]=@attach %!/INC`ATARGET=%0,1;@attach %!/INC`CTARGET=%1,1,%q<tar1id>;@attach %!/INC`MSG=Selected %q<etype> '%q<centity1.id>: %q<centity1.name>' for '%q<tar1type>: %q<tar1name>'.;&D`ARMORY`%q<etype> %#=%q<centity1.id>;&D`ARMORY`%q<etype>`NAME %#=%q<centity1.name>;&D`ARMORY`%q<etype>`OWNER %#=%q<tar1name>;&D`ARMORY`%q<etype>`TYPE %#=%q<tar1type>;&D`ARMORY`%q<etype>`OWNER_ID %#=%q<tar1id>;@attach %!/INC`ARMORY`SELECT`%q<etype>;@attach %!/INC`ARMORY`SELECT`%q<etype>`%q<tar1type>
 
 &INC`ARMORY`SELECT`MANTLE [u(cobj,age)]=
 &INC`ARMORY`SELECT`MANTLE`GLOBAL [u(cobj,age)]=
@@ -1004,15 +1010,28 @@ Overwhelming
 @@ ---------- ARMORY SECTION FOR LIST
 &INC`ARMORY`LIST [u(cobj,age)]=@attach %!/INC`ATARGET=u(strfirstof,%0,CHARACTER/%#),1;@attach %!/INC`ARMORY`LIST`%q<etype>;@attach %!/INC`ARMORY`LIST`%q<etype>`%q<tar1type>
 
-&INC`ARMORY`VIEW`MANTLE [u(cobj,age)]
-&INC`ARMORY`VIEW`MANTLE`GLOBAL [u(cobj,age)]=@select/inline u(isadmin,%#)=1,{th u(setq,global_ids,u(mysql,IDS`GLOBAL))},0,{th u(setq,global_ids,iter(filterbool(#lambda/testlock(elements(\%0,2,chr(177)),%#),u(mysql3,IDS`GLOBAL`PLAYER),chr(176),chr(176)),first(%i0,chr(177)))};@check strlen(%q<global_ids>)=@attach %!/INC`MSG=ERROR: No Global %q<etype>S to list.;
+&INC`ARMORY`LIST`MANTLE [u(cobj,age)]=th u(setq,display_ids,u(mysql3,IDS`RETRIEVE,%q<tar1id>,0,u(version,%#)));@select/inline cor(u(isadmin,%#),eq(get(%#/D`ID),%q<tar1id>))=0,{th u(setq,display_ids,filterbool(#lambda/testlock(elements(\%0,2,chr(177)),%#),%q<display_ids>,chr(176),chr(176)))};@check strlen(%q<display_ids>)=@attach %!/INC`MSG=ERROR: No %q<tar1type> %q<etype>S to list.;th u(setq,display_ids,iter(%q<display_ids>,first(%i0,chr(177)),chr(176),%b))
 
-@pemit %#=u(header,Global [capstr(%q<etype>s)]);
-&INC`ARMORY`VIEW`MANTLE`CHARACTER [u(cobj,age)]=
-&INC`ARMORY`VIEW`MANTLE`GROUP [u(cobj,age)]=
+&FUN`MANTLELINE [u(cobj,age)]=align(5 20 18 14 8,%0,%1,if(cand(not(isint(%5)),not(u(isadmin,%#))),???,trim(iter(ldelete(%2,5,chr(176)),ljust(switch(inum(0),5,if(elements(%i0,2,chr(177)),ansi(hy,*),%b),ansi(u(statcolor,elements(%i0,1,chr(177))),u(VIEW`STAT3,elements(%i0,1,chr(177)))[if(elements(%i0,2,chr(177)),+)])),3),chr(176),%b))),u(cust,ARC,u(strfirstof,%3,0)),u(VIEW`WEIGHT,%4))
 
-&Q`IDS`GLOBAL [u(Cobj,age)]=SELECT centity_id FROM volv_centity WHERE centity_owner IS NULL and centity_type=? AND centity_version=?
-&Q`IDS`GLOBAL`PLAYER [u(cobj,age)]=SELECT centity_id,centity_claim_lock WHERE centity_owner IS NULL and centity_type=? AND centity_version=?
+
+&Q`LIST`MANTLE_STATS [u(cobj,age)]=SELECT trait_value,trait_flags_1 FROM vol_ctrait WHERE centity_id=? AND trait_type=0 ORDER BY trait_id
+&Q`LIST`MANTLE_NAME [u(cobj,age)]=SELECT centity_id,centity_name FROM volv_centity WHERE centity_id=? LIMIT 1
+&Q`LIST`MANTLE_ARCHETYPE [u(cobj,age)]=SELECT mantle_archetype FROm volv_mantle WHERE mantle_id=? LIMIT 1
+&Q`LIST`MANTLE_OWNER [u(cobj,age)]=SELECT centity_owner FROM vol_centity WHERe centity_id=? LIMIT 1
+
+&INC`ARMORY`LIST`MANTLE`UNIVERSAL [u(cobj,age)]=@pemit %#=ansi(u(color,%#,AGE,COLUMN_NAMES),align(5 20 18 14 8,ID,Name,iter(Po En Pr Mi Dr,%i0%B),Archetype,Weight));@pemit %#=u(separator);@dolist/inline %q<display_ids>={th u(setq,mdata,u(mysql3,LIST`MANTLE_NAME,%i0));th u(setq,mstats,u(mysql3,LIST`MANTLE_STATS,%i0));th u(setq,marc,u(mysql,LIST`MANTLE_ARCHETYPE,%i0));th u(setq,mown,u(mysql,LIST`MANTLE_OWNER,%i0));@pemit %#=u(FUN`MANTLELINE,%i0,elements(%q<mdata>,2,chr(177)),%q<mstats>,%q<marc>,elements(elements(%q<mstats>,5,chr(176)),1,chr(177)),%q<mown>)};@pemit %#=u(footer)
+
+&INC`ARMORY`LIST`MANTLE`GLOBAL [u(cobj,age)]=@pemit %#=u(header,Global [capstr(lcstr(%q<etype>s))]);@attach %!/INC`ARMORY`LIST`MANTLE`UNIVERSAL
+
+&INC`ARMORY`LIST`MANTLE`CHARACTER [u(cobj,age)]=@pemit %#=u(header,%q<tar1name>'s [capstr(lcstr(%q<etype>s))]);@attach %!/INC`ARMORY`LIST`MANTLE`UNIVERSAL;@select/inline cand(words(u(setr,display_ids,u(mysql,IDS`EXTRA,%q<tar1id>,0,u(VERSION,%#)))),cor(u(isadmin,%#),eq(get(%#/D`ID),%q<tar1id>)))=1,{@pemit %#=u(header,%q<tar1name>'s Borrowed [capstr(lcstr(%q<etype>)s)]);@attach %!/INC`ARMORY`LIST`MANTLE`UNIVERSAL}
+
+&INC`ARMORY`LIST`MANTLE`GROUP [u(cobj,age)]=@pemit %#=u(header,%q<tar1name>'s [capstr(lcstr(%q<etype>s))]);@attach %!/INC`ARMORY`LIST`MANTLE`UNIVERSAL
+
+
+&Q`IDS`EXTRA [u(cobj,age)]=SELECT centity_id FROM volv_clink WHERE character_id=? AND centity_type=? AND centity_version=? AND clink_locked=1 ORDER BY centity_name
+&Q`IDS`RETRIEVE [u(Cobj,age)]=SELECT centity_id,centity_claim_lock FROM volv_centity WHERE centity_owner=? and centity_type=? AND centity_version=? ORDER BY centity_name
+
 
 
 @@ ---------- ARMORY SECTION FOR VIEW
@@ -1039,29 +1058,27 @@ Overwhelming
 
 
 @@ --------- ARMORY SECTION SUPPLEMENTAL
-&INC`LOADSELECT [u(cobj,age)]=@check strlen(get(%#/D`ARMORY`%q<etype>))=@attach %!/INC`MSG=ERROR: Nothing is Selected!;@check strlen(u(setr,found,u(mysql2,EXIST`CENTITY,%q<eid>,u(VERSION,%#),%q<tar1id>,%q<value>,%q<value>)))=@attach %!/INC`MSG=ERROR: %q<etype> not found! It may have been deleted. use /select again!;th u(setq,fid,elements(%q<found>,1,|));th u(setq,fname,elements(%q<found>,1,|));th unsetq(found);@attach %!/INC`LOADSELECT`%q<etype>
+&INC`LOADSELECT [u(cobj,age)]=@check strlen(u(setr,value,get(%#/D`ARMORY`%q<etype>)))=@attach %!/INC`MSG=ERROR: Nothing is Selected!;@check u(setr,found,u(mysql3,FIND`CENTITY`EXACT[if(isint(%q<value>),`ID)],%q<value>,get(%#/D`ARMORY`%q<etype>`OWNER_ID),%q<eid>,u(VERSION,%#)))=@attach %!/INC`MSG=ERROR: %q<etype> not found! It may have been deleted. use /select again!;@attach %!/INC`LOADSQL=CENTITY,elements(%q<found>,1,chr(177)),1;th unsetq(found);@attach %!/INC`LOADSELECT`%q<etype>
 
 &INC`LOADSELECT`MANTLE [u(cobj,age)]=
 
-
-
 @@ --------- ARMORY SECTION FOR SET
-&INC`ARMORY`SET [u(cobj,age)]=@attach %!/INC`LOADSELECT;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Must choose a parameter to set!;@attach %!/INC`PARTIAL=%0,u(ARMORY`SET`%q<etype>,%#),|,choice;@attach %!/INC`ARMORY`SET`%q<etype>`%q<choice>;@attach %!/INC`MSG=You set [u(setr,msg,[get(%#/D`ARMORY`%q<etype>`OWNER)]'s %q<etype> "%q<fid>: %q<fname>" %q<choice> to: %q<value>)];@attach %!/INC`MSG`CHAN=Set %q<msg>
+&INC`ARMORY`SET [u(cobj,age)]=@attach %!/INC`LOADSELECT;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Must choose a parameter to set!;@attach %!/INC`PARTIAL=%0,u(ARMORY`SET`%q<etype>,%#),|,choice;@attach %!/INC`ARMORY`SET`%q<etype>`%q<choice>;@attach %!/INC`MSG=You set [u(setr,msg,[get(%#/D`ARMORY`%q<etype>`OWNER)]'s %q<etype> "%q<centity1.id>: %q<centity1.name>" %q<choice> to: %q<value>)];@attach %!/INC`MSG`CHAN=Set %q<msg>
 
-&ARMORY`SET`MANTLE [u(cobj,age)]=NAME|POWER|ENDURANCE|PRECISION|MITIGATION|STATS|WEIGHT|ARCHETYPE[if(u(tester,%0),|APPROVED|POWBON|ENDBON|PREBON|MITBON)]
+&ARMORY`SET`MANTLE [u(cobj,age)]=NAME|POWER|ENDURANCE|PRECISION|MITIGATION|WEIGHT|ARCHETYPE[if(u(tester,%0),|APPROVED|POWBON|ENDBON|PREBON|MITBON|DRIVEBON)]
 
-&INC`ARMORY`SET`CENTITY`NAME [u(cobj,age)]=@attach %!/INC`VALID`ENAME=%1;@stop cand(u(setr,fid2,first(u(mysql2,EXIST`CENTITY,%q<eid>,u(VERSION,%#),get(%#/D`ARMORY`%q<etype>`OWNER_ID),%q<value>,%q<value>),|)),neq(%q<fid>,%q<fid2>))=@attach %!/INC`MSG=ERROR: %q<etype> names must be unique per Owner.;@attach %!/INC`DOSQL=CENTITY`RENAME,%q<value>,%q<fid>;&D`ARMORY`%q<etype>`NAME %#=%q<value>
+&INC`ARMORY`SET`CENTITY`NAME [u(cobj,age)]=@attach %!/INC`VALID`ENAME=%1;@stop cand(u(setr,fid2,first(u(mysql2,EXIST`CENTITY,%q<eid>,u(VERSION,%#),get(%#/D`ARMORY`%q<etype>`OWNER_ID),%q<value>,%q<value>),|)),neq(%q<centity1.id>,%q<fid2>))=@attach %!/INC`MSG=ERROR: %q<etype> names must be unique per Owner.;@attach %!/INC`DOSQL=CENTITY`RENAME,%q<value>,%q<centity1.id>;&D`ARMORY`%q<etype>`NAME %#=%q<value>
 
 &Q`CENTITY`RENAME [u(cobj,age)]=UPDATE vol_entity SET entity_name=? WHERE entity_id=?
 
-&INC`ARMORY`SET`CENTITY`APPROVED [u(cobj,age)]=@check isint(%1)=@attach %!/INC`MSG=ERROR: Approved must be 0 (false) or 1 (true).;@attach %!/INC`DOSQL=SET`CENTITY_APPROVED,%1,%q<fid>;@attach %!/INC`ARMORY`SET`CENTITY`APPROVED`%q<etype>
-&INC`ARMORY`SET`CENTITY`APPROVED`CHARACTER [u(cobj,age)]=@attach %!/INC`DOSQL=SET`CLINK_APPROVED,%1,%q<fid>,get(%#/D`ARMORY`%q<etype>`OWNER_ID)
+&INC`ARMORY`SET`CENTITY`APPROVED [u(cobj,age)]=@check isint(%1)=@attach %!/INC`MSG=ERROR: Approved must be 0 (false) or 1 (true).;@attach %!/INC`DOSQL=SET`CENTITY_APPROVED,%1,%q<centity1.id>;@attach %!/INC`ARMORY`SET`CENTITY`APPROVED`%q<etype>
+&INC`ARMORY`SET`CENTITY`APPROVED`CHARACTER [u(cobj,age)]=@attach %!/INC`DOSQL=SET`CLINK_APPROVED,%1,%q<centity1.id>,get(%#/D`ARMORY`%q<etype>`OWNER_ID)
 
-&INC`ARMORY`SET`CENTITY`TRAIT [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: Nothing entered to set %q<choice> to!;@check and(isint(%1),gte(%1,u(setr,mintrait,u(cust,ENTITY`%q<eid>,STAT`%2`MINIMUM))),lte(%2,u(setr,maxtrait,u(cust,ENTITY`%q<eid>,STAT`%2`MAXIMUM))))=@attach %!/INC`MSG=ERROR: %q<choice> must be a whole number between %q<mintrait>-%q<maxtrait>.;@attach %!/INC`DOSQL=SET`CENTITY_STAT,%1,%q<fid>,%2,%3;
+&INC`ARMORY`SET`CENTITY`TRAIT [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: Nothing entered to set %q<choice> to!;@check and(isint(%1),gte(%1,u(setr,mintrait,u(cust,ENTITY`%q<eid>,STAT`%2`MINIMUM))),lte(%2,u(setr,maxtrait,u(cust,ENTITY`%q<eid>,STAT`%2`MAXIMUM))))=@attach %!/INC`MSG=ERROR: %q<choice> must be a whole number between %q<mintrait>-%q<maxtrait>.;@attach %!/INC`DOSQL=SET`CENTITY_STAT,u(setr,value,%1),%q<centity1.id>,%2,%3;
 
 &Q`SET`CENTITY_STAT [u(cobj,age)]=UPDATE vol_ctrait SET trait_value=? WHERE centity_id=? AND trait_id=? AND trait_type=?
 
-&INC`ARMORY`SET`CENTITY`TRAITFLAG1 [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: Nothing entered to set %q<choice> to!;@check cand(isint(%1),gte(%1,0))=@attach %!/INC`MSG=ERROR: %q<choice> must be a whole number.;@attach %!/INC`DOSQL=SET`CENTITY_STATFLAG1,%1,%q<fid>,%2,%3
+&INC`ARMORY`SET`CENTITY`TRAITFLAG1 [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: Nothing entered to set %q<choice> to!;@check cand(isint(%1),gte(%1,0))=@attach %!/INC`MSG=ERROR: %q<choice> must be a whole number.;@attach %!/INC`DOSQL=SET`CENTITY_STATFLAG1,%1,%q<centity1.id>,%2,%3;th u(setq,value,%1)
 
 &Q`SET`CENTITY_STATFLAG1 [u(cobj,age)]=UPDATE vol_ctrait SET trait_flags_1=? WHERE centity_id=? AND trait_id=? AND trait_type=?
 
@@ -1070,14 +1087,15 @@ Overwhelming
 &INC`ARMORY`SET`MANTLE`ENDURANCE [u(cobj,age)]=@attach %!/INC`ARMORY`SET`CENTITY`TRAIT=%0,%1,1,0
 &INC`ARMORY`SET`MANTLE`PRECISION [u(cobj,age)]=@attach %!/INC`ARMORY`SET`CENTITY`TRAIT=%0,%1,2,0
 &INC`ARMORY`SET`MANTLE`MITIGATION [u(cobj,age)]=@attach %!/INC`ARMORY`SET`CENTITY`TRAIT=%0,%1,3,0
-&INC`ARMORY`SET`MANTLE`POWBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`TRAITFLAG1=%0,%1,0,0
-&INC`ARMORY`SET`MANTLE`ENDBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`TRAITFLAG1=%0,%1,1,0
-&INC`ARMORY`SET`MANTLE`PREBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`TRAITFLAG1=%0,%1,2,0
-&INC`ARMORY`SET`MANTLE`MITBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`TRAITFLAG1=%0,%1,3,0
+&INC`ARMORY`SET`MANTLE`POWBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`CENTITY`TRAITFLAG1=%0,%1,0,0
+&INC`ARMORY`SET`MANTLE`ENDBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`CENTITY`TRAITFLAG1=%0,%1,1,0
+&INC`ARMORY`SET`MANTLE`PREBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`CENTITY`TRAITFLAG1=%0,%1,2,0
+&INC`ARMORY`SET`MANTLE`MITBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`CENTITY`TRAITFLAG1=%0,%1,3,0
+&INC`ARMORY`SET`MANTLE`DRIVEBON [u(Cobj,age)]=@attach %!/INC`ARMORY`SET`CENTITY`TRAITFLAG1=%0,%1,4,0
 
-&INC`ARMORY`SET`MANTLE`WEIGHT [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: Nothing entered to set %q<choice> to!;@attach %!/INC`PARTIAL=%1,LIGHT|MEDIUM|HEAVY|SUPERHEAVY|BOSS,|,value;@attach %!/INC`ARMORY`SET`CENTITY`TRAIT=%0,match(LIGHT|MEDIUM|HEAVY|SUPERHEAVY|BOSS,%q<value>,|),4,0
+&INC`ARMORY`SET`MANTLE`WEIGHT [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: Nothing entered to set %q<choice> to!;@attach %!/INC`PARTIAL=%1,LIGHT|MEDIUM|HEAVY|SUPERHEAVY|BOSS,|,weight;@attach %!/INC`ARMORY`SET`CENTITY`TRAIT=%0,match(LIGHT|MEDIUM|HEAVY|SUPERHEAVY|BOSS,%q<weight>,|),4,0;th u(setq,value,%q<weight>)
 
-&INC`ARMORY`SET`MANTLE`ARCHETYPE [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: Archetype field empty!;@check isint(u(setr,archetype_id,u(FIND_TRAIT,ARC,%1)))=@attach %!/INC`MSG=ERROR: Could not find Archetype!;@attach %!/INC`DOSQL=SET`MANTLE`ARCHETYPE,%q<fid>,%q<archetype_id>,0,1;th u(setq,value,u(cust,ARC,%q<archetype_id>))
+&INC`ARMORY`SET`MANTLE`ARCHETYPE [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: Archetype field empty!;@check isint(u(setr,archetype_id,u(FIND_TRAIT,ARC,%1)))=@attach %!/INC`MSG=ERROR: Could not find Archetype!;@attach %!/INC`DOSQL=SET`MANTLE`ARCHETYPE,%q<centity1.id>,0,1,%q<archetype_id>;th u(setq,value,u(cust,ARC,%q<archetype_id>))
 
 &Q`SET`MANTLE`ARCHETYPE [u(cobj,age)]=INSERT INTO vol_ctrait (centity_id,trait_id,trait_type,trait_value) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE trait_value=VALUES(trait_value)
 
@@ -1089,11 +1107,11 @@ Overwhelming
 &FIL`WILD_TRAIT [u(cobj,age)]=strmatch(get(u(cobj,agedb)/%0),%1*)
 
 @@ ---- ARMORY SECTION FOR ADD
-&INC`ARMORY`ADD [u(cobj,age)]=@attach %!/INC`LOADSELECT;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Must choose a parameter to add!;@attach %!/INC`PARTIAL=%0,u(ARMORY`ADD`%q<etype>,%#),|,choice;@attach %!/INC`ARMORY`ADD`%q<etype>`%q<choice>;@attach %!/INC`MSG=You added '%q<value>' to [u(setr,msg,[get(%#/D`ARMORY`%q<etype>`OWNER)]'s %q<etype> "%q<fid>: %q<fname>" %q<choice> list.)];@attach %!/INC`MSG`CHAN=Added '%q<value>' to %q<msg>
+&INC`ARMORY`ADD [u(cobj,age)]=@attach %!/INC`LOADSELECT;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Must choose a parameter to add!;@attach %!/INC`PARTIAL=%0,u(ARMORY`ADD`%q<etype>,%#),|,choice;@attach %!/INC`ARMORY`ADD`%q<etype>`%q<choice>;@attach %!/INC`MSG=You added '%q<value>' to [u(setr,msg,[get(%#/D`ARMORY`%q<etype>`OWNER)]'s %q<etype> "%q<centity1.id>: %q<centity1.name>" %q<choice> list.)];@attach %!/INC`MSG`CHAN=Added '%q<value>' to %q<msg>
 
 &ARMORY`ADD`MANTLE [u(Cobj,age)]=QUIRK
 
-&INC`ARMORY`ADD`CENTITY`TRAIT [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: No %2 entered to add.;@check u(setr,trait_id,u(FIND_TRAIT,%3,%1))=@attach %!/INC`MSG=ERROR: Could not find %2 named '%1'.;@stop u(mysql,EXIST`CENTITY_TRAIT,%q<fid>,%q<trait_id>,%4)=@attach %!/INC`MSG=ERROR: %q<etype> already has that %2.;@attach %!/INC`DOSQL=ADD`CENTITY_TRAIT,%q<fid>,%q<trait_id>,%4,1;th u(setq,value,u(cust,%3,%q<trait_id>))
+&INC`ARMORY`ADD`CENTITY`TRAIT [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: No %2 entered to add.;@check u(setr,trait_id,u(FIND_TRAIT,%3,%1))=@attach %!/INC`MSG=ERROR: Could not find %2 named '%1'.;@stop u(mysql,EXIST`CENTITY_TRAIT,%q<centity1.id>,%q<trait_id>,%4)=@attach %!/INC`MSG=ERROR: %q<etype> already has that %2.;@attach %!/INC`DOSQL=ADD`CENTITY_TRAIT,%q<centity1.id>,%q<trait_id>,%4,1;th u(setq,value,u(cust,%3,%q<trait_id>))
 
 &Q`EXIST`CENTITY_TRAIT [u(cobj,age)]=SELECT trait_value FROM vol_ctrait WHERE centity_id=? AND trait_id=? AND trait_type=? 
 &Q`ADD`CENTITY_TRAIT [u(cobj,age)]=INSERT INTO vol_ctrait (centity_id,trait_id,trait_type,trait_value) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE trait_value=VALUES(trait_value)
@@ -1101,11 +1119,11 @@ Overwhelming
 &INC`ARMORY`ADD`MANTLE`QUIRK [u(cobj,age)]=@attach %!/INC`ARMORY`ADD`CENTITY`TRAIT=%0,%1,Quirk,QRK,2
 
 @@ ---- ARMORY SECTION FOR REMOVE
-&INC`ARMORY`REMOVE [u(cobj,age)]=@attach %!/INC`LOADSELECT;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Must choose a parameter to add!;@attach %!/INC`PARTIAL=%0,u(ARMORY`REMOVE`%q<etype>,%#),|,choice;@attach %!/INC`ARMORY`REMOVE`%q<etype>`%q<choice>;@attach %!/INC`MSG=You removed '%q<value>' from [u(setr,msg,[get(%#/D`ARMORY`%q<etype>`OWNER)]'s %q<etype> "%q<fid>: %q<fname>" %q<choice> list.)];@attach %!/INC`MSG`CHAN=Removed '%q<value>' from %q<msg>
+&INC`ARMORY`REMOVE [u(cobj,age)]=@attach %!/INC`LOADSELECT;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Must choose a parameter to add!;@attach %!/INC`PARTIAL=%0,u(ARMORY`REMOVE`%q<etype>,%#),|,choice;@attach %!/INC`ARMORY`REMOVE`%q<etype>`%q<choice>;@attach %!/INC`MSG=You removed '%q<value>' from [u(setr,msg,[get(%#/D`ARMORY`%q<etype>`OWNER)]'s %q<etype> "%q<centity1.id>: %q<centity1.name>" %q<choice> list.)];@attach %!/INC`MSG`CHAN=Removed '%q<value>' from %q<msg>
 
 &ARMORY`REMOVE`MANTLE [u(cobj,age)]=u(ARMORY`ADD`MANTLE,%0)
 
-&INC`ARMORY`REMOVE`CENTITY`TRAIT [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: No %2 entered to remove.;@check u(setr,trait_id,u(FIND_TRAIT,%3,%1))=@attach %!/INC`MSG=ERROR: Could not find %2 named '%1'.;@check u(mysql,EXIST`CENTITY_TRAIT,%q<fid>,%q<trait_id>,%4)=@attach %!/INC`MSG=ERROR: %q<etype> lacks that %2.;@attach %!/INC`DOSQL=DELETE`CENTITY_TRAIT,%q<fid>,%q<trait_id>,%4;th u(setq,value,u(cust,%3,%q<trait_id>))
+&INC`ARMORY`REMOVE`CENTITY`TRAIT [u(cobj,age)]=@check strlen(%1)=@attach %!/INC`MSG=ERROR: No %2 entered to remove.;@check u(setr,trait_id,u(FIND_TRAIT,%3,%1))=@attach %!/INC`MSG=ERROR: Could not find %2 named '%1'.;@check u(mysql,EXIST`CENTITY_TRAIT,%q<centity1.id>,%q<trait_id>,%4)=@attach %!/INC`MSG=ERROR: %q<etype> lacks that %2.;@attach %!/INC`DOSQL=DELETE`CENTITY_TRAIT,%q<centity1.id>,%q<trait_id>,%4;th u(setq,value,u(cust,%3,%q<trait_id>))
 
 &Q`DELETE`CENTITY_TRAIT [u(cobj,age)]=DELETE FROM vol_ctrait WHERE centity_id=? AND trait_id=? AND trait_type=?
 
@@ -1113,33 +1131,42 @@ Overwhelming
 
 
 @@ ----- ARMORY SECTION FOR TRANSFER
-&INC`ARMORY`TRANSFER [u(cobj,age)]=@attach %!/INC`LOADSELECT;@attach %!/INC`ATARGET=%0,1;@select/inline strlen(%1)=>0,{@attach %!/INC`VALID`ENAME=%1};@stop cand(u(setr,fid2,first(u(mysql2,EXIST`CENTITY,%q<eid>,u(VERSION,%#),%q<tar1id>,u(strfirstof,%q<value>,%q<fname>),u(strfirstof,%q<value>,%q<fname>)),|)),neq(%q<fid>,%q<fid2>))=@attach %!/INC`MSG=ERROR: %q<etype> names must be unique per Owner.;@attach %!/INC`ARMORY`TRANSFER`CENTITY;@attach %!/INC`ARMORY`TRANSFER`CENTITY`%q<etype>;&D`ARMORY`%q<etype>`TYPE %#=%q<tar1type>;&D`ARMORY`%q<etype>`OWNER %#=%q<tar1name>;&D`ARMORY`%q<etype>`OWNER_ID %#=%q<tar1id>;&D`ARMORY`%q<etype>`NAME %#=u(strfirstof,%q<value>,%q<fname>);@attach %!/INC`MSG=You transferred [u(setr,msg,[get(%#/D`ARMORY`%q<etype>`OWNER)]'s %q<etype> "%q<fid>: %q<fname>" to: %q<tar1type>: %q<tar1name>)];@attach %!/INC`MSG`CHAN=Removed '%q<value>' from %q<msg>
+&INC`ARMORY`TRANSFER [u(cobj,age)]=@attach %!/INC`LOADSELECT;@attach %!/INC`ATARGET=%0,1;@select/inline strlen(%1)=>0,{@attach %!/INC`VALID`ENAME=%1};@stop cand(u(setr,fid2,first(u(mysql2,EXIST`CENTITY,%q<eid>,u(VERSION,%#),%q<tar1id>,u(strfirstof,%q<value>,%q<centity1.name>),u(strfirstof,%q<value>,%q<centity1.name>)),|)),neq(%q<centity1.id>,%q<fid2>))=@attach %!/INC`MSG=ERROR: %q<etype> names must be unique per Owner.;@attach %!/INC`ARMORY`TRANSFER`CENTITY;@attach %!/INC`ARMORY`TRANSFER`CENTITY`%q<etype>;&D`ARMORY`%q<etype>`TYPE %#=%q<tar1type>;&D`ARMORY`%q<etype>`OWNER %#=%q<tar1name>;&D`ARMORY`%q<etype>`OWNER_ID %#=%q<tar1id>;&D`ARMORY`%q<etype>`NAME %#=u(strfirstof,%q<value>,%q<centity1.name>);@attach %!/INC`MSG=You transferred [u(setr,msg,%q<centity1.ownername>'s %q<etype> "%q<centity1.id>: %q<centity1.name>" to: %q<tar1type>: %q<tar1name>)];@attach %!/INC`MSG`CHAN=Transferred %q<msg>
 
-&INC`ARMORY`TRANSFER`CENTITY [u(cobj,age)]=@attach %!/INC`DOSQL=TRANSFER`CENTITY,%q<tar1id>,%q<fid>
+&INC`ARMORY`TRANSFER`CENTITY [u(cobj,age)]=@attach %!/INC`DOSQL=TRANSFER`CENTITY,switch(%q<tar1id>,NULL,SET_NULL,%q<tar1id>),%q<centity1.id>
 
 &Q`TRANSFER`CENTITY [u(cobj,age)]=UPDATE vol_centity SET centity_owner=? WHERE centity_id=?
 
-&INC`ARMORY`TRANSFER`CENTITY`CHARACTER [u(cobj,age)]=@attach %!/INC`DOSQL=TRANSFER`CENTITY`CHARACTER,%q<tar1id>,%q<fid>;
+&INC`ARMORY`TRANSFER`CENTITY`CHARACTER [u(cobj,age)]=@attach %!/INC`DOSQL=TRANSFER`CLINK,%q<tar1id>,%q<centity1.id>;
 
 &Q`TRANSFER`CLINK [u(cobj,age)]=UPDATE vol_clink SET character_id=? WHERE centity_id=? AND clink_parent IS NULL
 
 @@ ----- ARMORY SECTION FOR CLONE
-&INC`ARMORY`CLONE [u(cobj,age)]=@attach %!/INC`LOADSELECT;@attach %!/INC`ATARGET=%0,1;@select/inline strlen(%1)=>0,{@attach %!/INC`VALID`ENAME=%1};@stop cand(u(setr,fid2,first(u(mysql2,EXIST`CENTITY,%q<eid>,u(VERSION,%#),%q<tar1id>,u(strfirstof,%q<value>,%q<fname>),u(strfirstof,%q<value>,%q<fname>)),|)),neq(%q<fid>,%q<fid2>))=@attach %!/INC`MSG=ERROR: %q<etype> names must be unique per Owner.;@attach %!/INC`ARMORY`CLONE`CENTITY;@attach %!/INC`ARMORY`CLONE`CENTITY`%q<etype>;
+&INC`ARMORY`CLONE [u(cobj,age)]=@attach %!/INC`LOADSELECT;@attach %!/INC`ATARGET=%0,1;@select/inline strlen(%1)=>0,{@attach %!/INC`VALID`ENAME=%1};@stop cand(u(setr,fid2,first(u(mysql2,EXIST`CENTITY,%q<eid>,u(VERSION,%#),%q<tar1id>,u(strfirstof,%q<value>,%q<centity1.name>),u(strfirstof,%q<value>,%q<centity1.name>)),|)),neq(%q<centity1.id>,%q<fid2>))=@attach %!/INC`MSG=ERROR: %q<etype> names must be unique per Owner.;@attach %!/INC`ARMORY`CLONE`CENTITY;@attach %!/INC`ARMORY`CLONE`CENTITY`%q<etype>;
 
-&INC`ARMORY`CLONE`CENTITY [u(cobj,age)]=@attach %!/INC`DOSQL=CLONE`CENTITY`1/newid,u(strfirstof,%q<value>,%q<fname>);@attach %!/INC`DOSQL=CLONE`CENTITY`2,%q<newid>,%q<tar1id>,%q<fid>;@attach %!/INC`DOSQL=CLONE`CENTITY`3,%q<newid>,%q<fid>
+&INC`ARMORY`CLONE`CENTITY [u(cobj,age)]=@attach %!/INC`DOSQL=CLONE`CENTITY`1/newid,u(strfirstof,%q<value>,%q<centity1.name>);@attach %!/INC`DOSQL=CLONE`CENTITY`2,%q<newid>,%q<tar1id>,%q<centity1.id>;@attach %!/INC`DOSQL=CLONE`CENTITY`3,%q<newid>,%q<centity1.id>
 
 &Q`CLONE`CENTITY`1 [u(cobj,age)]=INSERT INTO vol_entity (entity_type,entity_name) VALUES (9,?)
 &Q`CLONE`CENTITY`2 [u(cobj,age)]=INSERT INTO vol_centity (centity_id,centity_date_created,centity_version,centity_type,centity_owner,centity_lock,centity_approved) SELECT ?,UTC_TIMESTAMP(),centity_version,centity_type,?,centity_lock,centity_approved FROM vol_centity WHERE centity_id=?
 &Q`CLONE`CENTITY`3 [u(Cobj,age)]=INSERT INTO vol_ctrait (centity_id,trait_id,trait_type,trait_value,trait_flags_1,trait_flags_2) SELECT ?,trait_id,trait_type,trait_value,trait_flags_1,trait_flags_2 FROM vol_ctrait WHERE centity_id=?
 
-&INC`ARMORY`CLONE`CENTITY`CHARACTER [u(cobj,age)]=@attach %!/INC`DOSQL=CLONE`CLINK,%q<tar1id>,%q<newid>,%q<fid>,get(%0/D`ARMORY`%q<etype>`OWNER_ID);
+&INC`ARMORY`CLONE`CENTITY`CHARACTER [u(cobj,age)]=@attach %!/INC`DOSQL=CLONE`CLINK,%q<tar1id>,%q<newid>,%q<centity1.id>,get(%0/D`ARMORY`%q<etype>`OWNER_ID);
 
 &Q`CLONE`CLINK [u(cobj,age)]=INSERT INTO vol_clink (character_id,centity_id,clink_approved,clink_type,clink_locked) SELECT (?,?,clink_approved,clink_type,clink_locked) FROM vol_clink WHERE centity_id=? AND character_id=?
 
-
 @@ ---------- ARMORY SECTION FOR LOANSYS
+
+@@ Lock
+&INC`ARMORY`UNLOCK [u(cobj,age)]=@attach %!/INC`ARMORY`LOCK=#TRUE,%1,1
+&INC`ARMORY`RAWLOCK [u(cobj,age)]=@attach %!/INC`ARMORY`LOCK=%0,%1,1
+&INC`ARMORY`LOCK [u(cobj,age)]=@attach %!/INC`LOADSELECT;@attach %!/INC`VALID`[if(%2,LOCK,GROUPLOCK)]=%0;@attach %!/INC`DOSQL=LOCK`CENTITY,%q<value>,%q<centity1.id>;@attach %!/INC`MSG=Locked [u(setr,msg,%q<centity1.ownername>'s %q<etype> "%q<centity1.id>: %q<centity1.name>" to: %q<valueformat>)];@attach %!/INC`MSG`CHAN=Locked %q<msg>
+
+&Q`LOCK`CENTITY [u(cobj,age)]=UPDATE vol_centity SET centity_claim_lock=? WHERE centity_id=?
+
+
+
 @@ Claim
-&INC`ARMORY`CLAIM [u(cobj,age)]=@attach %!/INC`ATARGET=%0,1;@attach %!/INC`ARMORY`CLAIM`%q<tar1type>;@attach %!/INC`VALID`ETARGET=%1;@check strlen(u(setr,claimable,filterbool(#lambda/testlock(elements(\%0,2,chr(177)),%#),u(mysql3,LIST`CLAIMABLE,%q<tar1id>,u(VERSION,%#),%q<eid>),chr(176),chr(176))))=@attach %!/INC`MSG=ERROR: %q<tar1type> %q<tar1name> has no claimable %q<etype>S you can access!;th u(setq,claimids,u(SQL`IN`NUMBER,iter(%q<claimable>,first(%i0,chr(177)))));@check strlen(u(setr,found,u(mysql,SELECT`CENTITY_NAME_IDFILTER,%q<claimids>,%q<value>,%q<value>,%q<value>)))=@attach %!/INC`MSG=ERROR: Cannot find %q<etype> called %q<value>;@stop u(mysql,EXIST`CLAIM,%q<t1id>,first(%q<found>,chr(177)))=@attach %!/INC`MSG=ERROR: You already have a link to that %q<etype>!;@attach %!/INC`DOSQL=CLAIM`%q<etype>,%q<t1id>,first(%q<found>,chr(177)),%q<tar1id>;@attach %!/INC`ARMORY`CLAIM`%q<etype>;@attach %!/INC`ARMORY`CLAIM`%q<etype>`%q<tar1type>;@attach %!/INC`MSG=You claim [u(setr,msg,"[first(%q<found>,chr(177))]: [rest(%q<found>,chr(177))]" from %q<tar1type>: %q<tar1name>.)];@attach %!/INC`MSG`CHAN=Claimed %q<msg>
+&INC`ARMORY`CLAIM [u(cobj,age)]=@attach %!/INC`ATARGET=%0,1;@attach %!/INC`ARMORY`CLAIM`%q<tar1type>;@attach %!/INC`VALID`ETARGET=%1;@check strlen(u(setr,claimable,filterbool(#lambda/testlock(elements(\%0,2,chr(177)),%#),u(mysql3,LIST`CLAIMABLE,%q<tar1id>,u(VERSION,%#),%q<eid>),chr(176),chr(176))))=@attach %!/INC`MSG=ERROR: %q<tar1type> %q<tar1name> has no claimable %q<etype>S you can access!;th u(setq,claimids,u(SQL`IN`NUMBER,iter(%q<claimable>,first(%i0,chr(177)),chr(176),%b)));@check strlen(u(setr,found,u(mysql,SELECT`CENTITY_NAME_IDFILTER,%q<claimids>,%q<value>,%q<value>,%q<value>)))=@attach %!/INC`MSG=ERROR: Cannot find %q<etype> called %q<value>;@stop u(mysql,EXIST`CLAIM,%q<t1id>,first(%q<found>,chr(177)))=@attach %!/INC`MSG=ERROR: You already have a link to that %q<etype>!;@attach %!/INC`DOSQL=CLAIM`%q<etype>,%q<t1id>,u(setr,claimid,first(%q<found>,chr(177))),%q<tar1id>;@attach %!/INC`ARMORY`CLAIM`%q<etype>;@attach %!/INC`ARMORY`CLAIM`%q<etype>`%q<tar1type>;@attach %!/INC`MSG=You claim [u(setr,msg,"%q<claimid>: [rest(%q<found>,chr(177))]" from %q<tar1type>: %q<tar1name>.)];@attach %!/INC`MSG`CHAN=Claimed %q<msg>
 
 &Q`EXIST`CLAIM [u(cobj,age)]=SELECT centity_id FROM vol_clink WHERE character_id=? AND centity_id=? LIMIT 1
 
@@ -1150,35 +1177,44 @@ Overwhelming
 &Q`CLAIM`MANTLE [u(cobj,age)]=INSERT INTO vol_clink (character_id,centity_id,clink_approved,clink_loan_from,clink_locked) VALUES (?,?,1,?,1)
 
 @@ Release
-&INC`ARMORY`RELEASE [u(cobj,age)]=@attach %!/INC`VALID`ETARGET=%0;@check u(setr,found,u(mysql,RELEASE`%q<etype>,%q<t1id>,u(VERSION,%#),%q<eid>,%q<value>,%q<value>,%q<value>))=@attach %!/INC`MSG=ERROR: No loaned %q<etype> found by that name or ID!;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will remove %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]" from your character. You may not have the permissions to re-claim it. Are you sure? Enter the same command again to verify.,RELEASE %q<etype> %q<found>;@attach %!/INC`DOSQL=DELETE`CLINK,elements(%q<found>,1,chr(177));@attach %!/INC`MSG=You released your claim on the %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!;@attach %!/INC`MSG`CHAN=Released claim on the %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"
+&INC`ARMORY`RELEASE [u(cobj,age)]=@attach %!/INC`VALID`ETARGET=%0;@check u(setr,found,u(mysql3,RELEASE`%q<etype>,%q<t1id>,u(VERSION,%#),%q<eid>,%q<value>,%q<value>,sqlescape(%q<value>)))=@attach %!/INC`MSG=ERROR: No loaned %q<etype> found by that name or ID!;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will remove %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]" from your character. You may not have the permissions to re-claim it. Are you sure? Enter the same command again to verify.,RELEASE %q<etype> %q<found>;@attach %!/INC`DOSQL=DELETE`CLINK,elements(%q<found>,1,chr(177));@attach %!/INC`MSG=You released your claim on [elements(%q<found>,4,chr(177))]'s %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!;@attach %!/INC`MSG`CHAN=Released claim on [elements(%q<found>,4,chr(177))]'s' %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"
 
-&Q`RELEASE`MANTLE [u(cobj,age)]=SELECT clink_id,centity_id,centity_name FROM volv_clink WHERE character_id=? AND centity_version=? AND centity_type=? AND clink_locked>0 AND (centity_id=? OR (centity_name=? OR centity_name LIKE '!%')) ORDER BY CHAR_LENGTH(centity_name) LIMIT 1
+&Q`RELEASE`MANTLE [u(cobj,age)]=SELECT clink_id,centity_id,centity_name,centity_owner_name FROM volv_clink WHERE character_id=? AND centity_version=? AND centity_type=? AND clink_locked>0 AND (centity_id=? OR (centity_name=? OR centity_name LIKE '!%')) ORDER BY CHAR_LENGTH(centity_name) LIMIT 1
 
 &Q`DELETE`CLINK [u(cobj,age)]=DELETE FROM vol_clink WHERE clink_id=?
 
 @@ Grant
-&INC`ARMORY`GRANT [u(cobj,age)]=@attach %!/INC`CHECKPC=%0,2;@attach %!/INC`VALID`ETARGET=%1;@check strlen(u(setr,found,u(mysql3,GRANT`%q<etype>,%q<t1id>,u(VERSION,%#),%q<eid>,%q<value>,%q<value>,%q<value>,%q<t1id>)))=@attach %!/INC`MSG=ERROR: Cannot find an owned %q<etype> named %q<value>!;@stop u(mysql,EXIST`CLAIM,%q<t2id>,elements(%q<found>,2,chr(177)))=@attach %!/INC`MSG=ERROR: %q<t2name> already has a link to that %q<etype>!;@attach %!/INC`DOSQL=CLAIM`%q<etype>,%q<t2id>,elements(%q<found>,2,chr(177)),%q<t1id>;@attach %!/INC`MSG=You have granted %q<t1name> your %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]";@attach %!/INC`MSG=%n granted you %p %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!;@attach %!/INC`MSG`CHAN=%n granted %q<t2name> %p %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!
+&INC`ARMORY`GRANT [u(cobj,age)]=@attach %!/INC`CHECKPC=%0,2;@attach %!/INC`VALID`ETARGET=%1;@check strlen(u(setr,found,u(mysql3,GRANT`%q<etype>,%q<t1id>,u(VERSION,%#),%q<eid>,%q<value>,%q<value>,sqlescape(%q<value>),%q<t1id>)))=@attach %!/INC`MSG=ERROR: Cannot find an owned %q<etype> named %q<value>!;@stop u(mysql,EXIST`CLAIM,%q<t2id>,elements(%q<found>,2,chr(177)))=@attach %!/INC`MSG=ERROR: %q<t2name> already has a link to that %q<etype>!;@attach %!/INC`DOSQL=CLAIM`%q<etype>,%q<t2id>,elements(%q<found>,2,chr(177)),%q<t1id>;@attach %!/INC`MSG=You have granted %q<t1name> your %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]";@attach %!/INC`MSG=%n granted you %p %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!,%q<t2>;@attach %!/INC`MSG`CHAN=%n granted %q<t2name> %p %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!
 
 &Q`GRANT`MANTLE [u(Cobj,age)]=SELECT clink_id,centity_id,centity_name FROM volv_clink WHERE character_id=? AND centity_version=? AND centity_type=? AND clink_locked=0 AND (centity_id=? OR (centity_name=? OR centity_name LIKE '!%')) AND centity_owner=? ORDER BY CHAR_LENGTH(centity_name) LIMIT 1
 
 @@ Revoke
-&INC`ARMORY`REVOKE [u(cobj,age)]=@attach %!/INC`CHECKPC=%0,2;@attach %!/INC`VALID`ETARGET=%1;@check strlen(u(setr,found,u(mysql3,REVOKE`%q<etype>,%q<t2id>,u(VERSION,%#),%q<eid>,%q<value>,%q<value>,%q<value>,%q<t1id>)))=@attach %!/INC`MSG=ERROR: Cannot find a granted %q<etype> named %q<value>!;@attach %!/INC`DOSQL=DELETE`CLINK,elements(%q<found>,1,chr(177));@attach %!/INC`MSG=You have revoked %q<t1name>'s access to your %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]";@attach %!/INC`MSG=%n revoked your access to %p %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!;@attach %!/INC`MSG`CHAN=%n revoked %q<t1name>'s access to %p %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!
+&INC`ARMORY`REVOKE [u(cobj,age)]=@attach %!/INC`CHECKPC=%0,2;@attach %!/INC`VALID`ETARGET=%1;@check strlen(u(setr,found,u(mysql3,REVOKE`%q<etype>,%q<t2id>,u(VERSION,%#),%q<eid>,%q<value>,%q<value>,sqlescape(%q<value>),%q<t1id>)))=@attach %!/INC`MSG=ERROR: Cannot find a granted %q<etype> named %q<value>!;@attach %!/INC`DOSQL=DELETE`CLINK,elements(%q<found>,1,chr(177));@attach %!/INC`MSG=You have revoked %q<t1name>'s access to your %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]";@attach %!/INC`MSG=%n revoked your access to %p %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!,%q<t2>;@attach %!/INC`MSG`CHAN=%n revoked %q<t1name>'s access to %p %q<etype> "[elements(%q<found>,2,chr(177))]: [elements(%q<found>,3,chr(177))]"!
 
 &Q`REVOKE`MANTLE [u(cobj,age)]=SELECT clink_id,centity_id,centity_name FROM volv_clink WHERE character_id=? AND centity_version=? AND centity_type=? AND (centity_id=? OR (centity_name=? OR centity_name LIKE '!%')) AND centity_owner=? ORDER BY CHAR_LENGTH(centity_name)
 
 &VIEW`STAT [u(Cobj,age)]=switch(%0,1,Poor,2,Average,3,Good,4,Great,5,Excellent,?)
-
+&VIEW`STAT2 [u(Cobj,age)]=switch(%0,1,D,2,C,3,B,4,A,5,S,?)
+&VIEW`STAT3 [u(Cobj,age)]=switch(%0,1,Pr,2,Av,3,Gd,4,Gr,5,Ex,??)
 
 @@ ---- ARMORY section for MAIN
-&INC`ARMORY`MAIN [u(cobj,age)]=@attach %!/INC`VALID`ETARGET;@check strlen(u(setr,found,u(mysql3,CHOOSE`%q<etype>,%q<t1id>,u(VERSION,%#),%q<eid>,%q<value>,%q<value>,%q<value>)))=@attach %!/INC`MSG=ERROR: Cannot find a %q<etype> called %q<value>!;@select/inline cor(get(%0/D`COMBAT`DAMAGE),nattr(%0/D`COMBAT`Q`**))=1,{@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] You appear to be in combat. Changing %q<etype>S will force a +reset. Are you sure? Enter the same command again to continue.,ARMORY CHANGE %q<etype> [first(%q<found>,chr(177))]};@attach %!/INC`ARMORY`MAIN`%q<etype>;@attach %!/INC`MSG=You are now ready to rock as the %q<etype> "[elements(%q<found>,1,chr(177))]: [elements(%q<found>,2,chr(177))]"
+&INC`ARMORY`MAIN [u(cobj,age)]=@select/inline strlen(%0)=>0,{@attach %!/INC`VALID`ETARGET;@check strlen(u(setr,found,u(mysql3,CHOOSE`%q<etype>,%q<t1id>,u(VERSION,%#),%q<eid>,%q<value>,%q<value>,sqlescape(%q<value>))))=@attach %!/INC`MSG=ERROR: Cannot find a %q<etype> called %q<value>!;@select/inline cor(get(%0/D`COMBAT`DAMAGE),nattr(%0/D`COMBAT`Q`**))=1,{@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] You appear to be in combat. Changing %q<etype>S will force a +reset. Are you sure? Enter the same command again to continue.,ARMORY CHANGE %q<etype> [first(%q<found>,chr(177))]};@attach %!/INC`ARMORY`MAIN`%q<etype>;@attach %!/INC`MSG=You are now ready to rock as the %q<etype> "[elements(%q<found>,1,chr(177))]: [elements(%q<found>,2,chr(177))]"},0,{@attach %!/INC`ARMORY`LIST}
 
-&INC`ARMORY`MAIN`MANTLE [u(cobj,age)]=@dolist/inline 1~ID|2~NAME|3~LOCKED|4~CONSEQUENCES|5~CONSEQUENCES`SOURCE|6~CONSEQUENCES`GAINED|7~CONSEQUENCES`TIMEOUT|8~CONSEQUENCES`SCENES={th u(attrib_set,%#,D`ARMORY`MAIN`%q<etype>`[after(%i0,~)],elements(%q<found>,before(%i0,~),chr(177)))}
+&INC`ARMORY`MAIN`MANTLE [u(cobj,age)]=@dolist/inline/delimit | 1~ID|2~NAME|3~LINK|4~ARCHETYPE|5~LOCKED={th u(attrib_set,%#,D`ARMORY`MAIN`%q<etype>`[after(%i0,~)],elements(%q<found>,before(%i0,~),chr(177)))}
 
-&Q`CHOOSE`MANTLE [u(cobj,age)]=SELECT centity_id,centity_name,clink_locked,consequences_tier,consequences_source,consequences_date_gained_secs,consequences_date_timeout_secs,consequences_scenes FROM volv_clink WHERE character_id=? AND centity_version=? AND centity_type=? AND (centity_id=? OR (centity_name=? OR centity_name LIKE '!%')) ORDER BY CHAR_LENGTH(centity_name) LIMIT 1
+&Q`CHOOSE`MANTLE [u(cobj,age)]=SELECT l.centity_id,l.centity_name,l.clink_id,t.trait_value,l.clink_locked FROM volv_clink AS l LEFT JOIN vol_ctrait AS t ON t.centity_id=l.centity_id AND t.trait_type=1 AND trait_id=0 WHERE l.character_id=? AND l.centity_version=? AND l.centity_type=? AND (l.centity_id=? OR (l.centity_name=? OR l.centity_name LIKE '!%')) ORDER BY CHAR_LENGTH(l.centity_name) LIMIT 1
 
+
+
+@@ ---- ARMORY help section
+&SHLP`ARMORY [u(cobj,age)]=The Armory System is a generic framework for creating and maintaining different Combat System entities. Each game may implement its own commands such as +pilot or +armor which may have unique differences listed in sub-files of this one. This file covers the general concepts. Replace the +armory command with whatever's relevant for this game like +mantle/list!%R%R[ansi(hc,Concepts)]%R[align(5 [sub(u(width,%#),6)],,[ansi(h,target)] - All Combat Entities are OWNED BY one of three possible things: a specific CHARACTER\, a specific GROUP\, or the GLOBAL list - effectively owned by admin or the game itself. Whenever a <target> is called for\, it is entered as follows: Character/<Name>\, Group/<Name>\, or Global. This does take partial match! You can do C/<name> and so on.)]%R%R[ansi(hc,Commands)]%R[align(5 [sub(u(width,%#),6)],,[ansi(h,+armory/list <target>)] - Lists what a target owns. For characters it also lists whatever they're borrowing. Un-privileged players can only see Combat Entities if they pass its Claim Lock \(see below\).%R[ansi(h,+armory/create <target>=<name>)] - Creates a new Combat Entity owned by <target>. It will have all default stats and be auto-selected for editing.%R[ansi(h,+armory/delete <target>=<name>)] - Delete a Combat Entity. This CANNOT be undone! So be careful. <name> must be the exact name for sanity-checking but is not case-sensitive.%R[ansi(h,+armory/select <target>=<name>)] - Selects a Combat Entity for editing. This is useful for commands listed below.%R[ansi(h,+armory/transfer <target>\[=<name>\])] - Transfer the selected Combat Entity to a different owner. An optional name can be provided to rename it on the fly if the owner already has a Combat Entity of this name.%R[ansi(h,+armory/clone <target>\[=<name>\])] - Creates an identical copy of the selected Combat Entity and gives it to <target>. This is NOT the same as a loaned/borrowed Combat Entity - it is a standalone copy.%R[ansi(h,+armory/lock <lockstring>)] - Set the Claim Lock on a Combat Entity. This defaults to #FALSE \(nobody\). /lock uses the LockGen \(+help LockGen\) system. use /rawlock to instead use PennMUSH locks. /unlock simply sets it #TRUE \(everyone can see/claim it\).%R[ansi(h,+armory/set name=<new name>)] - Renames the selected Combat Entity. This is only a tiny bit of what /set can do though. See subfiles.)]
++shelp/add Character/Armory=[u(cobj,age)]/SHLP`ARMORY
+
+&SHLP`ARMORY`MANTLE [u(cobj,age)]=Note: these commands first require you to use +mantle/select <target>=<mantlename>!%R%R[ansi(hc,Commands)]%R[align(5 [sub(u(width,%#),6)],,[ansi(h,+mantle/set <stat>=<value>)] - <stat> can be POWER\, ENDURANCE\, PRECISION\, or MITIGATION. <value> takes a number 1-5.%R[ansi(h,+mantle/set Weight=<value>)] - <Value> is the name of the Weight class. Light\, Heavy\, etc.%R[ansi(h,+mantle/set Archetype=<value>)] - <value> is the name of the Archetype.%R[ansi(h,+mantle/add quirk=<value>)] - This is used only for mantles with static Quirks that override player preferences. <value> is the name of a Quirk. If a mantle has even a single static Quirk then it will ignore all player prefs!%R[ansi(h,+mantle/remove quirk=<value>)] - Remove a quirk added via /add.%R[ansi(h,+mantle/set <bonus>=<value>)] - <bonus> can be POWBON\, ENDBON\, PREBON\, MITBON\, or DRIVEBON. Set to 0 or 1. Numbers higher than 1 do not count.%R[ansi(h,+mantle/set approved=<value>)] - Set to 0 \(no\) or 1 \(yes\). Unapproved Mantles cannot be used. \(Not currently implemented\))]
++shelp/addsub Armory/+mantle=[u(cobj,age)]/SHLP`ARMORY`MANTLE
 
 @@ +matrix section
-&CMD`MATRIX [u(cobj,age)]=$^(?s)\+(matrix|rollforce|hypeforce|driveforce|switch|damageforce|healforce)(?\:/(\S+))?(?\: +(.+?))?(?\:/(.+?)?)?(?\:=(.*))?$:th u(setq,sysname,MATRIX);@check cor(u(isadmin,%#),u(tester,%#))=@attach %!/INC`MSG=Try as you might\, you cannot see the Matrix.;@attach %!/INC`%q<sysname>`%1=%3,%4,%5
+&CMD`MATRIX [u(cobj,age)]=$^(?s)\+(matrix|rollforce|hypeforce|driveforce|switch|damageforce|healforce|csetup)(?\:/(\S+))?(?\: +(.+?))?(?\:/(.+?)?)?(?\:=(.*))?$:th u(setq,sysname,MATRIX);@check cor(u(isadmin,%#),u(tester,%#))=@attach %!/INC`MSG=Try as you might\, you cannot see the Matrix.;@attach %!/INC`%q<sysname>`%1=%3,%4,%5
 @set [u(cobj,age)]/CMD`MATRIX=regexp
 
 &INC`MATRIX`MATRIX [u(cobj,age)]=&D`MATRIX %#=not(get(%#/D`MATRIX));@attach %!/INc`MSG=You [if(get(%#/D`MATRIX),will now,will no longer)] see the Matrix.
@@ -1261,7 +1297,7 @@ Overwhelming
 &PUSH`7`3 [u(cobj,agedb)]=You are cured of all Debuff or Damage Over Time effects of Moderate/Small severity or lower.
 &PUSH`7`5 [u(cobj,agedb)]=You are cured of all Debuff or Damage Over Time effects of Significant/Standard severity or lower.
 &PUSH`7`7 [u(cobj,agedb)]=You are cured of all Debuff or Damage Over Time effects of Superior/Substantial severity or lower.
-&PUSH`7`ACTIVATE [u(cobj,agedb)]=@check words(u(setr,tocure,u(filter,COSTCOMPARE,setunion(get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`DEBUFF),get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`DOT)),%b,%b,CURE,switch(get(%0/D`COMBAT`STATUS`%1`COST),3,Moderate,5,Significant,7,Superior),switch(get(%0/D`COMBAT`STATUS`%1`COST),3,Small,5,Standard,7,Substantial),%0)))=@attach %!/INC`MSG=ERROR: Nothing to cure! Either no applicable Statuses found or existing Statuses are too potent.;@dolist/inline %q<tocure>={@attach %!/KILLSTATUS=%0,%i0,1};@attach %!/INC`EANNOUNCE=CURE,[ansi(hw,%n)] shrugs off negative Status Effects!
+&PUSH`7`ACTIVATE [u(cobj,agedb)]=@check words(u(setr,tocure,u(filter,COSTCOMPARE,setunion(get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`DEBUFF),get(%0/D`COMBAT`ACTIVE`STATUS`TAGS`DOT)),%b,%b,CURE,switch(%2,3,Moderate,5,Significant,7,Superior),switch(%2,3,Small,5,Standard,7,Substantial),%0)))=@attach %!/INC`MSG=ERROR: Nothing to cure! Either no applicable Statuses found or existing Statuses are too potent.;@dolist/inline %q<tocure>={@attach %!/KILLSTATUS=%0,%i0,1};@attach %!/INC`EANNOUNCE=CURE,[ansi(hw,%n)] shrugs off negative Status Effects!
 
 &PUSH`8 [u(cobj,agedb)]=Break
 &PUSH`8`CHOICES [u(cobj,agedb)]=3|5|7
@@ -1454,9 +1490,9 @@ Overwhelming
 &STATUS`ARC_ACE`ATTACK`BONUS`STAT`2 [u(cobj,age)]=switch(get(%0/D`COMBAT`DRIVE`STATUS),PRIMED,Moderate,Ready,Minor)
 &STATUS`ARC_ACE`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=switch(get(%0/D`COMBAT`DRIVE`STATUS),PRIMED,Minor,Ready,Minor)
 &STATUS`ARC_ACE`ATTACK`PENALTY`STAT`0 [u(cobj,age)]=switch(get(%0/D`COMBAT`DRIVE`STATUS),WAVERING,Solid,SPENT,Solid,OVEREXTENDED,Solid,LAGGING,Minor)
-&STATUS`ARC_ACE`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=switch(get(%0/D`COMBAT`DRIVE`STATUS),WAVERING,Solid,SPENT,Solid,OVEREXTENDED,Solid,LAGGING,Minor)
+&STATUS`ARC_ACE`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=switch(u(strfirstof,get(%0/D`COMBAT`DRIVE`STATUS`ATTACK),get(%0/D`COMBAT`DRIVE`STATUS)),WAVERING,Solid,SPENT,Solid,OVEREXTENDED,Solid,LAGGING,Minor)
 &STATUS`ARC_ACE`ATTACK`PENALTY`STAT`2 [u(cobj,age)]=switch(get(%0/D`COMBAT`DRIVE`STATUS),WAVERING,Solid,SPENT,Solid,OVEREXTENDED,Solid,LAGGING,Minor)
-&STATUS`ARC_ACE`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=switch(get(%0/D`COMBAT`DRIVE`STATUS),WAVERING,Solid,SPENT,Solid,OVEREXTENDED,Solid,LAGGING,Minor)
+&STATUS`ARC_ACE`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=switch(u(strfirstof,get(%0/D`COMBAT`DRIVE`STATUS`ATTACK),get(%0/D`COMBAT`DRIVE`STATUS)),WAVERING,Solid,SPENT,Solid,OVEREXTENDED,Solid,LAGGING,Minor)
 &STATUS`ARC_ACE`ATTACK`DRIVE_COST [u(cobj,age)]=-5
 &STATUS`ARC_ACE`DRIVE`EXHAUSTION_MULTIPLIER [u(Cobj,age)]=1
 
@@ -1557,7 +1593,7 @@ Overwhelming
 
 &STATUS`ARC_ASSASSIN_FOCUS`ATTACK_INCREASE_HITMUL [u(Cobj,age)]=@select/inline and(Eq(%q<hitmul>,0.7),lte(u(setr,assrand,rand(0,100)),35))=1,{th u(setq,assmod,1);@attach %!/INC`EANNOUNCE=ASSASSIN,[ansi(hw,name(%q<atker>))] deftly hits where it hurts! Critical Hit!;th u(setq,hitmul,1.0)};@attach %!/INC`DEBUG=ASSASSIN-FOCUS,Solid>Crit Upgrade Random: %q<assrand>/35;th unsetq(assrand)
 &STATUS`ARC_ASSASSIN_FOCUS`ATTACK_INCREASE_DAMAGE [u(Cobj,age)]=@@ @select/inline and(not(%q<assmod>),gte(%q<orighitmul>,1.0))=1,{@attach %!/INC`EANNOUNCE=ASSASSIN,[ansi(hw,name(%q<atker>))] blitzes through [ansi(hw,%n)]'s Defenses!;th u(setq,incdamagemul,add(%q<incdamagemul>,u(scatter,35)))}
-&STATUS`ARC_ASSASSIN_FOCUS`ATTACK_DECREASE_DAMAGE_2 [u(cobj,age)]=@select/inline eq(%q<hitmul>,0.4)=1,{@attach %!/INC`EANNOUNCE=ASSASSIN,[ansi(hw,name(%q<atker>))] misses [ansi(hw,%n)]'s vitals! Damage decreased!;th u(setq,atkdecdamagemul,linsert(%q<atkdecdamagemul>,-1,u(setr,assfoatkdecmul,u(scatter,25))));@attach %!/INC`DEBUG=ASSASSIN>Focus,Attack Decrease Damage Multiplier: -%q<assfoatkdecmul>;th unsetq(%q<assfoatdecmul>)}
+&STATUS`ARC_ASSASSIN_FOCUS`ATTACK_DECREASE_DAMAGE_2 [u(cobj,age)]=@select/inline eq(%q<hitmul>,0.4)=1,{@attach %!/INC`EANNOUNCE=ASSASSIN,[ansi(hw,name(%q<atker>))] misses [ansi(hw,%n)]'s vitals! Damage decreased!;th u(setq,atkdecdamagemul,linsert(%q<atkdecdamagemul>,-1,u(setr,assfoatkdecmul,u(scatter,25))));@attach %!/INC`DEBUG=ASSASSIN>Focus,Attack Decrease Damage Multiplier: -%q<assfoatkdecmul>;th unsetq(assfoatdecmul)}
 
 &STATUS`ARC_ASSASSIN_MANEUVER [u(cobj,age)]=Assassin-Maneuver
 &STATUS`ARC_ASSASSIN_MANEUVER`DEFENSE_INCREASE_DAMAGE_2 [u(cobj,age)]=@@ @select/inline gte(%q<hitmul>,1)=1,{@attach %!/INC`EANNOUNCE=ASSASSIN,[ansi(hw,%n)] is too lightly armored!;th u(setq,incdamagemul,add(%q<incdamagemul>,u(scatter,20)))}
@@ -1715,24 +1751,28 @@ Overwhelming
 &STATUS`ARC_GRAPPLER_PRECISION`TAGS [u(cobj,age)]=DEBUFF DISPLAY
 &STATUS`ARC_GRAPPLER_PRECISION`ATTACK`PENALTY`STAT`2 [u(cobj,age)]=Significant
 &STATUS`ARC_GRAPPLER_PRECISION`DESCRIPTION [u(cobj,age)]=Significant Penalty to Precision
+&STATUS`ARC_GRAPPLER_PRECISION`TYPE [u(cobj,age)]=ADD
 
 &STATUS`ARC_GRAPPLER_POWER [u(cobj,age)]=Grappler-PowerDebuff
 &STATUS`ARC_GRAPPLER_POWER`TAGS [u(cobj,age)]=DEBUFF DISPLAY
 &STATUS`ARC_GRAPPLER_POWER`ATTACK`PENALTY`STAT`0 [u(cobj,age)]=Significant
 &STATUS`ARC_GRAPPLER_POWER`DESCRIPTION [u(cobj,age)]=Significant Penalty to Power
+&STATUS`ARC_GRAPPLER_POWER`TYPE [u(cobj,age)]=ADD
 
 &STATUS`ARC_GRAPPLER_ENDURANCE [u(cobj,age)]=Grappler-EnduranceDebuff
 &STATUS`ARC_GRAPPLER_ENDURANCE`TAGS [u(cobj,age)]=DEBUFF DISPLAY
 &STATUS`ARC_GRAPPLER_ENDURANCE`DEFENSE`PENALTY`STAT`1 [u(cobj,age)]=Significant
 &STATUS`ARC_GRAPPLER_ENDURANCE`DESCRIPTION [u(cobj,age)]=Significant Penalty to Endurance
+&STATUS`ARC_GRAPPLER_ENDURANCE`TYPE [u(cobj,age)]=ADD
 
 &STATUS`ARC_GRAPPLER_MITIGATION [u(cobj,age)]=Grappler-MitigationDebuff
 &STATUS`ARC_GRAPPLER_MITIGATION`TAGS [u(cobj,age)]=DEBUFF DISPLAY
 &STATUS`ARC_GRAPPLER_MITIGATION`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Significant
 &STATUS`ARC_GRAPPLER_MITIGATION`DESCRIPTION [u(cobj,age)]=Significant Penalty to Mitigation
+&STATUS`ARC_GRAPPLER_MITIGATION`TYPE [u(cobj,age)]=ADD
 
 &STATUS`ARC_GHOST [u(cobj,age)]=Ghost
-&STATUS`ARC_GHOST`DEFENSE_DECREASE_HITMUL [u(cobj,age)]=th u(setq,ghost_downgrade,lte(u(setr,ghostrand,rand(0,100)),u(setr,ghostcheck,switch(%q<def>,1,20,2,20,3,25,4,25,5,30))));@select/inline cand(%q<hitmul>,%q<ghost_downgrade>)=1,{th u(setq,hitmul,switch(%q<hitmul>,0.0,0.0,0.4,0,0.7,0.4,1.0,0.7));@attach %!/INC`EANNOUNCE=GHOST,[ansi(hw,%n)] somehow eludes the brunt of the attack! Severity downgraded!};@attach %!/INC`DEBUG=GHOST,Hit Downgrade Rand: %q<ghostrand>/%q<ghostcheck>;th unsetq(ghostrand ghostcheck)
+&STATUS`ARC_GHOST`DEFENSE_DECREASE_HITMUL [u(cobj,age)]=th u(setq,ghost_downgrade,lte(u(setr,ghostrand,rand(1,100)),u(setr,ghostcheck,switch(%q<def>,1,20,2,20,3,25,4,25,5,30))));@select/inline cand(%q<hitmul>,%q<ghost_downgrade>)=1,{th u(setq,hitmul,switch(%q<hitmul>,0.0,0.0,0.4,0,0.7,0.4,1.0,0.7));@attach %!/INC`EANNOUNCE=GHOST,[ansi(hw,%n)] somehow eludes the brunt of the attack! Severity downgraded!};@attach %!/INC`DEBUG=GHOST,Hit Downgrade Rand: %q<ghostrand>/%q<ghostcheck>;th unsetq(ghostrand ghostcheck)
 &STATUS`ARC_GHOST`DEFENSE_PRE_REROLL [u(cobj,age)]=@select/inline cand(not(%q<hitmul>),match(3 4,%q<def>))=1,{th u(setq,disablereroll,1)}
 &STATUS`ARC_GHOST`DEFENSE_ON_MISS [u(cobj,age)]=@select/inline %q<def>=1,{@attach %!/INC`SETSTATUS=%0,%0,ARC_GHOST_BUFF,,1,0;@attach %!/INC`EANNOUNCE=GHOST,[ansi(h,%n)] phases to a better vantage for attack. Major bonus to Power!},2,{@attach %!/INC`SETSTATUS=%0,%0,ARC_GHOST_BUFF,,1,0;@attach %!/INC`EANNOUNCE=GHOST,[ansi(h,%n)] phases to a better vantage for attack. Major bonus to Power!},5,{@attach %!/INC`HYPE=%0,1,GHOST}
 &STATUS`ARC_GHOST`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=Significant
@@ -1771,8 +1811,10 @@ Overwhelming
 &STATUS`ARC_HOTBLOODED [u(Cobj,age)]=Hot Blooded
 &STATUS`ARC_HOTBLOODED`ATTACK`BONUS`STAT`0 [u(cobj,age)]=if(match(LAGGING OVEREXTENDED,get(%0/D`COMBAT`DRIVE`STATUS)),u(cust,DRIVES,get(%0/D`COMBAT`DRIVE`STATUS)`ATTACK`PENALTY`STAT`0))
 &STATUS`ARC_HOTBLOODED`ATTACK`BONUS`STAT`2 [u(cobj,age)]=if(match(LAGGING OVEREXTENDED,get(%0/D`COMBAT`DRIVE`STATUS)),u(cust,DRIVES,get(%0/D`COMBAT`DRIVE`STATUS)`ATTACK`PENALTY`STAT`2))
-&STATUS`ARC_HOTBLOODED`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=if(match(LAGGING OVEREXTENDED,get(%0/D`COMBAT`DRIVE`STATUS)),u(cust,DRIVES,get(%0/D`COMBAT`DRIVE`STATUS)`DEFENSE`PENALTY`STAT`1))
-&STATUS`ARC_HOTBLOODED`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=if(match(LAGGING OVEREXTENDED,get(%0/D`COMBAT`DRIVE`STATUS)),u(cust,DRIVES,get(%0/D`COMBAT`DRIVE`STATUS)`DEFENSE`PENALTY`STAT`3))
+&STATUS`ARC_HOTBLOODED`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=if(match(LAGGING OVEREXTENDED,u(strfirstof,get(%0/D`COMBAT`DRIVE`STATUS`ATTACK),get(%0/D`COMBAT`DRIVE`STATUS))),u(cust,DRIVES,u(strfirstof,get(%0/D`COMBAT`DRIVE`STATUS`ATTACK),get(%0/D`COMBAT`DRIVE`STATUS))`DEFENSE`PENALTY`STAT`1))
+&STATUS`ARC_HOTBLOODED`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=if(match(LAGGING OVEREXTENDED,u(strfirstof,get(%0/D`COMBAT`DRIVE`STATUS`ATTACK),get(%0/D`COMBAT`DRIVE`STATUS))),u(cust,DRIVES,u(strfirstof,get(%0/D`COMBAT`DRIVE`STATUS`ATTACK),get(%0/D`COMBAT`DRIVE`STATUS))`DEFENSE`PENALTY`STAT`3))
+
+
 
 &STATUS`ARC_HOTBLOODED`OFF`1`ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_HOTBLOODED_CONSISTENT,,1,0
 &STATUS`ARC_HOTBLOODED`OFF`2`ACTIVATE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,ARC_HOTBLOODED_FORCEFUL,,1,0
@@ -1861,7 +1903,7 @@ Overwhelming
 &STATUS`ARC_PREDATOR_INFLICT`ATTACK_INFLICT_STATUS [u(cobj,age)]=@select/inline t(%q<damage>)=1,{@attach %!/INC`SETSTATUS=%0,%0,ARC_PREDATOR_DOT,DAMAGE=%q<damage>|INCREMENT=-1,0,3;@attach %!/INC`EANNOUNCE=PREDATOR,[ansi(hw,%n)] now sports an aggravated\, bloody wound!}
 
 &STATUS`ARC_PREDATOR_DOT [u(cobj,age)]=Predator-DoT
-&STATUS`ARC_PREDATOR_DOT`TAGS [u(cobj,age)]=DOT
+&STATUS`ARC_PREDATOR_DOT`TAGS [u(cobj,age)]=DOT DISPLAY
 &STATUS`ARC_PREDATOR_DOT`DEFENSE`DOT [u(cobj,age)]=bound(floor(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),u(scatter,switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,24,1,7,2,7)))),0)
 &STATUS`ARC_PREDATOR_DOT`TAGS [u(Cobj,age)]=DOT DISPLAY
 &STATUS`ARC_PREDATOR_DOT`DESCRIPTION [u(Cobj,age)]=Inflicts DoT on Defense Phase
@@ -2014,7 +2056,7 @@ Overwhelming
 &STATUS`SUP_AEGIS [u(cobj,age)]=Aegis-Support
 &STATUS`SUP_AEGIS`TAGS [u(cobj,age)]=SUPPORT DISPLAY
 &STATUS`SUP_AEGIS`DESCRIPTION [u(cobj,age)]=Standard Damage Reduction, 25% Chance to block Debuffs/DOTs.
-&STATUS`SUP_AEGIS`DEFENSE_DECREASE_DAMAGE_2 [u(cobj,age)]=th u(setq,defdecdamagemul,linsert(%q<defdecdamagemul>,-1,u(setr,aegisdefmul,u(scatter,10))));@attach %!/INC`DEBUG=AEGIS,Defense Decrease Damage Multiplier: %q<aegisdefmul>;th unsetq(aegisdefmul>)
+&STATUS`SUP_AEGIS`DEFENSE_DECREASE_DAMAGE_2 [u(cobj,age)]=th u(setq,defdecdamagemul,linsert(%q<defdecdamagemul>,-1,u(setr,aegisdefmul,u(scatter,10))));@attach %!/INC`DEBUG=AEGIS,Defense Decrease Damage Multiplier: %q<aegisdefmul>;th unsetq(aegisdefmul)
 &STATUS`SUP_AEGIS`ON_GAIN_STATUS [u(cobj,age)]=@select/inline and(words(setinter(DEBUFF DOT,get(u(cobj,age)/STATUS`[before(%2,$)]`TAGS))),lte(u(setr,aegisblock,rand(1,100)),25))=1,{@attach %!/KILLSTATUS=%0,%2,1;@attach %!/INC`EANNOUNCE=AEGIS-SUPPORT,[ansi(hw,name(%0))] is protected from evil magic!};@attach %!/INC`DEBUG=AEGIS-SUPPORT,Block DebuffDot 1d100 Roll: %q<aegisblock>/25 \(Responding to %2\);th unsetq(aegisblock)
 
 
@@ -2128,8 +2170,8 @@ Overwhelming
 &STATUS`SUP_MASTERMIND [u(cobj,age)]=Mastermind-Support
 &STATUS`SUP_MASTERMIND`TAGS [u(cobj,age)]=SUPPORT DISPLAY
 &STATUS`SUP_MASTERMIND`DESCRIPTION [u(Cobj,age)]=Heal a Small amount of damage you inflict.
-&STATUS`SUP_MASTERMIND`ATTACK_POST_DAMAGE [u(cobj,age)]=@attach %!/INC`HEAL=%q<atker>,u(setr,healed,round(mul(add(%q<damage>,%q<dot>),u(scatter,8.5)),0)),,MASTERMIND-SUPPORT-ATTACK,[ansi(hw,name(%q<atker>))] regenerates [ansi(hg,%q<healed>)] HP!;th unsetq(healed)
-&STATUS`SUP_MASTERMIND`DEFENSE_POST_DAMAGE [u(cobj,age)]=@attach %!/INC`HEAL=u(setr,healtarget,u(strfirstof,get(%0/D`COMBAT`STATUS`%1`SOURCE),%0)),u(setr,healed,round(mul(%q<damage>,u(scatter,7)),0)),,MASTERMIND-SUPPORT-DEFENSE,[ansi(hw,name(%q<healtarget>))] regenerates [ansi(hg,%q<healed>)] HP!;th unsetq(healtarget healed)
+&STATUS`SUP_MASTERMIND`ATTACK_SPECIAL_DAMAGE [u(cobj,age)]=@select/inline gt(u(setr,healed,round(mul(add(%q<damage>,%q<dot>),u(scatter,8.5)),0)),0)=1,{@attach %!/INC`HEAL=%q<atker>,%q<healed>,,MASTERMIND-SUPPORT-ATTACK,[ansi(hw,name(%q<atker>))] regenerates [ansi(hg,%q<healed>)] HP!};th unsetq(healed)
+&STATUS`SUP_MASTERMIND`DEFENSE_SPECIAL_DAMAGE [u(cobj,age)]=@select/inline gt(u(setr,healed,round(mul(%q<damage>,u(scatter,7)),0)),0)=1,{@attach %!/INC`HEAL=u(setr,healtarget,u(strfirstof,get(%0/D`COMBAT`STATUS`%1`SOURCE),%0)),%q<healed>,,MASTERMIND-SUPPORT-DEFENSE,[ansi(hw,name(%q<healtarget>))] regenerates [ansi(hg,%q<healed>)] HP!};th unsetq(healtarget healed)
 
 
 &STATUS`ARC_PANACEA [u(cobj,age)]=Panacea
@@ -2207,7 +2249,7 @@ Overwhelming
 &STATUS`ARC_SAINT`PRE_SET_STATUS [u(cobj,age)]=@select/inline cand(words(setinter(%3,BUFF)),strmatch(%0,%1))=1,{@select/inline gt(add(%4,get(u(cobj,age)/STATUS`%2`ATTACK_TURNS)),0)=1,{th u(setq,statusatkturns,1)};@select/inline gt(add(%5,get(u(cobj,age)/STATUS`%2`DEFENSE_TURNS)),0)=1,{th u(setq,statusdefturns,1)};@attach %!/INC`EANNOUNCE=SAINT,[ansi(h,%n)]'s mystical resolution further empowers Buffs to last one turn more.}
 
 &STATUS`ARC_SAINT_FOCUSBOLSTER [u(cobj,age)]=Saint-FocusBolster
-&STATUS`ARC_SAINT_FOCUSBOLSTER`ATTACK_NEGATE_DAMAGE [u(cobj,age)]=@select/inline gt(u(setr,ndrive,div(%q<damage>,15)),0)=1,{@attach %!/INC`DRIVE=%0,-%q<ndrive>,SAINT};th u(setq,damage,0);
+&STATUS`ARC_SAINT_FOCUSBOLSTER`ATTACK_NEGATE_DAMAGE [u(cobj,age)]=@select/inline gt(u(setr,ndrive,floor(fdiv(%q<damage>,15))),0)=1,{@attach %!/INC`DRIVE=%0,-%q<ndrive>,SAINT};th u(setq,damage,0);
 
 &STATUS`ARC_SAINT_MANEUVERGUARDRALLY [u(cobj,age)]=Saint-ManeuverGuardRally
 &STATUS`ARC_SAINT_MANEUVERGUARDRALLY`DEFENSE_NEGATE_DAMAGE [u(cobj,age)]=@select/inline u(setr,ndrive,div(u(setr,saintred,round(mul(%q<damage>,u(scatter,30)),0)),15))=>0,{@attach %!/INC`DRIVE=%0,mul(-1,%q<ndrive>),SAINT};th u(setq,damage,sub(%q<damage>,%q<saintred>));@attach %!/INC`EANNOUNCE=SAINT,[ansi(h,%n)]'s faith keeps them strong! [ansi(h,%q<saintred>)] damage prevented!
@@ -2243,12 +2285,12 @@ Overwhelming
 &STATUS`SUP_SPOTTER_FORCEFUL`STATUS`OFF_FORCEFUL`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Solid
 
 &STATUS`SUP_SPOTTER_EFFICIENT [u(cobj,age)]=Spotter-Support-Efficient
-&STATUS`SUP_SPOTTER_EFFICIENT`STATUS`OFF_EFFICIENT`ATTACK`BONUS`STAT`0 [u(cobj,)]=fdiv(u(adj,Solid),2)
-&STATUS`SUP_SPOTTER_EFFICIENT`STATUS`OFF_EFFICIENT`ATTACK`BONUS`STAT`2 [u(cobj,)]=fdiv(u(adj,Solid),2)
+&STATUS`SUP_SPOTTER_EFFICIENT`STATUS`OFF_EFFICIENT`ATTACK`BONUS`STAT`0 [u(cobj,age)]=fdiv(u(adj,Solid),2)
+&STATUS`SUP_SPOTTER_EFFICIENT`STATUS`OFF_EFFICIENT`ATTACK`BONUS`STAT`2 [u(cobj,age)]=fdiv(u(adj,Solid),2)
 
 &STATUS`SUP_SPOTTER_DRAMATIC [u(cobj,age)]=Spotter-Support-Dramatic
-&STATUS`SUP_SPOTTER_DRAMATIC`STATUS`OFF_DRAMATIC`ATTACK`BONUS`STAT`0 [u(cobj,)]=fdiv(u(adj,Solid),2)
-&STATUS`SUP_SPOTTER_DRAMATIC`STATUS`OFF_DRAMATIC`ATTACK`BONUS`STAT`2 [u(cobj,)]=fdiv(u(adj,Solid),2)
+&STATUS`SUP_SPOTTER_DRAMATIC`STATUS`OFF_DRAMATIC`ATTACK`BONUS`STAT`0 [u(cobj,age)]=fdiv(u(adj,Solid),2)
+&STATUS`SUP_SPOTTER_DRAMATIC`STATUS`OFF_DRAMATIC`ATTACK`BONUS`STAT`2 [u(cobj,age)]=fdiv(u(adj,Solid),2)
 
 &STATUS`SUP_SPOTTER_FOCUS [u(cobj,age)]=Spotter-Support-Focus
 &STATUS`SUP_SPOTTER_FOCUS`STATUS`DEF_FOCUS`ATTACK`BONUS`STAT`2 [u(cobj,age)]=Solid
@@ -2342,7 +2384,7 @@ Overwhelming
 &STATUS`QRK_CALIBRATEDWEAPONRY`DEFENSE`PENALTY`STAT`3 [u(cobj,age)]=Minor
 
 &STATUS`QRK_CERTAINKILL [u(cobj,age)]=Certain Kill
-&STATUS`QRK_CERTAINKILL`ATTACK_ON_CRITICAL [u(cobj,age)]=@attach %!/INC`EANNOUNCE=CERTAIN KILL,[ansi(hw,name(%q<atker>))]'s blows strike with deadly precision! Critical Damage increased!;th u(setq,incdamagemul,add(%q<incdamagemul>,u(scatter,25)))
+&STATUS`QRK_CERTAINKILL`ATTACK_ON_CRITICAL [u(cobj,age)]=@select/inline %q<orighitmul>=1.0,{@attach %!/INC`EANNOUNCE=CERTAIN KILL,[ansi(hw,name(%q<atker>))]'s blows strike with deadly precision! Critical Damage increased!;th u(setq,incdamagemul,add(%q<incdamagemul>,u(scatter,25)))}
 
 &STATUS`QRK_ELEGANTSTANCE [u(cobj,age)]=Elegant Stance
 &STATUS`QRK_ELEGANTSTANCE`ATTACK`PENALTY`STAT`0 [u(cobj,age)]=Moderate
@@ -2404,7 +2446,8 @@ Overwhelming
 &STATUS`QRK_MOMENTUM`DEFENSE_ON_CRITICAL [u(cobj,age)]=@attach %!/STATUS`QRK_MOMENTUM`DEFENSE_ON_SOLID
 
 &STATUS`QRK_MOMENTUM_BONUS [u(cobj,age)]=Momentum-Bonus
-&STATUS`QRK_MOMENTUM_BONUS`TAGS [u(cobj,age)]=DISPLAY BUFF NOSTACK
+&STATUS`QRK_MOMENTUM_BONUS`TYPE [u(Cobj,age)]=ADD
+&STATUS`QRK_MOMENTUM_BONUS`TAGS [u(cobj,age)]=DISPLAY BUFF
 &STATUS`QRK_MOMENTUM_BONUS`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Significant
 &STATUS`QRK_MOMENTUM_BONUS`BREAK`INTENSITY [u(cobj,age)]=Significant
 
@@ -2420,7 +2463,9 @@ Overwhelming
 &STATUS`QRK_RIPOSTE`DEFENSE_ON_CLOSE [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%0,QRK_RIPOSTE_BONUS,,1,0;@attach %!/INC`EANNOUNCE=RIPOSTE,[ansi(h,%n)] readies a retaliation! Significant Bonus to Precision!
 
 &STATUS`QRK_RIPOSTE_BONUS [u(cobj,age)]=Riposte-Bonus
-&STATUS`QRK_RIPOSTE_BONUS`TAGS [u(cobj,age)]=DISPLAY BUFF NOSTACK
+&STATUS`QRK_RIPOSTE_BONUS`TYPE [u(cobj,age)]=ADD
+&STATUS`QRK_RIPOSTE_BONUS`TAGS [u(cobj,age)]=DISPLAY BUFF
+&STATUS`QRK_RIPOSTE_BONUS`DESCRIPTION [u(cobj,age)]=Solid Bonus to Precision
 &STATUS`QRK_RIPOSTE_BONUS`ATTACK`BONUS`STAT`2 [u(cobj,age)]=Solid
 
 &STATUS`QRK_STIMULANTS [u(cobj,age)]=Stimulants
@@ -2429,7 +2474,7 @@ Overwhelming
 &STATUS`QRK_STIMULANTS`STATIC`MAXIMUM`HP [u(cobj,age)]=-50
 
 &STATUS`QRK_TOXICITY [u(cobj,age)]=Toxicity
-&STATUS`QRK_TOXICITY`BLOCK_OPPONENT_KILL_STATUS [u(cobj,age)]=@select/inline cand(words(setinter(get(u(cobj,age)/STATUS`[before(%3,$)]`TAGS),DOT DEBUFF)),eq(1,u(setr,toxicrand,rand(1,2))),not(get(%2/D`COMBAT`STATUS`%3`TOXICITY)))=1,{@attach %!/INC`EANNOUNCE=TOXICITY,[ansi(hw,name(%q<src>))] oozes with deadly poison! [ansi(hw,get(u(cobj,age)/STATUS`[before(%3,$)]))] will persist a little longer!;th u(attrib_set,%2,D`COMBAT`STATUS`%3`TOXICITY,1);@select/inline not(%4)=1,{th u(addto,%2,D`COMBAT`STATUS`%3`ATTACK_TURNS,1);th u(addto,%2,D`COMBAT`STATUS`%3`DEFENSE_TURNS,1)}};@attach %!/INC`DEBUG=TOXICITY,Block KillStatus Rand 1d2: %q<toxicrand>/1;th unsetq(toxicrand)
+&STATUS`QRK_TOXICITY`BLOCK_OPPONENT_KILL_STATUS [u(cobj,age)]=@select/inline cand(words(setinter(get(u(cobj,age)/STATUS`[before(%3,$)]`TAGS),DOT DEBUFF)),eq(1,u(setr,toxicrand,rand(1,2))),not(get(%2/D`COMBAT`STATUS`%3`TOXICITY)))=1,{@attach %!/INC`EANNOUNCE=TOXICITY,[ansi(hw,name(get(%2/D`COMBAT`STATUS`%3`SOURCE)))] oozes with deadly poison! [ansi(hw,get(u(cobj,age)/STATUS`[before(%3,$)]))] will persist a little longer!;th u(attrib_set,%2,D`COMBAT`STATUS`%3`TOXICITY,1);@select/inline not(%4)=1,{th u(addto,%2,D`COMBAT`STATUS`%3`ATTACK_TURNS,1);th u(addto,%2,D`COMBAT`STATUS`%3`DEFENSE_TURNS,1)}};@attach %!/INC`DEBUG=TOXICITY,Block KillStatus Rand 1d2: %q<toxicrand>/1;th unsetq(toxicrand)
 
 &STATUS`QRK_UNWIELDYSTRENGTH [u(cobj,age)]=Unwieldy Strength
 &STATUS`QRK_UNWIELDYSTRENGTH`ATTACK`BONUS`STAT`0 [u(cobj,age)]=Significant
@@ -2452,7 +2497,7 @@ Overwhelming
 @@ STATUS - Quirks - Defense
 
 &STATUS`QRK_ABLATIVEBARRIER [u(cobj,age)]=Ablative Barrier
-&STATUS`QRK_ABLATIVEBARRIER`DEFENSE_DECREASE_DAMAGE [u(cobj,age)]=@select/inline cand(gte(u(setr,oridamage,%q<damage>),350),not(get(%0/D`COMBAT`HISTORY`QRK_ABLATIVEBARRIER)))=1,{th u(setq,damage,sub(%q<damage>,60));th u(setq,damage,sub(%q<damage>,mul(10,div(%q<damage>,50))));@attach %!/INC`EANNOUNCE=ABLATIVE BARRIER,Damage to [ansi(hw,%n)] reduced by [ansi(117,sub(%q<oridamage>,%q<damage>))] HP!;&D`COMBAT`HISTORY`QRK_ABLATIVEBARRIER %0=1}
+&STATUS`QRK_ABLATIVEBARRIER`DEFENSE_DECREASE_DAMAGE [u(cobj,age)]=@select/inline cand(gte(u(setr,oridamage,%q<damage>),350),not(get(%0/D`COMBAT`HISTORY`QRK_ABLATIVEBARRIER)))=1,{th u(setq,damage,sub(%q<damage>,60));th u(setq,damage,sub(%q<damage>,mul(10,floor(fdiv(%q<damage>,50)))));@attach %!/INC`EANNOUNCE=ABLATIVE BARRIER,Damage to [ansi(hw,%n)] reduced by [ansi(117,sub(%q<oridamage>,%q<damage>))] HP!;&D`COMBAT`HISTORY`QRK_ABLATIVEBARRIER %0=1}
 
 &STATUS`QRK_ANTICIPATION [u(cobj,age)]=Anticipation
 &STATUS`QRK_ANTICIPATION`DEFENSE_END_TURN [u(cobj,age)]=th u(attrib_set,%0,D`COMBAT`HISTORY`%q<atker>`OFF,%q<off>)
@@ -2461,7 +2506,7 @@ Overwhelming
 &STATUS`QRK_ANTICIPATION`DEFENSE_ON_CALCULATE [u(cobj,age)]=@select/inline eq(get(%0/D`COMBAT`HISTORY`%q<atker>`OFF),%q<off>)=1,{@attach %!/INC`EANNOUNCE=ANTICIPATION,[ansi(hw,%n)] saw through [ansi(hw,name(%q<atker>))]'s repeated attack\, reducing its effectiveness!}
 
 &STATUS`QRK_CLOAKING [u(cobj,age)]=Cloaking
-&STATUS`QRK_CLOAKING`DEFENSE_DECREASE_HITMUL [u(cobj,age)]=@select/inline cand(eq(0.4,%q<hitmul>),eq(1,lte(u(setr,cloakrand,rand(1,100)),30)))=1,{th u(setq,hitmul,0.0);@attach %!/INC`EANNOUNCE=CLOAKING,[ansi(hw,name(%0))] slips out of reach!};@attach %!/INC`DEBUG=CLOAKING,Random Check 1d100: %q<cloakrand>/30;th unsetq(cloakrand)
+&STATUS`QRK_CLOAKING`DEFENSE_DECREASE_HITMUL [u(cobj,age)]=@select/inline cand(eq(0.4,%q<hitmul>),lte(u(setr,cloakrand,rand(1,100)),30))=1,{th u(setq,hitmul,0.0);@attach %!/INC`EANNOUNCE=CLOAKING,[ansi(hw,name(%0))] slips out of reach!};@attach %!/INC`DEBUG=CLOAKING,Random Check 1d100: %q<cloakrand>/30;th unsetq(cloakrand)
 &STATUS`QRK_CLOAKING`STATIC`MAXIMUM`HP [u(cobj,age)]=-50
 
 &STATUS`QRK_CONVENIENTKEEPSAKE [u(cobj,age)]=Convenient Keepsake
@@ -2471,7 +2516,7 @@ Overwhelming
 
 &STATUS`QRK_FORTIFIEDDEFENSES [u(cobj,age)]=Fortified Defense
 &STATUS`QRK_FORTIFIEDDEFENSES`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Minor
-&STATUS`QRK_FORTIFIEDDEFENSES`DEFENSE_DECREASE_HITMUL [u(cobj,age)]=@select/inline cand(gte(%q<hitmul>,1.0),lte(u(setr,fortrand,rand(1,100)),50))={th u(setq,hitmul,0.7);@attach %!/INC`EANNOUNCE=FORTIFIED DEFENSES,[ansi(hw,name(%0))]'s protected from Critical Hits!};@attach %!/INC`DEBUG=FORTIFIED DEFENSES,Crit Downgrade Rand 1d100: %q<fortrand>/50;th unsetq(fortrand)
+&STATUS`QRK_FORTIFIEDDEFENSES`DEFENSE_DECREASE_HITMUL [u(cobj,age)]=@select/inline cand(gte(%q<hitmul>,1.0),lte(u(setr,fortrand,rand(1,100)),50))=1,{th u(setq,hitmul,0.7);@attach %!/INC`EANNOUNCE=FORTIFIED DEFENSES,[ansi(hw,name(%0))]'s protected from Critical Hits!};@attach %!/INC`DEBUG=FORTIFIED DEFENSES,Crit Downgrade Rand 1d100: %q<fortrand>/50;th unsetq(fortrand)
 
 &STATUS`QRK_HEAVYARMOR [u(cobj,age)]=Heavy Armor
 &STATUS`QRK_HEAVYARMOR`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Significant
@@ -2544,7 +2589,7 @@ Overwhelming
 &STATUS`QRK_SHIELDUSER`ATTACK`PENALTY`STAT`0 [u(cobj,age)]=Minor
 &STATUS`QRK_SHIELDUSER`DEFENSE_DECREASE_DAMAGE [u(cobj,age)]=@select/inline eq(0.4,%q<hitmul>)=1,{th u(setq,damage,mul(%q<damage>,sub(1.0,u(scatter,20))));@attach %!/INC`EANNOUNCE=SHIELD USER,[ansi(h,%n)] catches the blow on [poss(%0)] mighty shield! Substantial damage reduction!}
 
-&STATUS`QRK_SIEGEMODE [u(Cob,age)]=Siege Mode
+&STATUS`QRK_SIEGEMODE [u(Cobj,age)]=Siege Mode
 &STATUS`QRK_SIEGEMODE`ATTACK`PENALTY`STAT`2 [u(cobj,age)]=Solid
 &STATUS`QRK_SIEGEMODE`ATTACK`PENALTY`STAT`0 [u(cobj,age)]=Solid
 &STATUS`QRK_SIEGEMODE`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Significant
@@ -2809,12 +2854,14 @@ Overwhelming
 &STATUS`QRK_REPERTOIRE`DEF`4`ACTIVATE [u(cobj,age)]=@attach %!/STATUS`QRK_REPERTOIRE`DEF`3`ACTIVATE
 
 &STATUS`QRK_REPERTOIRE_DEFENSE [u(cobj,age)]=Repertoire-Defense
+&STATUS`QRK_REPERTOIRE_DEFENSE`TYPE [u(cobj,age)]=ADD
 &STATUS`QRK_REPERTOIRE_DEFENSE`TAGS [u(cobj,age)]=DISPLAY
 &STATUS`QRK_REPERTOIRE_DEFENSE`DESCRIPTION [u(cobj,age)]=Minor Bonus to Endurance and Mitigation
 &STATUS`QRK_REPERTOIRE_DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Minor
 &STATUS`QRK_REPERTOIRE_DEFENSE`BONUS`STAT`3 [u(cobj,age)]=Minor
 
 &STATUS`QRK_REPERTOIRE_OFFENSE [u(cobj,age)]=Repertoire-Offense
+&STATUS`QRK_REPERTOIRE_OFFENSE`TYPE [u(cobj,age)]=ADD
 &STATUS`QRK_REPERTOIRE_OFFENSE`TAGS [u(cobj,age)]=DISPLAY
 &STATUS`QRK_REPERTOIRE_OFFENSE`DESCRIPTION [u(cobj,age)]=Minor Bonus to Power and Precision
 &STATUS`QRK_REPERTOIRE_OFFENSE`BONUS`STAT`0 [u(cobj,age)]=Minor
@@ -3022,14 +3069,14 @@ Overwhelming
 &STATUS`SIG_IMPERVIOUS_ACTIVE [u(cobj,age)]=Impervious
 &STATUS`SIG_IMPERVIOUS_ACTIVE`TAGS [u(Cobj,age)]=DISPLAY
 &STATUS`SIG_IMPERVIOUS_ACTIVE`DESCRIPTION [u(cobj,age)]=Negate damage exceeding 20% or 250 HP.
-&STATUS`SIG_IMPERVIOUS_ACTIVE`DEFENSE_NEGATE_DAMAGE [u(cobj,age)]=@select/inline lte(%q<damage>,u(hitpercent,%0,0.15,1))=1,{th u(setq,damage,0);@attach %!/INC`EANNOUNCE=IMPERVIOUS,Nothing can pierce [ansi(hw,%n)]'s absolute defense!}
+&STATUS`SIG_IMPERVIOUS_ACTIVE`DEFENSE_NEGATE_DAMAGE [u(cobj,age)]=@select/inline lte(firstof(%q<defbosspredam>,%q<damage>),u(hitpercent,%0,0.15,1))=1,{th u(setq,damage,0);@attach %!/INC`EANNOUNCE=IMPERVIOUS,Nothing can pierce [ansi(hw,%n)]'s absolute defense!}
 
 &STATUS`SIG_KILLERMOVE [u(cobj,age)]=Killer Move
 &STATUS`SIG_KILLERMOVE`TAGS [u(cobj,age)]=SIGNATURE DISPLAY
 &STATUS`SIG_KILLERMOVE`DESCRIPTION [u(cobj,age)]=Unleash Hi-ougi at 100% charge! (Current: [ansi(hg,default(%0/D`COMBAT`STATUS`%1`CHARGE,0)\%)])
 &STATUS`SIG_KILLERMOVE`STATIC`GAIN`DRIVE [u(cobj,age)]=1
-&STATUS`SIG_KILLERMOVE`DEFENSE_END_TURN [u(cobj,age)]=th u(addto,%0,D`COMBAT`STATUS`%1`CHARGE,u(setr,gaincharge,20));@attach %!/INC`EPRIVATE=KILLER MOVE,You gained [ansi(hg,%q<gaincharge>\%)] Special Meter! (Current: [ansi(hg,get(%0/D`COMBAT`STATUS`%1`CHARGE)\%)]);th unsetq(gaincharge)
-&STATUS`SIG_KILLERMOVE`ATTACK_BEFORE_LAUNCH [u(cobj,age)]=@select/inline cand(gte(%q<atklevel>,4),gte(get(%0/D`COMBAT`STATUS`%1`CHARGE),100))=1,{@attach %!/INC`EANNOUNCE=KILLER MOVE,Ichigeki hissatsu! [ansi(h,%n)] unleashes %p hi-ougi! ([ansi(hr,-100\% Special Meter!)] Remaining: [ansi(hg,get(%0/D`COMBAT`%1`CHARGE)\%)]),%0;@attach %!/INC`SETSTATUS=%0,%0,SIG_KILLERMOVE_BONUS,,1,0;th u(addto,%0,D`COMBAT`STATUS`%1`CHARGE,-100)}
+&STATUS`SIG_KILLERMOVE`DEFENSE_END_TURN [u(cobj,age)]=th u(addto,%0,D`COMBAT`STATUS`%1`COUNTER,1);@select/inline isint(fdiv(get(%0/D`COMBAT`STATUS`%1`COUNTER),get(%0/D`COMBAT`OPPONENTS)))=1,{th u(addto,%0,D`COMBAT`STATUS`%1`CHARGE,u(setr,gaincharge,20));@attach %!/INC`EANNOUNCE=KILLER MOVE,%n gains [ansi(hg,%q<gaincharge>\%)] Special Meter! (Current: [ansi(hg,get(%0/D`COMBAT`STATUS`%1`CHARGE)\%)]);th unsetq(gaincharge)}
+&STATUS`SIG_KILLERMOVE`ATTACK_BEFORE_LAUNCH [u(cobj,age)]=@select/inline cand(gte(%q<atklevel>,4),gte(get(%0/D`COMBAT`STATUS`%1`CHARGE),100))=1,{th u(addto,%0,D`COMBAT`STATUS`%1`CHARGE,-100);@attach %!/INC`EANNOUNCE=KILLER MOVE,Ichigeki hissatsu! [ansi(h,%n)] unleashes %p hi-ougi! ([ansi(hr,-100\% Special Meter!)] Remaining: [ansi(hg,default(%0/D`COMBAT`%1`CHARGE,0)\%)]),%0;@attach %!/INC`SETSTATUS=%0,%0,SIG_KILLERMOVE_BONUS,,1,0}
 &STATUS`SIG_KILLERMOVE`SIGNATURE [u(cobj,age)]=@select/inline lt(get(%0/D`COMBAT`STATUS`%1`ACTIVATED),get(%0/D`COMBAT`OPPONENTS))=1,{@select/inline gte(get(%0/D`COMBAT`HYPE),u(setr,needsighype,mul(5,get(%0/D`COMBAT`OPPONENTS))))=1,{@attach %!/INC`HYPE=%0,-%q<needsighype>,KILLER MOVE;th u(addto,%0,D`COMBAT`STATUS`%1`CHARGE,u(setr,gaincharge,20));@attach %!/INC`DRIVE=%0,mul(8,get(%0/D`COMBAT`OPPONENTS)),KILLER MOVE,[ansi(hw,%n)] focuses [poss(%0)] energy! Gains [ansi(hg,mul(8,get(%0/D`COMBAT`OPPONENTS)))] Drive and [ansi(hg,%q<gaincharge>\%)] Special Meter! (Current: [ansi(hg,get(%0/D`COMBAT`STATUS`%1`CHARGE)\%)]);th u(addto,%0,D`COMBAT`STATUS`%1`ACTIVATED,1)},0,{@attach %!/INC`EPRIVATE=KILLER MOVE,You require %q<needsighype> Hype to activate Killer Move!}},0,{@attach %!/INC`EPRIVATE=KILLER MOVE,Your special meter could shatter if you push it any further!}
 
 &STATUS`SIG_KILLERMOVE_BONUS [u(cobj,age)]=Killer Move
@@ -3041,14 +3088,16 @@ Overwhelming
 &STATUS`SIG_EXECUTION`SIGNATURE [u(cobj,age)]=@select/inline lt(get(%0/D`COMBAT`STATUS`%1`ACTIVATED),get(%0/D`COMBAT`OPPONENTS))=1,{@attach %!/INC`SETSTATUS=%0,%0,SIG_EXECUTION_INFLICT,,1,0;@attach %!/INC`EANNOUNCE=EXECUTION,ansi(h,%n) radiates a fierce killing intent!;th u(addto,%0,D`COMBAT`STATUS`%1`ACTIVATED,1)},0,{@attach %!/INC`EPRIVATE=EXECUTION,Look as you may\, no more weak points stand out!}
 
 &STATUS`SIG_EXECUTION_INFLICT [u(cobj,age)]=Execution
-&STATUS`SIG_EXECUTION_INFLICT`ATTACK_INFLICT_STATUS [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%q<atker>,SIG_EXECUTION_DOT,DAMAGE=%q<damage>,0,4;@attach %!/INC`EANNOUNCE=EXECUTION,ansi(h,%n) suffers a deadly injury! Cure cannot help %o! Beware bleeding out...
+&STATUS`SIG_EXECUTION_INFLICT`ATTACK_INFLICT_STATUS [u(cobj,age)]=@attach %!/INC`SETSTATUS=%0,%q<atker>,SIG_EXECUTION_DOT,DAMAGE=%q<damage>|INCREMENT=1,0,mul(3,get(%0/D`COMBAT`OPPONENTS));@attach %!/INC`EANNOUNCE=EXECUTION,ansi(h,%n) suffers a deadly injury! Cure cannot help %o! Beware bleeding out...
 &STATUS`SIG_EXECUTION_INFLICT`ATTACK_NEGATE_DAMAGE [u(Cobj,age)]=th u(setq,damage,0)
 
 &STATUS`SIG_EXECUTION_DOT [u(cobj,age)]=Execution
 &STATUS`SIG_EXECUTION_DOT`TAGS [u(Cobj,age)]=DISPLAY
 &STATUS`SIG_EXECUTION_DOT`TYPE [u(cobj,age)]=IGNORE
 &STATUS`SIG_EXECUTION_DOT`DESCRIPTION [u(cobj,age)]=Suffer an Overwhelming amount of damage every defense... (Incurable!)
-&STATUS`SIG_EXECUTION_DOT`DEFENSE`DOT [u(cobj,age)]=bound(round(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),switch(get(%0/D`COMBAT`STATUS`%1`INCREMENT),0,0,1,0.8,2,0.4,3,0.4,4,0.4)),0),0)
+&STATUS`SIG_EXECUTION_DOT`DEFENSE`DOT [u(cobj,age)]=if(eq(mod(default(%0/D`COMBAT`STATUS`%1`INCREMENT,0),get(%0/D`COMBAT`OPPONENTS)),0),bound(round(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),switch(div(default(%0/D`COMBAT`STATUS`%1`INCREMENT,0),get(%0/D`COMBAT`OPPONENTS)),1,0.725,2,0.3625,3,0.3625,0.3625),add(1,u(scatter,10))),0),0),0)
+
+
 
 &STATUS`SIG_ENERVATION [u(cobj,age)]=Enervation
 &STATUS`SIG_ENERVATION`TAGS [u(cobj,age)]=SIGNATURE
@@ -3099,7 +3148,7 @@ Overwhelming
 
 &STATUS`SIG_ULTIMATEDEFENSE_REDUCE [u(cobj,age)]=Ultimate Defense
 &STATUS`SIG_ULTIMATEDEFENSE_REDUCE`DEFENSE_ON_MISS [u(cobj,age)]=th u(addto,%0,D`COMBAT`STATUS`[get(%0/D`COMBAT`STATUS`%1`FROM)]`ACTIVATED,-1);@attach %!/INC`DRIVE=%0,5,ULTIMATE DEFENSE,Refunded 1 use of Ultimate Defense and [ansi(hg,5 Drive)]!
-&STATUS`SIG_ULTIMATEDEFENSE_REDUCE`DEFENSE_DECREASE_DAMAGE [u(cobj,age)]=@select/inline lte(%q<damage>,0)=0,{@attach %!/INC`EANNOUNCE=ULTIMATE DEFENSE,[ansi(h,%n)] reduces incoming damage from [ansi(hr,%q<damage>)] to [ansi(hr,u(setr,damage,bound(sub(%q<damage>,50),0)))]!},1,{@attach %!/STATUS`SIG_ULTIMATEDEFENSE_REDUCE`DEFENSE_ON_MISS=%0,%1}
+&STATUS`SIG_ULTIMATEDEFENSE_REDUCE`DEFENSE_NEGATE_DAMAGE [u(cobj,age)]=@select/inline lte(%q<damage>,0)=0,{@attach %!/INC`EANNOUNCE=ULTIMATE DEFENSE,[ansi(h,%n)] reduces incoming damage from [ansi(hr,%q<damage>)] to [ansi(hr,u(setr,damage,bound(sub(%q<damage>,50),0)))]!},1,{@attach %!/STATUS`SIG_ULTIMATEDEFENSE_REDUCE`DEFENSE_ON_MISS=%0,%1}
 
 &STATUS`SIG_UNTOUCHABLE [u(Cobj,age)]=Untouchable
 &STATUS`SIG_UNTOUCHABLE`TAGS [u(cobj,age)]=SIGNATURE DISPLAY
@@ -3107,14 +3156,17 @@ Overwhelming
 &STATUS`SIG_UNTOUCHABLE`SIGNATURE [u(Cobj,age)]=@select/inline lt(get(%0/D`COMBAT`STATUS`%1`ACTIVATED),mul(get(%0/D`COMBAT`OPPONENTS),5))=1,{@attach %!/INC`SETSTATUS=%0,%0,SIG_UNTOUCHABLE_ACTIVATED,FROM=%1,0,1;@attach %!/INC`EANNOUNCE=UNTOUCHABLE,ansi(h,%n) is ready to dance through any danger!},0,{@attach %!/INC`EPRIVATE=UNTOUCHABLE,Your well of reserve strength is dry!}
 
 &STATUS`SIG_UNTOUCHABLE_ACTIVATED [u(Cobj,age)]=Untouchable
-&STATUS`SIG_UNTOUCHABLE_ACTIVATED`DEFENSE_FINAL_HITMUL [u(cobj,age)]=@select/inline gte(u(setr,cost,sub(sub(mul(get(%0/D`COMBAT`OPPONENTS),5),get(%0/D`COMBAT`STATUS`[u(setr,from,get(%0/D`COMBAT`STATUS`%1`FROM))]`ACTIVATED)),%q<atklevel>)),0)=1,{@select/inline gt(%q<hitmul>,0)=1,{th u(setq,hitmul,switch(%q<hitmul>,1.0,0.7,0.7,0.4,0.4,0.0,0.0,0));@attach %!/INC`EANNOUNCE=UNTOUCHABLE,ansi(h,%n) dances through the danger like a champ! Hit degraded to a [ansi(hg,switch(%q<hitmul>,0.7,Solid,0.4,Close Call,0.0,Miss))]! ... But %q<atklevel>x Minor Penalties to Endurance.;@dolist/inline lnum(1,%q<atklevel>)={@attach %!/INC`SETSTATUS=%0,%0,SIG_UNTOUCHABLE_PENALTY,,0,1}},0,{@attach %!/INC`SETSTATUS=%0,%0,SIG_UNTOUCHABLE_BONUS,,0,2;@attach %!/INC`EANNOUNCE=UNTOUCHABLE,ansi(h,%n) dances through the danger like a champ! Extreme bonus to Mitigation!};th u(addto,%0,D`COMBAT`STATUS`%q<from>`ACTIVATED,%q<atklevel>)},0,{@attach %!/INC`EANNOUNCE=UNTOUCHABLE,ansi(h,%n) fails to evade!}
+&STATUS`SIG_UNTOUCHABLE_ACTIVATED`DEFENSE_FINAL_HITMUL [u(cobj,age)]=@select/inline gte(u(setr,cost,sub(sub(mul(get(%0/D`COMBAT`OPPONENTS),5),get(%0/D`COMBAT`STATUS`[u(setr,from,get(%0/D`COMBAT`STATUS`%1`FROM))]`ACTIVATED)),%q<atklevel>)),0)=1,{@select/inline gt(%q<hitmul>,0)=1,{th u(setq,hitmul,switch(%q<hitmul>,1.0,0.7,0.7,0.4,0.4,0.0,0.0,0));@attach %!/INC`EANNOUNCE=UNTOUCHABLE,ansi(h,%n) dances through the danger like a champ! Hit degraded to a [ansi(hg,switch(%q<hitmul>,0.7,Solid,0.4,Close Call,0.0,Miss))]!;@@ ... But %q<atklevel>x Minor Penalties to Endurance.;@@ @dolist/inline lnum(1,%q<atklevel>)={@attach %!/INC`SETSTATUS=%0,%0,SIG_UNTOUCHABLE_PENALTY,,0,1}},0,{@attach %!/INC`SETSTATUS=%0,%0,SIG_UNTOUCHABLE_BONUS,,0,2;@attach %!/INC`EANNOUNCE=UNTOUCHABLE,ansi(h,%n) dances through the danger like a champ! Extreme bonus to Mitigation!};th u(addto,%0,D`COMBAT`STATUS`%q<from>`ACTIVATED,%q<atklevel>)},0,{@attach %!/INC`EANNOUNCE=UNTOUCHABLE,ansi(h,%n) fails to evade!}
 
 &STATUS`SIG_UNTOUCHABLE_PENALTY [u(cobj,age)]=Untouchable
-&STATUS`SIG_UNTOUCHABLE_PENALTY`TAGS [u(cobj,age)]=Minor penalty to Endurance
+&STATUS`SIG_UNTOUCHABLE_PENALTY`TAGS [u(cobj,age)]=DISPLAY
+&STATUS`SIG_UNTOUCHABLE_PENALTY`DESCRIPTION [u(cobj,age)]=Minor penalty to Endurance
 &STATUS`SIG_UNTOUCHABLE_PENALTY`DEFENSE`PENALTY`STAT`1 [u(Cobj,age)]=Minor
 
 &STATUS`SIG_UNTOUCHABLE_BONUS [u(Cobj,age)]=Untouchable
-&STATUS`SIG_UNTOUCHABLE_BONUS`DEFENSE`BONUS`STAT`1 [u(cobj,age)]=Extreme
+&STATUS`SIG_UNTOUCHABLE_BONUS`TAGS [u(cobj,age)]=DISPLAY
+&STATUS`SIG_UNTOUCHABLE_BONUS`DESCRIPTION [u(cobj,age)]=Extreme Bonus to Mitigation!
+&STATUS`SIG_UNTOUCHABLE_BONUS`DEFENSE`BONUS`STAT`3 [u(cobj,age)]=Extreme
 
 &STATUS`SIG_PERFECTSTRIKE [u(cobj,age)]=Perfect Strike
 &STATUS`SIG_PERFECTSTRIKE`TAGS [u(cobj,age)]=SIGNATURE DISPLAY
@@ -3122,13 +3174,16 @@ Overwhelming
 &STATUS`SIG_PERFECTSTRIKE`SIGNATURE [u(Cobj,age)]=@select/inline lt(get(%0/D`COMBAT`STATUS`%1`ACTIVATED),mul(get(%0/D`COMBAT`OPPONENTS),5))=1,{@attach %!/INC`SETSTATUS=%0,%0,SIG_PERFECTSTRIKE_ACTIVATED,FROM=%1,1,0;@attach %!/INC`EANNOUNCE=PERFECT STRIKE,ansi(h,%n) hones %p focus to find the perfect moment!},0,{@attach %!/INC`EPRIVATE=PERFECT STRIKE,Your well of reserve strength is dry!}
 
 &STATUS`SIG_PERFECTSTRIKE_ACTIVATED [u(Cobj,age)]=Perfect Strike
-&STATUS`SIG_PERFECTSTRIKE_ACTIVATED`ATTACK_FINAL_HITMUL [u(cobj,age)]=@select/inline gte(u(setr,cost,sub(sub(mul(get(%0/%q<atk>`OPPONENTS),5),get(%q<atker>/D`COMBAT`STATUS`[u(setr,from,get(%0/%q<atk>`STATUS`%1`FROM))]`ACTIVATED)),%q<atklevel>)),0)=1,{@select/inline lt(%q<hitmul>,1)=1,{th u(setq,hitmul,switch(%q<hitmul>,0.0,0.4,0.4,0.7,0.7,1.0));@attach %!/INC`EANNOUNCE=PERFECT STRIKE,ansi(h,name(%q<atker>)) draws on honed combat instincts and delivers the ultimate blow! Hit upgraded to a [ansi(hg,switch(%q<hitmul>,1.0,Critical,0.7,Solid,0.4,Close Call,0.0,Miss))]! ... But %q<atklevel>x Minor Penalties to Power.;@dolist/inline lnum(1,%q<atklevel>)={@attach %!/INC`SETSTATUS=%q<atker>,%q<atker>,SIG_PERFECTSTRIKE_PENALTY,,1,0}},0,{@attach %!/INC`SETSTATUS=%q<atker>,%q<atker>,SIG_PERFECTSTRIKE_BONUS,,1,0;@attach %!/INC`EANNOUNCE=PERFECT STRIKE,ansi(h,%n) draws on honed combat instincts and delivers the ultimate blow! Extreme Power bonus to %p her next attack!};th u(addto,%q<atker>,D`COMBAT`STATUS`%q<from>`ACTIVATED,%q<atklevel>)},0,{@attach %!/INC`EANNOUNCE=PERFECT STRIKE,ansi(h,name(%q<atker>)) fails to land the ultimate blow!}
+&STATUS`SIG_PERFECTSTRIKE_ACTIVATED`ATTACK_FINAL_HITMUL [u(cobj,age)]=@select/inline gte(u(setr,cost,sub(sub(mul(get(%0/%q<atk>`OPPONENTS),5),get(%q<atker>/D`COMBAT`STATUS`[u(setr,from,get(%0/%q<atk>`STATUS`%1`FROM))]`ACTIVATED)),%q<atklevel>)),0)=1,{@select/inline lt(%q<hitmul>,1)=1,{th u(setq,hitmul,switch(%q<hitmul>,0.0,0.4,0.4,0.7,0.7,1.0));@attach %!/INC`EANNOUNCE=PERFECT STRIKE,ansi(h,name(%q<atker>)) draws on honed combat instincts and delivers the ultimate blow! Hit upgraded to a [ansi(hg,switch(%q<hitmul>,1.0,Critical,0.7,Solid,0.4,Close Call,0.0,Miss))]!;@@ ... But %q<atklevel>x Minor Penalties to Power.;@@ @dolist/inline lnum(1,%q<atklevel>)={@attach %!/INC`SETSTATUS=%q<atker>,%q<atker>,SIG_PERFECTSTRIKE_PENALTY,,1,0}},0,{@attach %!/INC`SETSTATUS=%q<atker>,%q<atker>,SIG_PERFECTSTRIKE_BONUS,,1,0;@attach %!/INC`EANNOUNCE=PERFECT STRIKE,ansi(h,name(%q<atker>)) draws on honed combat instincts and delivers the ultimate blow! Extreme Precision bonus to [poss(%q<atker>)] next attack!};th u(addto,%q<atker>,D`COMBAT`STATUS`%q<from>`ACTIVATED,%q<atklevel>)},0,{@attach %!/INC`EANNOUNCE=PERFECT STRIKE,ansi(h,name(%q<atker>)) fails to land the ultimate blow!}
 
 &STATUS`SIG_PERFECTSTRIKE_PENALTY [u(cobj,age)]=Perfect Strike
-&STATUS`SIG_PERFECTSTRIKE_PENALTY`TAGS [u(cobj,age)]=Minor penalty to Power
+&STATUS`SIG_PERFECTSTRIKE_PENALTY`TAGS [u(cobj,age)]=DISPLAY
+&STATUS`SIG_PERFECTSTRIKE_PENALTY`DESCRIPTION [u(cobj,age)]=Minor penalty to Power
 &STATUS`SIG_PERFECTSTRIKE_PENALTY`ATTACK`PENALTY`STAT`0 [u(Cobj,age)]=Minor
 
 &STATUS`SIG_PERFECTSTRIKE_BONUS [u(Cobj,age)]=Perfect Strike
+&STATUS`SIG_PERFECTSTRIKE_BONUS`TAGS [u(cobj,age)]=DISPLAY
+&STATUS`SIG_PERFECTSTRIKE_BONUS`DESCRIPTION [u(cobj,age)]=Extreme Bonus to Precision!
 &STATUS`SIG_PERFECTSTRIKE_BONUS`ATTACK`BONUS`STAT`2 [u(cobj,age)]=Extreme
 
 &STATUS`SIG_JUSTTHATGOOD [u(cobj,age)]=Just That Good
@@ -3188,26 +3243,30 @@ Overwhelming
 
 &STATUS`ENH_DRIVE [u(cobj,age)]=Enhanced Drive
 &STATUS`ENH_DRIVE`TAGS [u(cobj,age)]=ENHANCEMENT
-&STATUS`ENH_DRIVE`STATIC`GAIN`DRIVE [iu(cobj,age)]=2
+&STATUS`ENH_DRIVE`STATIC`GAIN`DRIVE [u(cobj,age)]=2
+&STATUS`ENH_DRIVE`DEFENSE`BONUS`DRIVE_GAIN`EXEMPT [u(cobj,age)]=2
 
 @@ COMBAT CODE
 
-&CMD`COMBAT [u(cobj,age)]=$^(?s)\+(mantle|attack|defend|stats|sheet|reset|push|queue|cancel|health|boss|scan|support|keeps|forgive|quirk|sig|signature|meister|pull|scale|restrain|sell|hardsell|takehit)(?\:/(\S+))?(?\: +(.+?))?(?\:/(.+?)?)?(?\:=(.*))?$:th u(setq,command,switch(%1,sig,SIGNATURE,%1));th u(setq,sysname,COMBAT);@attach %!/INC`GETSWITCH=%2;@attach %!/INC`CHECKPC=%#,1;@attach %!/INC`%q<sysname>`%q<command>`[u(strfirstof,%q<switch>,MAIN)]=%3,%4,%5
+&CMD`COMBAT [u(cobj,age)]=$^(?s)\+(attack|defend|stats|sheet|reset|push|queue|cancel|health|boss|scan|support|keeps|forgive|quirk|sig|signature|meister|pull|scale|restrain|sell|hardsell|takehit)(?\:/(\S+))?(?\: +(.+?))?(?\:/(.+?)?)?(?\:=(.*))?$:th u(setq,command,switch(%1,sig,SIGNATURE,%1));th u(setq,sysname,COMBAT);@attach %!/INC`GETSWITCH=%2;@attach %!/INC`CHECKPC=%#,1;@attach %!/INC`%q<sysname>`%q<command>`[u(strfirstof,%q<switch>,MAIN)]=%3,%4,%5
 @set [u(cobj,age)]/CMD`COMBAT=regexp
 
 &COMBAT`PUSH`PLAYER [u(cobj,age)]=LIST
 &COMBAT`PUSH`ADMIN [u(cobj,age)]=
 
 @@ Takehit
-&INC`COMBAT`TAKEHIT`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat-ready!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Consequences severity field empty.;@attach %!/INC`PARTIAL=%0,MILD|MODERATE|SEVERE|NONE,|,severity;@check gt(u(setr,newcon,switch(%q<severity>,NONE,0,MILD,1,MODERATE,2,SEVERE,3)),get(%#/D`CONSEQUENCES))=@attach %!/INC`MSG=ERROR: You can only Takehit for more intense Consequences than you already have.;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will guarantee at least %q<severity> Consequences after this fight. Did you enter the right grade? Enter this command again within ten seconds to verify.,TAKEHIT %q<severity>;@attach %!/INC`EANNOUNCE=TAKEHIT,[ansi(hw,%n)] will voluntarily take [capstr(lcstr(switch(%q<severity>,NONE,No,%q<severity>)))] Consequences this day!;@attach %!/INC`CONSEQUENCES`SET=%#,%q<newcon>,,setunion(get(%#/D`CONSEQUENCES`SCENE),get(%#/D`SCENE))
+&INC`COMBAT`TAKEHIT`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat-ready!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Consequences severity field empty.;@attach %!/INC`PARTIAL=%0,MILD|MODERATE|SEVERE|NONE,|,severity;@check gt(u(setr,newcon,switch(%q<severity>,NONE,0,MILD,1,MODERATE,2,SEVERE,3)),get(%#/D`CONSEQUENCES))=@attach %!/INC`MSG=ERROR: You can only Takehit for more intense Consequences than you already have.;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will guarantee at least %q<severity> Consequences after this fight. Did you enter the right grade? Enter this command again within ten seconds to verify.,TAKEHIT %q<severity>;@attach %!/INC`EANNOUNCE=TAKEHIT,[ansi(hw,%n)] will voluntarily take [capstr(lcstr(switch(%q<severity>,NONE,No,%q<severity>)))] Consequences this day!;@attach %!/INC`CONSEQUENCES`SET=%#,get(%#/D`COMBAT`MANTLE`LINK),%q<newcon>
 
 @@ SCALE
 
 &COMBAT`SCALE`PLAYER [u(Cobj,age)]=CHANGE
 @@ @check get(%#/D`CSYS`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: Can only use +boss with loaner Mantles.;
-&INC`COMBAT`SCALE`MAIN [u(cobj,age)]=@check isint(get(%#/D`CSYS`MANTLE))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@stop get(%#/D`CSYS`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: Can only use +scale with your own Mantles.;@attach %!/INC`VALID`POSINT=%0;@stop lt(%q<value>,2)=@attach %!/INC`MSG=ERROR: Scale requires a value 2 or greater!;@attach %!/INC`MSG=You will Scale %q<value> opponents when you next +reset!;&D`CSYS`OPPONENTS %#=%q<value>;&D`CSYS`MODE %#=SCALE;
 
-&INC`COMBAT`SCALE`CHANGE [u(cobj,age)]=@check isint(get(%#/D`CSYS`MANTLE))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@stop get(%#/D`CSYS`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: Can only use +scale with your own Mantles.;@stop match(BOSS SCALE,get(%#/D`COMBAT`MODE))=@attach %!/INC`MSG=ERROR: Cannot change to Scale mode from Boss or Scale mode.;@attach %!/INC`VALID`POSINT=%0;@attach %!/INC`COMBAT`SCALE`CHANGE`DO=%#,%q<value>;@attach %!/INC`EANNOUNCE=SCALE,%n is now tanking for %q<value> opponents!
+&INC`COMBAT`SCALE`MAIN [u(cobj,age)]=@attach %!/INC`COMBAT`SCALE`CHANGE
+
+@@ @check isint(get(%#/D`CSYS`MANTLE))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@stop get(%#/D`CSYS`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: Can only use +scale with your own Mantles.;@attach %!/INC`VALID`POSINT=%0;@stop lt(%q<value>,2)=@attach %!/INC`MSG=ERROR: Scale requires a value 2 or greater!;@attach %!/INC`MSG=You will Scale %q<value> opponents when you next +reset!;&D`CSYS`OPPONENTS %#=%q<value>;&D`CSYS`MODE %#=SCALE;
+
+&INC`COMBAT`SCALE`CHANGE [u(cobj,age)]=@check isint(get(%#/D`CSYS`MANTLE))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@stop get(%#/D`CSYS`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: Can only use +scale with your own Mantles.;@stop match(BOSS,get(%#/D`COMBAT`MODE))=@attach %!/INC`MSG=ERROR: Cannot change to Scale mode from Boss mode.;@attach %!/INC`VALID`POSINT=%0;@attach %!/INC`COMBAT`SCALE`CHANGE`DO=%#,%q<value>;@attach %!/INC`EANNOUNCE=SCALE,%n is now tanking for %q<value> opponents!
 
 &INC`COMBAT`SCALE`CHANGE`DO [u(cobj,age)]=th u(attrib_set,%0,D`COMBAT`OPPONENTS,%1);th u(attrib_set,%0,D`COMBAT`MODE,SCALE);th u(setq,damper,u(percent,%0));th u(setq,drper,u(dpercent,%0));th u(setq,hper,u(hpercent,%0));th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH`ORIGINAL),get(%0/D`COMBAT`OPPONENTS)),0));th u(attrib_set,%0,D`COMBAT`DAMAGE,round(mul(get(%0/D`COMBAT`HEALTH),sub(1,%q<damper>)),0));th u(attrib_set,%0,D`COMBAT`DRIVE`MAXIMUM,round(mul(get(%0/D`COMBAT`DRIVE`MAXIMUM`ORIGINAL),get(%0/D`COMBAT`OPPONENTS)),0));th u(attrib_set,%0,D`COMBAT`DRIVE,round(mul(get(%0/D`COMBAT`DRIVE`MAXIMUM),%q<drper>),0));th u(attrib_set,%0,D`COMBAT`HYPE`MAXIMUM,round(mul(get(%0/D`COMBAT`HYPE`MAXIMUM`ORIGINAL),get(%0/D`COMBAT`OPPONENTS)),0));th u(attrib_set,%0,D`COMBAT`HYPE,round(mul(get(%0/D`COMBAT`HYPE`MAXIMUM),%q<hper>),0))
 
@@ -3220,7 +3279,7 @@ Overwhelming
 &INC`COMBAT`BOSS`NORMAL [u(cobj,age)]=@attach %!/INC`COMBAT`BOSS`CHANGE=%0,NORMAL
 &INC`COMBAT`BOSS`SERIOUS [u(cobj,age)]=@attach %!/INC`COMBAT`BOSS`CHANGE=%0,SERIOUS
 
-&INC`COMBAT`BOSS`CHANGE [u(cobj,age)]=@check isint(get(%#/D`CSYS`MANTLE))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@attach %!/INC`VALID`POSINT=%0;@attach %!/INC`COMBAT`BOSS`CHANGE`DO=%#,%q<value>,%1;@attach %!/INC`EANNOUNCE=BOSS,%n is [switch(%q<value>,1,no longer in Boss mode!,now [ansi(switch(%1,casual,hg,normal,hy,serious,hr,hw),capstr(lcstr(%1)))] Boss'ing for %q<value> opponents!)]
+&INC`COMBAT`BOSS`CHANGE [u(cobj,age)]=@check isint(get(%#/D`ARMORY`MAIN`MANTLE`LINK))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@attach %!/INC`VALID`POSINT=%0;@attach %!/INC`COMBAT`BOSS`CHANGE`DO=%#,%q<value>,%1;@attach %!/INC`EANNOUNCE=BOSS,%n is [switch(%q<value>,1,no longer in Boss mode!,now [ansi(switch(%1,casual,hg,normal,hy,serious,hr,hw),capstr(lcstr(%1)))] Boss'ing for %q<value> opponents!)]
 
 &INC`COMBAT`BOSS`CHANGE`DO [u(cobj,age)]=th u(attrib_set,%0,D`COMBAT`OPPONENTS,%1);th u(setq,damper,u(percent,%0));th u(setq,drper,u(dpercent,%0));th u(setq,hper,u(hpercent,%0));@select/inline %1=>1,{th u(attrib_set,%0,D`COMBAT`MODE,BOSS);th u(attrib_set,%0,D`COMBAT`BOSSMODE,%2)},1,{@attach %!/WIPE=%0,D`COMBAT`*MODE};th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH`ORIGINAL),add(1,mul(u(conf,BOSS_EXTRA_HP),sub(%1,1)))),0));th u(attrib_set,%0,D`COMBAT`HYPE`MAXIMUM,switch(%1,1,get(%0/D`COMBAT`HYPE`MAXIMUM`ORIGINAL),mul(get(%0/D`COMBAT`HYPE`MAXIMUM`ORIGINAL),%1)));th u(attrib_set,%0,D`COMBAT`DRIVE`MAXIMUM,switch(%1,1,get(%0/D`COMBAT`DRIVE`MAXIMUM`ORIGINAL),mul(get(%0/D`COMBAT`DRIVE`MAXIMUM`ORIGINAL),%1)));th u(attrib_set,%0,D`COMBAT`DAMAGE,round(mul(get(%0/D`COMBAT`HEALTH),sub(1,%q<damper>)),0));th u(attrib_set,%0,D`COMBAT`HYPE,round(mul(get(%0/D`COMBAT`HYPE`MAXIMUM),%q<hper>),0));th u(attrib_set,%0,D`COMBAT`DRIVE,round(mul(get(%0/D`COMBAT`DRIVE`MAXIMUM),%q<drper>),0))
 
@@ -3228,13 +3287,13 @@ Overwhelming
 @@ Quirk
 &COMBAT`QUIRK`PLAYER [u(cobj,age)]=ADD|REMOVE|WIPE
 
-&INC`COMBAT`QUIRK`MANTLE [u(Cobj,age)]=@check u(setr,clink_id,get(%#/D`CSYS`MANTLE`LINK))=@attach %!/INC`MSG=ERROR: No Mantle selected!;@stop get(%#/D`CSYS`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: This Mantle is read-only.
+&INC`COMBAT`QUIRK`MANTLE [u(Cobj,age)]=@check u(setr,clink_id,get(%#/D`ARMORY`MAIN`MANTLE`LINK))=@attach %!/INC`MSG=ERROR: No Mantle selected!;@stop get(%#/D`ARMORY`MAIN`MANTLE`LOCKED)=@attach %!/INC`MSG=ERROR: This Mantle is read-only.
 
 &INC`COMBAT`QUIRK`TARGET [u(Cobj,age)]=@check strlen(%0)=@attach %!/INC`MSG=ERROR: No Quirk name entered!;@check u(setr,quirk_id,u(FIND_TRAIT,QRK,%0))=@attach %!/INC`MSG=ERROR: Could not find Quirk named '%0'.
 
 &INC`COMBAT`QUIRK`MAIN [u(cobj,age)]=@attach %!/INC`COMBAT`QUIRK`MANTLE;@attach %!/INC`MSG=You are currently using Quirks: [iter(u(mysql,SELECT`MANTLE_LINK`QUIRK,%q<clink_id>),default(u(cobj,agedb)/QRK`%i0,<unset>),%b,\,%b)]
 
-&INC`COMBAT`QUIRK`ADD [u(cobj,age)]=@attach %!/INC`COMBAT`QUIRK`MANTLE;th u(setq,maxquirks,add(3,get(u(cobj,age)/STATUS`[get(u(cobj,agedb)/ARC`[get(%#/D`CSYS`MANTLE`ARCHETYPE)]`STATUS)]`STATIC`MAXIMUM`QUIRKS)));@stop gte(u(mysql,COUNT`MANTLE_LINK`QUIRK,%q<clink_id>),%q<maxquirks>)=@attach %!/INC`MSG=ERROR: You are already at your maximum of %q<maxquirks> Quirks.;@attach %!/INC`COMBAT`QUIRK`TARGET;@stop u(mysql,EXIST`MANTLE_LINK`QUIRK,%q<clink_id>,%q<quirk_id>)=@attach %!/INC`MSG=ERROR: You already are using that Quirk.;@attach %!/INC`DOSQL=ADD`MANTLE_LINK`QUIRK,%q<clink_id>,%q<quirk_id>;@attach %!/INC`MSG=You have selected the '[default(u(cobj,agedb)/QRK`%q<quirk_id>,<unset>)]' Quirk! You must +reset for this to reflect in your +stats.
+&INC`COMBAT`QUIRK`ADD [u(cobj,age)]=@attach %!/INC`COMBAT`QUIRK`MANTLE;th u(setq,maxquirks,add(3,get(u(cobj,age)/STATUS`[get(u(cobj,agedb)/ARC`[get(%#/D`ARMORY`MAIN`MANTLE`ARCHETYPE)]`STATUS)]`STATIC`MAXIMUM`QUIRKS)));@stop gte(u(mysql,COUNT`MANTLE_LINK`QUIRK,%q<clink_id>),%q<maxquirks>)=@attach %!/INC`MSG=ERROR: You are already at your maximum of %q<maxquirks> Quirks.;@attach %!/INC`COMBAT`QUIRK`TARGET;@stop u(mysql,EXIST`MANTLE_LINK`QUIRK,%q<clink_id>,%q<quirk_id>)=@attach %!/INC`MSG=ERROR: You already are using that Quirk.;@attach %!/INC`DOSQL=ADD`MANTLE_LINK`QUIRK,%q<clink_id>,%q<quirk_id>;@attach %!/INC`MSG=You have selected the '[default(u(cobj,agedb)/QRK`%q<quirk_id>,<unset>)]' Quirk! You must +reset for this to reflect in your +stats.
 
 &INC`COMBAT`QUIRK`REMOVE [u(cobj,age)]=@attach %!/INC`COMBAT`QUIRK`MANTLE;@attach %!/INC`COMBAT`QUIRK`TARGET;@check u(mysql,EXIST`MANTLE_LINK`QUIRK,%q<clink_id>,%q<quirk_id>)=@attach %!/INC`MSG=ERROR: You are not using that Quirk.;@attach %!/INC`DOSQL=REMOVE`MANTLE_LINK`QUIRK,%q<clink_id>,%q<quirk_id>;@attach %!/INC`MSG=You have removed the '[default(u(cobj,agedb)/QRK`%q<quirk_id>,<unset>)]' Quirk! You must +reset for this to reflect in your +stats.
 
@@ -3266,9 +3325,9 @@ Overwhelming
 @@ Meister
 &COMBAT`MEISTER`PLAYER [u(cobj,age)]=SET|CLEAR|WIPE
 
-&INC`COMBAT`MEISTER`MAIN [u(cobj,age)]=@attach %!/INC`COMBAT`QUIRK`MANTLE;@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat ready!;@check eq(124,get(%#/D`CSYS`MANTLE`ARCHETYPE))=@attach %!/INC`MSG=ERROR: You are not a Meister!;@check words(u(setr,sigs,get(%#/D`COMBAT`ACTIVE`STATUS`TAGS`MEISTER)))=@attach %!/INC`MSG=ERROR: You have no Meister Signature Ability to activate! Sucks.;@dolist/inline %q<sigs>={@attach %!/STATUS`[before(%i0,$)]`SIGNATURE=%#,%i0}
+&INC`COMBAT`MEISTER`MAIN [u(cobj,age)]=@attach %!/INC`COMBAT`QUIRK`MANTLE;@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat ready!;@check eq(124,get(%#/D`ARMORY`MAIN`MANTLE`ARCHETYPE))=@attach %!/INC`MSG=ERROR: You are not a Meister!;@check words(u(setr,sigs,get(%#/D`COMBAT`ACTIVE`STATUS`TAGS`MEISTER)))=@attach %!/INC`MSG=ERROR: You have no Meister Signature Ability to activate! Sucks.;@dolist/inline %q<sigs>={@attach %!/STATUS`[before(%i0,$)]`SIGNATURE=%#,%i0}
 
-&INC`COMBAT`MEISTER`SET [u(cobj,age)]=@attach %!/INC`COMBAT`QUIRK`MANTLE;@check eq(124,get(%#/D`CSYS`MANTLE`ARCHETYPE))=@attach %!/INC`MSG=ERROR: You are not a Meister!;@attach %!/INC`COMBAT`SIGNATURE`TARGET;@stop u(mysql,EXIST`SIGLINK,%q<clink_id>,%q<sig_id>)=@attach %!/INC`MSG=[ansi(hr,ERROR:)] You have already equipped that Signature technique!;@attach %!/INC`DOSQL=WIPE`MANTLE_LINK`MEISTER,%q<clink_id>;@attach %!/INC`DOSQL=ADD`MANTLE_LINK`MEISTER,%q<clink_id>,%q<sig_id>;@attach %!/INC`MSG=You have selected the '[default(u(cobj,agedb)/SIG`%q<sig_id>,<unset>)]' Signature Ability! You must +reset for this to reflect in your +stats.
+&INC`COMBAT`MEISTER`SET [u(cobj,age)]=@attach %!/INC`COMBAT`QUIRK`MANTLE;@check eq(124,get(%#/D`ARMORY`MAIN`MANTLE`ARCHETYPE))=@attach %!/INC`MSG=ERROR: You are not a Meister!;@attach %!/INC`COMBAT`SIGNATURE`TARGET;@stop u(mysql,EXIST`SIGLINK,%q<clink_id>,%q<sig_id>)=@attach %!/INC`MSG=[ansi(hr,ERROR:)] You have already equipped that Signature technique!;@attach %!/INC`DOSQL=WIPE`MANTLE_LINK`MEISTER,%q<clink_id>;@attach %!/INC`DOSQL=ADD`MANTLE_LINK`MEISTER,%q<clink_id>,%q<sig_id>;@attach %!/INC`MSG=You have selected the '[default(u(cobj,agedb)/SIG`%q<sig_id>,<unset>)]' Signature Ability! You must +reset for this to reflect in your +stats.
 
 &Q`ADD`MANTLE_LINK`MEISTER [u(cobj,age)]=INSERT INTO vol_clink_trait (clink_id,trait_id,trait_type,trait_value) VALUES (?,?,5,1)
 &Q`WIPE`MANTLE_LINK`MEISTER [u(cobj,age)]=DELETE FROM vol_clink_trait WHERE clink_id=? AND trait_type=5
@@ -3278,9 +3337,11 @@ Overwhelming
 @@ Forgive
 &COMBAT`FORGIVE`ADMIN [u(cobj,age)]=ALL
 
-&INC`COMBAT`FORGIVE`ALL [u(cobj,age)]=@attach %!/INC`CHECKPC=%0,1;@check nattr(%q<t1>/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: %q<t1name> is not combat-ready!;@check nattr(%q<t1>/D`CONSEQUENCES`**)=@attach %!/INC`MSG=ERROR: %q<t1name> suffers from no consequences.;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will clear all Consequences from %q<t1name> and force them to reset. Do not use in the middle of a fight. Are you sure? Enter the same command again to continue.,FORGIVE ALL %q<t1>;@attach %!/WIPE=%q<t1>,D`CONSEQUENCES;@attach %!/INC`MSG=Consequences forgiven!;@attach %!/INC`MSG`CHAN=Forgave All Consequences for %q<t1name>;@attach %!/INC`MSG=Your combat Consequences have been fully forgiven and combat status reset!,%q<t1>;@attach %!/INC`COMBAT`READYCHARACTER=%q<t1objid>,get(%q<t1>/D`CSYS`MANTLE),get(%q<t1>/D`CSYS`MANTLE`LINK),get(%q<t1>/D`CSYS`MANTLE`LOCKED)
+&INC`COMBAT`FORGIVE`ALL [u(cobj,age)]=@attach %!/INC`CHECKPC=%0,1;@check nattr(%q<t1>/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: %q<t1name> is not combat-ready!;@@ @check nattr(%q<t1>/D`CONSEQUENCES`**)=@attach %!/INC`MSG=ERROR: %q<t1name> suffers from no consequences.;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will clear all Consequences from %q<t1name> and force them to reset. Do not use in the middle of a fight. Are you sure? Enter the same command again to continue.,FORGIVE ALL %q<t1>;@attach %!/INC`DOSQL=FORGIVE`CONSEQUENCES,%q<t1id>;@attach %!/INC`MSG=Consequences forgiven!;@attach %!/INC`MSG`CHAN=Forgave All Consequences for %q<t1name>;@attach %!/INC`MSG=Your combat Consequences have been fully forgiven and combat status reset!,%q<t1>;@attach %!/INC`COMBAT`READYCHARACTER=%q<t1objid>,get(%q<t1>/D`ARMORY`MAIN`MANTLE`LINK)
 
 &INC`COMBAT`FORGIVE`MAIN [u(cobj,age)]=
+
+&Q`FORGIVE`CONSEQUENCES [u(cobj,age)]=UPDATE vol_clink SET consequences_date_timeout=SET_NULL,consequences_date_gained=SET_NULL WHERE character_id=?
 
 @@ Support
 &INC`COMBAT`SUPPORT`MAIN [u(cobj,age)]=@check hasattr(%#/D`COMBAT`SUPPORTING)=@attach %!/INC`MSG=ERROR: You are not a Synergist Archetype!;@check gt(u(percent,%#),0)=@attach %!/INC`MSG=ERROR: You are KO'd!;@check strmatch(objid(get(%#/D`COMBAT`SUPPORTING)),%:)=@attach %!/INC`MSG=ERROR: Support Effect has already been assigned!;@attach %!/INC`CHECKPC=%0,2;@check nattr(%q<t2>/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: %q<t2name> is not combat ready!;@check gt(u(percent,%q<t2>),0)=@attach %!/INC`MSG=ERROR: %q<t2name> is KO'd!;@check strmatch(loc(%q<t2>),%l)=@attach %!/INC`MSG=ERROR: %q<t2name> is not present!;@check hasflag(%q<t2>,CONNECTED)=@attach %!/INC`MSG=ERROR: %q<t2name> is not connected!;@check strlen(u(setr,supactive,get(%#/D`COMBAT`ACTIVE`STATUS`[u(setr,supname,get(%#/D`COMBAT`SUPPORT))])))=@attach %!/INC`MSG=ERROR: Code Error. Synergist is not properly configured. Contact Volund.;@attach %!/KILLSTATUS=%#,%q<supactive>;@attach %!/INC`SETSTATUS=%q<t2>,%#,%q<supname>,,X,X;&D`COMBAT`SUPPORTING %#=%q<t2objid>;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS)={@attach %!/STATUS`[before(%i0,$)]`ON_SUPPORT=%#,%i0,%q<t2objid>};@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] lends Synergist Support to [ansi(hw,%q<t2name>)]!;@attach %!/WIPE=%#,D`COMBACK
@@ -3292,8 +3353,8 @@ Overwhelming
 @@ Scan
 &INC`COMBAT`SCAN`MAIN [u(cobj,age)]=@pemit %#=u(header,Combatants);@pemit %#=ansi(u(color,%#,COLUMN_NAMES),align(15 15 10 10 10 12,Name,Archetype,Weight,Drive,HP,Consequences));@pemit %#=u(separator);@dolist/inline u(filter,COMBATREADY,lplayers(%l))={@pemit %#=align(15 15 10 10 10 12,u(getmoniker,%i0),u(GET`ARCHETYPE,%i0)[if(get(%i0/D`COMBAT`MANTLE`LOCKED),\(P\))],ansi(u(scalecolor,get(%i0/D`COMBAT`STATS`4)),u(fancyweight,%i0)),get(%i0/D`COMBAT`DRIVE`STATUS),ansi(u(ryg,sub(100,bound(u(setr,hp,round(mul(u(percent,%i0),100),0)),0))),%q<hp>\%),u(fancycon,%i0))};@pemit %#=u(footer)
 
-&FANCYCON [u(cobj,age)]=switch(if(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES),0),1,ansi(228,Mild),2,ansi(215,Moderate),3,ansi(202,Severe),ansi(hx,None))
-&FANCYCON2 [u(cobj,age)]=switch(if(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES),0),1,ansi(228,Mild),2,ansi(215,Moderate),3,ansi(202,Severe),ansi(hx,No Consequences))
+&FANCYCON [u(cobj,age)]=switch(%0,1,ansi(228,Mild),2,ansi(215,Moderate),3,ansi(202,Severe),ansi(hx,None))
+&FANCYCON2 [u(cobj,age)]=switch(%0,1,ansi(228,Mild),2,ansi(215,Moderate),3,ansi(202,Severe),ansi(hx,No Consequences))
 
 &FIL`COMBATREADY [u(cobj,age)]=cand(hasflag(%0,CONNECTED),nattr(%0/D`COMBAT`**))
 
@@ -3302,7 +3363,7 @@ Overwhelming
 
 @@ CSETUP
 
-&INC`CHARGEN`CSETUP`MAIN [u(cobj,age)]=@check u(tester,%#)=@attach %!/INC`MSG=ERROR: Permission denied.;@attach %!/INC`CHECKPC=%0,1;@attach %!/INC`FINDMANTLELINK=%q<t1id>,%q<t1name>;&D`CSYS`MANTLE %q<t1>=%q<mantle_id>;&D`CSYS`MANTLE`LINK %q<t1>=%q<link_id>;&D`CSYS`MANTLE`LOCKED %q<t1>=%q<link_locked>;&D`CSYS`MANTLE`ARCHETYPE %q<t1>=%q<archetype_id>;@attach %!/INC`COMBAT`READYCHARACTER=%q<t1objid>,%q<mantle_id>,get(%q<t1>/D`CSYS`MANTLE`LINK),get(%q<t1>/D`CSYS`MANTLE`LOCKED);@attach %!/INC`MSG=You have setup %q<t1name> for battle!
+&INC`MATRIX`CSETUP [u(cobj,age)]=@check u(tester,%#)=@attach %!/INC`MSG=ERROR: Permission denied.;@attach %!/INC`CHECKPC=%0,1;@force/inline %q<t1>={+mantle %q<t1name>;+reset;+reset};@@ @attach %!/INC`COMBAT`READYCHARACTER=%q<t1objid>,get(%q<t1>/D`ARMORY`MAIn`MANTLE`LINK);@attach %!/INC`MSG=You have setup %q<t1name> for battle!
 
 
 
@@ -3316,9 +3377,12 @@ Overwhelming
 
 @@ READY CHARACTER
 
-&INC`COMBAT`READYCHARACTER [u(cobj,age)]=@attach %!/WIPE=%0,D`COMBAT;@attach %!/WIPE=%0,D`COMBACK;@dolist/inline MODE OPPONENTS={th u(attrib_set,%0,D`COMBAT`%i0,get(%0/D`CSYS`%i0));@attach %!/WIPE=%0,D`CSYS`%i0};th u(attrib_set,%0,D`COMBAT`OPPONENTS,1);@attach %!/INC`COMBAT`READYCHARACTER`MANTLE;@attach %!/INC`COMBAT`READYCHARACTER`FINISH
+&Q`LOAD`CLINK [u(cobj,age)]=SELECT clink_id,character_id,character_name,character_objid,clink_approved,clink_loan_from,loan_from_name,loan_from_objid,clink_type,clink_locked,consequences_date_gained_secs,consequences_date_timeout_secs,consequences_scenes,centity_id,centity_name,centity_type,centity_version,centity_owner,centity_owner_name,centity_owner_type,centity_owner_objid,centity_date_created_secs,centity_claim_lock,centity_approved FROM volv_clink WHERE clink_id=?
+&FIELD`CLINK [u(Cobj,age)]=id linkowner linkownername linkownerobjid linkapproved loanfrom loanfromname loanfromobjid linktype linklocked congained contimeout conscenes centity centityname centitytype centityver centityowner centityownername centityownertype centityownerobjid centitycreated centityclaimlock centityapproved
 
-&INC`COMBAT`READYCHARACTER`MANTLE [u(cobj,age)]=th u(setq,mdata,u(mysql3,READY`MANTLE,%1));&D`COMBAT`MANTLE`LOCKED %0=%3;th u(setq,mstats,elements(%q<mdata>,1,chr(177)));&D`COMBAT`WEIGHT %0=u(setr,wt,elements(get(u(cobj,agedb)/WEIGHTS),elements(%q<mstats>,5),|));&D`COMBAT`WEIGHT`ORIGINAL %0=%q<wt>;@dolist/inline %q<mstats>={&D`COMBAT`STATS`[sub(inum(0),1)] %0=default(u(cobj,agedb)/ENTITY`0`STAT`[sub(inum(0),1)]`MAPPING`%i0,%i0);&D`COMBAT`STATS`[sub(inum(0),1)]`DISPLAY %0=%i0};&D`COMBAT`ARCHETYPE %0=u(setr,arcid,elements(%q<mdata>,2,chr(177)));@select/inline strlen(u(setr,arcname,get(u(cobj,agedb)/ARC`%q<arcid>`STATUS)))=>0,{@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/ARC`%q<arcid>`STATUS),,X,X;@select/inline strlen(u(setr,supname,get(u(cobj,age)/STATUS`%q<arcname>`SUPPORT)))=>0,{@attach %!/INC`SETSTATUS=%0,%0,%q<supname>,,X,X;&D`COMBAT`SUPPORTING %0=%0;&D`COMBAT`SUPPORT %0=%q<supname>}};&D`COMBAT`QUIRKS %0=sortkey(#lambda/get(u(cobj,agedb)/QRK`\%0),u(strfirstof,u(mysql,PUBLIC`QUIRKS,%1),u(mysql,READY`QUIRKS,%2)),i);@dolist/inline u(setr,sigids,u(mysql,READY`SIG,%2))={@attach %!/INC`SETSTATUS=%0,%0,u(cust,SIG,%i0`STATUS),,X,X,SIGMOVE};@select/inline %q<arcid>=124,{@dolist/inline u(setr,meiids,u(mysql,READY`MEI,%2))={@attach %!/INC`SETSTATUS=%0,%0,u(cust,SIG,%i0`STATUS),,X,X,MEISTER}};&D`COMBAT`SIG %0=squish(%q<sigids> %q<meiids>);@dolist/inline/delimit [chr(176)] [u(mysql3,READY`ENHANCEMENTS,%1)]={&D`COMBAT`STATS`[u(setr,accid,elements(%i0,1,chr(177)))]`ACC %0=u(setr,accval,elements(%i0,2,chr(177)));@attach %!/INC`SETSTATUS=%0,%0,ENH_[switch(%q<accid>,0,POWER,1,ENDURANCE,2,PRECISION,3,MITIGATION,5,DRIVE)],,X,X;th u(addto,%0,D`COMBAT`ACCOLADES,1)}
+&INC`COMBAT`READYCHARACTER [u(cobj,age)]=@attach %!/WIPE=%0,D`COMBAT;@attach %!/WIPE=%0,D`COMBACK;@dolist/inline MODE OPPONENTS={th u(attrib_set,%0,D`COMBAT`%i0,get(%0/D`CSYS`%i0));@attach %!/WIPE=%0,D`CSYS`%i0};th u(attrib_set,%0,D`COMBAT`OPPONENTS,1);@attach %!/INC`LOADSQL=CLINK,%1,,cl;th u(attrib_set,%0,D`COMBAT`MANTLE`LINK,%1);th u(attrib_set,%0,D`COMBAT`MANTLE`LOCKED,%q<cl.linklocked>);@attach %!/INC`COMBAT`READYCHARACTER`MANTLE;@attach %!/INC`COMBAT`READYCHARACTER`FINISH
+
+&INC`COMBAT`READYCHARACTER`MANTLE [u(cobj,age)]=th u(setq,mdata,u(mysql3,READY`MANTLE,%q<cl.centity>));&D`COMBAT`MANTLE`LOCKED %0=%q<cl.linklocked>;th u(setq,mstats,elements(%q<mdata>,1,chr(177)));&D`COMBAT`WEIGHT %0=u(setr,wt,elements(get(u(cobj,agedb)/WEIGHTS),elements(%q<mstats>,5),|));&D`COMBAT`WEIGHT`ORIGINAL %0=%q<wt>;@dolist/inline %q<mstats>={&D`COMBAT`STATS`[sub(inum(0),1)] %0=default(u(cobj,agedb)/ENTITY`0`STAT`[sub(inum(0),1)]`MAPPING`%i0,%i0);&D`COMBAT`STATS`[sub(inum(0),1)]`DISPLAY %0=%i0};&D`COMBAT`ARCHETYPE %0=u(setr,arcid,elements(%q<mdata>,2,chr(177)));@select/inline strlen(u(setr,arcname,get(u(cobj,agedb)/ARC`%q<arcid>`STATUS)))=>0,{@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/ARC`%q<arcid>`STATUS),,X,X;@select/inline strlen(u(setr,supname,get(u(cobj,age)/STATUS`%q<arcname>`SUPPORT)))=>0,{@attach %!/INC`SETSTATUS=%0,%0,%q<supname>,,X,X;&D`COMBAT`SUPPORTING %0=%0;&D`COMBAT`SUPPORT %0=%q<supname>}};&D`COMBAT`QUIRKS %0=sortkey(#lambda/get(u(cobj,agedb)/QRK`\%0),u(strfirstof,u(mysql,PUBLIC`QUIRKS,%q<cl.centity>),u(mysql,READY`QUIRKS,%q<cl.id>)),i);@dolist/inline u(setr,sigids,u(mysql,READY`SIG,%q<cl.id>))={@attach %!/INC`SETSTATUS=%0,%0,u(cust,SIG,%i0`STATUS),,X,X,SIGMOVE};@select/inline %q<arcid>=124,{@dolist/inline u(setr,meiids,u(mysql,READY`MEI,%q<cl.id>))={@attach %!/INC`SETSTATUS=%0,%0,u(cust,SIG,%i0`STATUS),,X,X,MEISTER}};&D`COMBAT`SIG %0=squish(%q<sigids> %q<meiids>);@dolist/inline/delimit [chr(176)] [u(mysql3,READY`ENHANCEMENTS,%q<cl.centity>)]={&D`COMBAT`STATS`[u(setr,accid,elements(%i0,1,chr(177)))]`ACC %0=u(setr,accval,elements(%i0,2,chr(177)));@attach %!/INC`SETSTATUS=%0,%0,ENH_[switch(%q<accid>,0,POWER,1,ENDURANCE,2,PRECISION,3,MITIGATION,5,DRIVE)],,X,X;th u(addto,%0,D`COMBAT`ACCOLADES,1)}
 
 &Q`READY`MANTLE [u(cobj,age)]=SELECT mantle_stats,mantle_archetype FROM volv_mantle WHERE mantle_id=? LIMIT 1
 &Q`READY`ENHANCEMENTS [u(cobj,age)]=SELECT trait_id,trait_flags_1 FROM vol_ctrait WHERE centity_id=? AND trait_type=0 AND trait_flags_1>0
@@ -3327,7 +3391,7 @@ Overwhelming
 &Q`READY`MEI [u(cobj,age)]=SELECT trait_id FROM vol_clink_trait WHERE clink_id=? AND trait_type=5 AND trait_value>0
 &Q`PUBLIC`QUIRKS [u(cobj,age)]=SELECT trait_id FROM vol_ctrait WHERE centity_id=? AND trait_type=2 AND trait_value>0
 
-&INC`COMBAT`READYCHARACTER`FINISH [u(cobj,age)]=@attach %!/INC`COMBAT`READYCHARACTER`FINISH`STARTING;@attach %!/INC`COMBAT`READYCHARACTER`FINISH`WEIGHT;@dolist/inline get(%0/D`COMBAT`QUIRKS)={@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/QRK`%i0`STATUS),,X,X};@attach/localize %!/INC`COMBAT`READYCHARACTER`FINISH`STATIC;th u(attrib_set,%0,D`COMBAT`HEALTH`ORIGINAL,get(%0/D`COMBAT`HEALTH));@select/inline cand(not(get(%0/D`CSYS`MANTLE`LOCKED)),get(%0/D`CONSEQUENCES))=1,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),switch(get(%0/D`CONSEQUENCES),1,0.9,2,0.75,3,0.6)),0))};@@ @select/inline strlen(get(%0/D`COMBAT`MODE))=>0,{@attach %!/INC`COMBAT`READYCHARACTER`FINISH`[get(%0/D`COMBAT`MODE)]};&D`COMBAT`DRIVE`STATUS %0=u(drivestatus,%0)
+&INC`COMBAT`READYCHARACTER`FINISH [u(cobj,age)]=@attach %!/INC`COMBAT`READYCHARACTER`FINISH`STARTING;@attach %!/INC`COMBAT`READYCHARACTER`FINISH`WEIGHT;@dolist/inline get(%0/D`COMBAT`QUIRKS)={@attach %!/INC`SETSTATUS=%0,%0,get(u(cobj,agedb)/QRK`%i0`STATUS),,X,X};@attach/localize %!/INC`COMBAT`READYCHARACTER`FINISH`STATIC;th u(attrib_set,%0,D`COMBAT`HEALTH`ORIGINAL,get(%0/D`COMBAT`HEALTH));@select/inline cand(not(%q<cl.linklocked>),u(setr,con,u(consequences,%q<cl.contimeout>)))=1,{th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH),switch(%q<con>,1,0.9,2,0.75,3,0.6)),0))};@@ @select/inline strlen(get(%0/D`COMBAT`MODE))=>0,{@attach %!/INC`COMBAT`READYCHARACTER`FINISH`[get(%0/D`COMBAT`MODE)]};&D`COMBAT`DRIVE`STATUS %0=u(drivestatus,%0)
 
 &INC`COMBAT`READYCHARACTER`FINISH`SCALE [u(cobj,age)]=th u(attrib_set,%0,D`COMBAT`HEALTH,round(mul(get(%0/D`COMBAT`HEALTH`ORIGINAL),default(%0/D`COMBAT`OPPONENTS,1)),0));th u(attrib_set,%0,D`COMBAT`DRIVE`MAXIMUM,mul(get(%0/D`COMBAT`DRIVE`MAXIMUM),get(%0/D`COMBAT`OPPONENTS)));th u(attrib_set,%0,D`COMBAT`DRIVE,mul(get(%0/D`COMBAT`DRIVE),get(%0/D`COMBAT`OPPONENTS)));th u(attrib_set,%0,D`COMBAT`HYPE`MAXIMUM,mul(get(%0/D`COMBAT`HYPE`MAXIMUM),get(%0/D`COMBAT`OPPONENTS)))
 
@@ -3343,27 +3407,41 @@ Overwhelming
 
 
 @@ - RESET
-&INC`COMBAT`RESET`MAIN [u(cobj,age)]=@check isint(u(setr,m1id,get(%#/D`CSYS`MANTLE)))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@select/inline t(nattr(%#/D`COMBAT`**))=1,{@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will reset you to base combat readiness\, and clear any attacks. ARE YOU SURE? Enter the same command again within ten seconds to continue.,RESET CSYS};@select/inline cand(hasattr(%#/D`COMBAT`SUPPORTING),not(strmatch(get(%#/D`COMBAT`SUPPORTING),%:)))=1,{@attach %!/KILLSTATUS=get(%#/D`COMBAT`SUPPORTING),first(get(get(%#/D`COMBAT`SUPPORTING)/D`COMBAT`ACTIVE`STATUS`[get(%#/D`COMBAT`SUPPORT)]))};@select/inline cand(nattr(%#/D`COMBAT`**),not(get(%#/D`CSYS`MANTLE`LOCKED)))=>0,{@attach %!/INC`COMBAT`RESET`MAIN`CONSEQUENCES};@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] has reset!;@attach %!/INC`COMBAT`READYCHARACTER=%:,%q<m1id>,get(%#/D`CSYS`MANTLE`LINK),get(%#/D`CSYS`MANTLE`LOCKED)
+&INC`COMBAT`RESET`MAIN [u(cobj,age)]=@check isint(u(setr,m1id,get(%#/D`ARMORY`MAIN`MANTLE`LINK)))=@attach %!/INC`MSG=ERROR: Your Mantle is not set.;@check u(setr,linkid,u(mysql,RESET_EXIST,%q<m1id>,get(%#/D`ID)))=@attach %!/INC`MSG=ERROR: Your Mantle is invalid. Re-select one.;@select/inline t(nattr(%#/D`COMBAT`**))=1,{@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] This will reset you to base combat readiness\, and clear any attacks. ARE YOU SURE? Enter the same command again within ten seconds to continue.,RESET CSYS};@select/inline cand(hasattr(%#/D`COMBAT`SUPPORTING),not(strmatch(get(%#/D`COMBAT`SUPPORTING),%:)))=1,{@attach %!/KILLSTATUS=get(%#/D`COMBAT`SUPPORTING),first(get(get(%#/D`COMBAT`SUPPORTING)/D`COMBAT`ACTIVE`STATUS`[get(%#/D`COMBAT`SUPPORT)]))};@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] has reset!;@attach %!/INC`COMBAT`READYCHARACTER=%:,get(%#/D`ARMORY`MAIN`MANTLE`LINK)
 
-&INC`CONSEQUENCES [u(cobj,age)]=@select/inline strmatch(u(conf,EXEMPT_DISTRICT),objid(parent(loc(%0))))=0,{@select/inline cand(get(%0/D`SCENE),get(%0/D`CONSEQUENCES))=1,{th u(attrib_set,%0,D`CONSEQUENCES`SCENE,setunion(get(%0/D`CONSEQUENCES`SCENE),get(%0/D`SCENE)))};@select/inline default(%0/D`COMBAT`KEEPS,0)=0,{th u(setq,newcon,if(lte(u(percent,%0),0.35),1,0))},1,{th u(setq,newcon,if(lt(u(percent,%0),0.25),3,if(lt(u(percent,%0),0.5),2,1)))};th u(setq,newcon,max(%q<newcon>,default(%0/D`COMBAT`TAKEHIT,0)));@select/inline gt(%q<newcon>,default(%0/D`CONSEQUENCES,0))=1,{@attach %!/INC`CONSEQUENCES`SET=%0,%q<newcon>,,get(%0/D`CONSEQUENCES`SCENE)}}
+&Q`RESET_EXIST [u(Cobj,age)]=SELECT clink_id FROM vol_clink WHERE clink_id=? AND character_id=? LIMIT 1
 
-&INC`CONSEQUENCES`SET [u(cobj,age)]=@attach %!/WIPE=%0,D`CONSEQUENCES;th u(attrib_set,%0,D`CONSEQUENCES,%1);th u(attrib_set,%0,D`CONSEQUENCES`GAINED,u(setr,gained,if(%2,%2,secs())));th u(attrib_set,%0,D`CONSEQUENCES`TIMEOUT,add(%q<gained>,mul(60,60,24,7,switch(%1,1,1,2,3,3,6)),if(not(%4),mul(60,60,12,-1),0)));th u(attrib_set,%0,D`CONSEQUENCES`SCENE,setunion(%3,if(isint(get(%0/D`SCENE)),get(%0/D`SCENE))));@attach %!/INC`EPRIVATE=CONSEQUENCES,You now suffer [switch(%1,1,Mild,2,Moderate,3,Severe)] Consequences! Maximum HP will be reduced next +reset!,%0
+&INC`CONSEQUENCES [u(cobj,age)]=@select/inline cand(not(strmatch(u(conf,EXEMPT_DISTRICT),objid(parent(loc(%0))))),not(get(%0/D`COMBAT`MANTLE`LOCKED)))=1,{@attach %!/INC`DOSQL=SCENE`CONSEQUENCES,setunion(u(mysql,GET`CONSEQUENCES_SCENE,get(%0/D`COMBAT`MANTLE`LINK)),get(%0/D`SCENE)),get(%0/D`COMBAT`MANTLE`LINK);@select/inline default(%0/D`COMBAT`KEEPS,0)=0,{th u(setq,newcon,if(lte(u(percent,%0),0.35),1,0))},1,{th u(setq,newcon,if(lt(u(percent,%0),0.25),3,if(lt(u(percent,%0),0.5),2,1)))};th u(setq,newcon,max(%q<newcon>,default(%0/D`COMBAT`TAKEHIT,0)));@select/inline gt(%q<newcon>,u(consequences,u(mysql,GET`CONSEQUENCES_TIMEOUT,get(%0/D`COMBAT`MANTLE`LINK))))=1,{@attach %!/INC`CONSEQUENCES`SET=%0,get(%0/D`COMBAT`MANTLE`LINK),%q<newcon>}}
 
-&INC`COMBAT`RESET`MAIN`CONSEQUENCES [u(cobj,age)]=@attach %!/INC`CONSEQUENCES`DOWNGRADE;
+&Q`GET`CONSEQUENCES_SCENE [u(cobj,age)]=SELECT consequences_scenes FROM vol_clink WHERE clink_id=?
+&Q`GET`CONSEQUENCES_TIMEOUT [u(Cobj,age)]=SELECT consequences_date_timeout_secs FROM volv_clink WHERE clink_id=?
 
-&INC`CONSEQUENCES`REDUCE [u(cobj,age)]=@select/inline cand(get(%0/D`CONSEQUENCES),not(match(get(%0/D`CONSEQUENCES`SCENE),%1)),gte(%2,get(%0/D`CONSEQUENCES`GAINED)))=1,{th u(addto,%0,D`CONSEQUENCES`TIMEOUT,mul(60,60,24,7,-1));@attach %!/INC`EPRIVATE=CONSEQUENCES,Consequences duration was reduced by one week from Scene %1 being marked Finished!,%0;@attach %!/INC`CONSEQUENCES`DOWNGRADE=%0}
+&INC`CONSEQUENCES`SET [u(cobj,age)]=@attach %!/INC`EPRIVATE=CONSEQUENCES,You now suffer [switch(%2,1,Mild,2,Moderate,3,Severe)] Consequences! Maximum HP will be reduced next +reset!,%0;@attach %!/INC`DOSQL=SET`CONSEQUENCES,secs(),u(setr,timeout,add(secs(),mul(60,60,24,7,switch(%2,1,1,2,4,3,10)))),%1
 
-&INC`CONSEQUENCES`DOWNGRADE [u(cobj,age)]=@select/inline t(hasattr(%0/D`CONSEQUENCES))=1,{@select/inline lte(add(get(%0/D`CONSEQUENCES`TIMEOUT),%q<overtime>),add(secs(),mul(60,60,24)))=1,{@select/inline sub(secs(),get(%0/D`CONSEQUENCES`TIMEOUT))=<0,{th u(setq,overtime,sub(secs(),get(%0/D`CONSEQUENCES`TIMEOUT)))};@attach %!/INC`CONSEQUENCES`DOWNGRADE`DO=%0,get(%0/D`CONSEQUENCES`SCENE)}}
+&Q`SET`CONSEQUENCES [u(cobj,age)]=UPDATE vol_clink SET consequences_date_gained=FROM_UNIXTIME(?),consequences_date_timeout=FROM_UNIXTIME(?) WHERE clink_id=?
 
-&INC`CONSEQUENCES`DOWNGRADE`DO [u(cobj,age)]=@select/inline get(%0/D`CONSEQUENCES)=1,{@attach %!/INC`EPRIVATE=CONSEQUENCES,You no longer suffer any combat Consequences. Full HP restored next +reset!,%0;@attach %!/WIPE=%0,D`CONSEQUENCES},{@attach %!/INC`CONSEQUENCES`SET=%0,sub(get(%0/D`CONSEQUENCES),1),get(%0/D`CONSEQUENCES`TIMEOUT),%1,0;@attach %!/INC`CONSEQUENCES`DOWNGRADE=%0}
+&Q`SCENE`CONSEQUENCES [u(cobj,age)]=UPDATE vol_clink SET consequences_scenes='!' WHERE clink_id=?
 
-&STARTUP [u(cobj,age)]=@trigger %!/LOOP`CONSEQUENCES
+&CONSEQUENCES [u(cobj,age)]=switch(sub(%0,secs()),<[mul(60,60,12)],0,<=[mul(60,60,24,7,1)],1,<=[mul(60,60,24,7,4)],2,<=[mul(60,60,24,7,10)],3)
+&CONSEQUENCES`REMAINING [u(cobj,age)]=bound(sub(%0,secs(),switch(u(consequences,%0),0,0,1,mul(60,60,12),2,mul(60,60,24,7,1),3,mul(60,60,24,7,4))),0)
 
-&LOOP`CONSEQUENCES [u(cobj,age)]=@dolist/inline lsearch(all,type,player,elock,D`CONSEQUENCES:>0)={@wait inum(0)={@trigger/clearregs %!/INC`CONSEQUENCES`DOWNGRADE=%i0}};@wait 60={@trigger %!/LOOP`CONSEQUENCES}
+
+
+&Q`GET`CONSEQUENCES_SCENE_NAME [u(cobj,age)]=SELECT clink_id,centity_name,consequences_scenes,centity_id FROM volv_clink WHERE character_id=? AND clink_locked=0 AND consequences_date_timeout>=UTC_TIMESTAMP()
+
+&INC`CONSEQUENCES`REDUCE [u(cobj,age)]=@dolist/inline/nobreak/delimit [chr(176)] [u(mysql3,GET`CONSEQUENCES_SCENE_NAME,get(%0/D`ID))]={@stop match(elements(%i0,3,chr(177)),%1);@attach %!/INC`DOSQL=REDUCE`CONSEQUENCES,elements(%i0,1,chr(177));@attach %!/INC`EPRIVATE=CONSEQUENCES,Consequences for '[elements(%i0,4,chr(177))]: [elements(%i0,2,chr(177))]' was reduced by one week from Scene %1 being marked Finished!,%0}
+
+&Q`REDUCE`CONSEQUENCES [u(cobj,age)]=UPDATE vol_clink SET consequences_date_timeout=consequences_date_timeout - INTERVAL 7 DAY WHERE clink_id=?
 
 &SCENE`CHANGE_STATUS [u(cobj,age)]=@select/inline cand(eq(%2,3),t(%4))=1,{@dolist/inline [u(filter,ISOBJID,u(mysql,SCENE`ACTORS,%0))]={@attach %!/INC`CONSEQUENCES`REDUCE=%i0,%0,%5}}
 
 &Q`SCENE`ACTORS [u(cobj,age)]=SELECT character_objid FROM volv_actor_agg WHERE scene_id=? AND action_count>0
+
+&LOOP`CONSEQUENCES [u(cobj,age)]=@attach %!/INC`DOSQL=CLEAR`CONSEQUENCES;@wait 60={@trigger me/LOOP`CONSEQUENCES}
+
+@STARTUP [u(Cobj,age)]=@trigger me/LOOP`CONSEQUENCES
+
+&Q`CLEAR`CONSEQUENCES [u(cobj,age)]=UPDATE vol_consequences SET consequences_scenes=SET_NULL,consequences_date_timeout=SET_NULL,consequences_date_gained=SET_NULL WHERE consequences_date_timeout IS NOT NULL AND consequences_date_timeout<UTC_TIMESTAMP + INTERVAL 12 HOUR
 
 @@ - KEEPS
 &INC`COMBAT`KEEPS`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not readied for battle.;@check get(%#/D`COMBAT`ARCHETYPE)=@attach %!/INC`MSG=ERROR: Unshaped Mantles may not use +keeps.;@stop strmatch(u(conf,EXEMPT_DISTRICT),objid(parent(%l)))=@attach %!/INC`MSG=ERROR: Keeps cannot be used in a Consequences-Free area.;@stop get(%#/D`COMBAT`KEEPS)=@attach %!/INC`MSG=ERROR: Keeps is already active! Go the distance!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Reason empty!;@attach %!/INC`VERIFY=[ansi(hr,WARNING:)] Consequences await. Are you SURE you want to use Keeps this fight? Type +keeps again to verify!,KEEPS;th u(attrib_set,%#,D`COMBAT`PULL,0);th u(attrib_set,%#,D`COMBAT`WEIGHT,u(setr,newwt,u(WEIGHT`UPGRADE,get(%#/D`COMBAT`WEIGHT`ORIGINAL))));th u(attrib_set,%#,D`COMBAT`KEEPS,1);@attach %!/INC`SETSTATUS=%#,%#,SPC_KEEPS,,1,1;@attach %!/INC`EANNOUNCE=KEEPS,Look out! [ansi(hw,%n)] is fighting for Keeps! Weight upgraded to [ansi(hw,capstr(%q<newwt>))];@attach %!/INC`MSG`CHAN=%n is fighting for Keeps! (%0);@attach %!/INC`DOSQL=LOG`KEEPS,get(%#/D`ID),%0;@attach %!/INC`CONSEQUENCES=%#
@@ -3405,21 +3483,20 @@ Overwhelming
 &INC`COMBAT`STATS`MAIN [u(cobj,age)]=@attach %!/INC`CHECKPC=u(strfirstof,if(u(tester,%#),%0),%#),1;@check nattr(%q<t1>/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: %q<t1name> is not readied for battle.;@pemit %#=u(header,%q<t1name> - Stats);@attach %!/INC`COMBAT`STATS`DISPLAY;@pemit %#=u(footer)
 
 
-&INC`COMBAT`STATS`DISPLAY [u(cobj,age)]=th u(setr,bor,ansi(u(color,%#,BORDER),|));@pemit %#=align(1. 50 1. 23 1.,%q<bor>,u(setr,startsec,u(fancyweight,%q<t1>)[repeat(*,get(%q<t1>/D`COMBAT`STATS`5`ORIG))]%b[ansi(hw,default(u(cobj,agedb)/ARC`[default(%q<t1>/D`COMBAT`ARCHETYPE,0)],Unpublished))]%B[if(get(%q<t1>/D`COMBAT`ACCOLADES),[ansi(hw,+)][ansi(%q<qcolor>,get(%q<t1>/D`COMBAT`ACCOLADES))])])[rjust(u(fancycon2,%q<t1>)[if(get(%q<t1>/D`CONSEQUENCES),%B\([squish(etime(sub(get(%q<t1>/D`CONSEQUENCES`TIMEOUT),secs()),6))]\))],sub(60,strlen(%q<startsec>),10))]%R[rjust(ansi(h,HP:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(u(setr,perc,mul(%i0,5)),100),u(percent,%q<t1>)),ansi(u(ryg,sub(100,%q<perc>)),|),%B),%b,)][ansi(h,>>)]%B[ansi(h,[sub(get(%q<t1>/D`COMBAT`HEALTH),get(%q<t1>/D`COMBAT`DAMAGE))]/[get(%q<t1>/D`COMBAT`HEALTH)]%B\([before(round(mul(u(percent,%q<t1>),100),0),.)]\%\))]%R[rjust(ansi(h,Drive:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`DRIVE),get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM))),ansi(u(drivebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`DRIVE)]/[get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM)]%B\([switch(get(%q<t1>/D`COMBAT`DRIVE`STATUS),Overextended,Overex.,get(%q<t1>/D`COMBAT`DRIVE`STATUS))]\))]%R[rjust(ansi(h,Hype:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`HYPE),get(%q<t1>/D`COMBAT`HYPE`MAXIMUM))),ansi(u(hypebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`HYPE)]/[get(%q<t1>/D`COMBAT`HYPE`MAXIMUM)])],%q<bor>,center(ansi(%q<qcolor>,Quirks),23)%R[iter(get(%q<t1>/D`COMBAT`QUIRKS),ansi(hw,default(u(cobj,agedb)/QRK`%i0,<unknown>)),%B,%R)],%q<bor>);@pemit %#=u(separator);@pemit %#=align(1. 50 1. 23 1.,%q<bor>,u(SHEET`STAT,%q<t1>,POW,0)[u(SHEET`STAT,%q<t1>,PRE,2)]%R[u(SHEET`STAT,%q<t1>,END,1)][u(SHEET`STAT,%q<t1>,MIT,3)],%q<bor>,center(ansi(%q<qcolor>,Signature),23)%R[iter(get(%q<t1>/D`COMBAT`SIG),ansi(hw,default(u(cobj,agedb)/SIG`%i0,<unknown>)),%B,%R)],%q<bor>);
-
-
+&INC`COMBAT`STATS`DISPLAY [u(cobj,age)]=th u(setr,bor,ansi(u(color,%#,BORDER),|));@pemit %#=align(1. 50 1. 23 1.,%q<bor>,u(setr,startsec,u(fancyweight,%q<t1>)[repeat(*,get(%q<t1>/D`COMBAT`STATS`5`ORIG))]%b[ansi(hw,default(u(cobj,agedb)/ARC`[default(%q<t1>/D`COMBAT`ARCHETYPE,0)],Unpublished))]%B[if(get(%q<t1>/D`COMBAT`ACCOLADES),[ansi(hw,+)][ansi(%q<qcolor>,get(%q<t1>/D`COMBAT`ACCOLADES))])])[rjust(u(fancycon2,u(setr,conseq,u(consequences,u(setr,conseqtime,u(mysql,GET`CONSEQUENCES_TIMEOUT,get(%q<t1>/D`COMBAT`MANTLE`LINK))))))[if(%q<conseq>,%B\([squish(etime(u(consequences`remaining,%q<conseqtime>),6))]\))],sub(60,strlen(%q<startsec>),10))]%R[rjust(ansi(h,HP:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(u(setr,perc,mul(%i0,5)),100),u(percent,%q<t1>)),ansi(u(ryg,sub(100,%q<perc>)),|),%B),%b,)][ansi(h,>>)]%B[ansi(h,[sub(get(%q<t1>/D`COMBAT`HEALTH),get(%q<t1>/D`COMBAT`DAMAGE))]/[get(%q<t1>/D`COMBAT`HEALTH)]%B\([before(round(mul(u(percent,%q<t1>),100),0),.)]\%\))]%R[rjust(ansi(u(setr,dcol,if(get(%q<t1>/D`COMBAT`STATS`5`ACC),hyu,h)),Drive:),6)] [ansi(%q<dcol>,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`DRIVE),get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM))),ansi(u(drivebar,%i0),|),%b),%b,)][ansi(%q<dcol>,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`DRIVE)]/[get(%q<t1>/D`COMBAT`DRIVE`MAXIMUM)]%B\([switch(get(%q<t1>/D`COMBAT`DRIVE`STATUS),Overextended,Overex.,get(%q<t1>/D`COMBAT`DRIVE`STATUS))]\))]%R[rjust(ansi(h,Hype:),6)] [ansi(h,<<)][iter(lnum(1,20),if(lte(fdiv(mul(%i0,5),100),fdiv(get(%q<t1>/D`COMBAT`HYPE),get(%q<t1>/D`COMBAT`HYPE`MAXIMUM))),ansi(u(hypebar,%i0),|),%b),%b,)][ansi(h,>>)]%B[ansi(h,[get(%q<t1>/D`COMBAT`HYPE)]/[get(%q<t1>/D`COMBAT`HYPE`MAXIMUM)])],%q<bor>,center(ansi(%q<qcolor>,Quirks),23)%R[iter(get(%q<t1>/D`COMBAT`QUIRKS),ansi(hw,default(u(cobj,agedb)/QRK`%i0,<unknown>)),%B,%R)],%q<bor>);@pemit %#=u(separator);@pemit %#=align(1. 50 1. 23 1.,%q<bor>,u(SHEET`STAT,%q<t1>,POW,0)[u(SHEET`STAT,%q<t1>,PRE,2)]%R[u(SHEET`STAT,%q<t1>,END,1)][u(SHEET`STAT,%q<t1>,MIT,3)],%q<bor>,center(ansi(%q<qcolor>,Signature),23)%R[iter(get(%q<t1>/D`COMBAT`SIG),ansi(hw,default(u(cobj,agedb)/SIG`%i0,<unknown>)),%B,%R)],%q<bor>);
 
 &DRIVEBAR [u(cobj,age)]=switch(1,t(match(1 2 3 4,%0)),27,t(match(5 6 7 8 9 10 11,%0)),75,t(match(12 13 14 15 16,%0)),117,t(match(17 18 19 20,%0)),159)
 
 &HYPEBAR [u(cobj,age)]=switch(1,t(match(1 2,%0)),56,t(match(3 4,%0)),93,t(match(5 6,%0)),129,t(match(7 8,%0)),165,t(match(9 10,%0)),201,t(match(11 12,%0)),207,t(match(13 14,%0)),213,t(match(15 16,%0)),219,t(match(17 18,%0)),225,t(match(19 20,%0)),231)
 
-&SHEET`STAT [u(cobj,age)]=localize(ansi(hw,%1:)%B[ljust(if(get(%0/D`COMBAT`MANTLE`LOCKED),Public,ansi(switch(u(setr,val,get(%0/D`COMBAT`STATS`%2`DISPLAY)),1,208,2,191,3,76,4,39,5,141),u(VIEW`STAT,%q<val>)%B[if(get(%0/D`COMBAT`STATS`%2`ACC),+)])),20)])
+&SHEET`STAT [u(cobj,age)]=localize(ansi(hw,%1:)%B[ljust(if(get(%0/D`COMBAT`MANTLE`LOCKED),Public,ansi(u(statcolor,u(setr,val,get(%0/D`COMBAT`STATS`%2`DISPLAY))),u(VIEW`STAT,%q<val>)%B[if(get(%0/D`COMBAT`STATS`%2`ACC),+)])),20)])
 
+&STATCOLOR [u(cobj,age)]=switch(%0,1,208,2,191,3,76,4,39,5,141)
 
 @@ - ATTACK
 &INC`COMBAT`ATTACK`MAIN [u(cobj,age)]=@attach %!/INC`COMBAT`ATTACK`MAIN`TARGET;@attach %!/INC`COMBAT`ATTACK`MAIN`ATTACK;@@ @attach %!/INC`COMBAT`ATTACK`MAIN`SELF_EFFECTS;@@ @attach %!/INC`COMBAT`ATTACK`MAIN`BONUSES;@attach %!/INC`COMBAT`ATTACK`MAIN`LAUNCH;@attach %!/INC`COMBAT`ATTACK`MAIN`ENDTURN
 
-&INC`COMBAT`ATTACK`MAIN`TARGET [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat ready. Make sure your Mantle's set and use +reset.;@stop gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=@attach %!/INC`MSG=ERROR: The defeated can do no such thing!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Nobody entered to attack.;@check strlen(%2)=@attach %!/INC`MSG=ERROR: No attack name entered.;th u(setq,allplayers,u(setr,players,lvplayers(%l)));@dolist/inline/delimit \, %0={@check isdbref(u(setr,ply,namegrab(%q<players>,%i0)))=@attach %!/INC`MSG=ERROR: '%i0' does not match a present player.;th u(setq,players,setdiff(%q<players>,%q<ply>))};th u(setq,targets,setdiff(%q<allplayers>,%q<players>));@dolist/inline %q<targets>={@check nattr(%i0/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: [name(%i0)] is not ready for battle.;@stop hasattr(%i0/D`COMBAT`Q`%#)=@attach %!/INC`MSG=ERROR: You have already attacked [name(%i0)]!;@stop gte(get(%i0/D`COMBAT`DAMAGE),get(%i0/D`COMBAT`HEALTH))=@attach %!/INC`MSG=ERROR: [name(%i0)] is already down!}
+&INC`COMBAT`ATTACK`MAIN`TARGET [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat ready. Make sure your Mantle's set and use +reset.;@stop gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=@attach %!/INC`MSG=ERROR: The defeated can do no such thing!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: Nobody entered to attack.;@stop strmatch(%0,*\,*)=@attach %!/INC`MSG=ERROR: Multi-targeting is currently disabled.;@check strlen(%2)=@attach %!/INC`MSG=ERROR: No attack name entered.;th u(setq,allplayers,u(setr,players,lvplayers(%l)));@dolist/inline/delimit \, %0={@check isdbref(u(setr,ply,namegrab(%q<players>,%i0)))=@attach %!/INC`MSG=ERROR: '%i0' does not match a present player.;th u(setq,players,setdiff(%q<players>,%q<ply>))};th u(setq,targets,setdiff(%q<allplayers>,%q<players>));@dolist/inline %q<targets>={@check nattr(%i0/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: [name(%i0)] is not ready for battle.;@stop hasattr(%i0/D`COMBAT`Q`%#)=@attach %!/INC`MSG=ERROR: You have already attacked [name(%i0)]!;@stop gte(get(%i0/D`COMBAT`DAMAGE),get(%i0/D`COMBAT`HEALTH))=@attach %!/INC`MSG=ERROR: [name(%i0)] is already down!}
 
 &INC`COMBAT`ATTACK`MAIN`ATTACK [u(cobj,age)]=@attach %!/INC`VALID`POSINT=before(%2,/);@check match(get(u(cobj,agedb)/ATTACKS),u(setr,atklevel,%q<value>),|)=@attach %!/INC`MSG=ERROR: No Attack Number for %q<value>!;@check strlen(before(after(%2,/),:))=@attach %!/INC`MSG=ERROR: Must enter an Attack Style!;@check u(setr,off,u(FIND_TRAIT,OFF,before(after(%2,/),:)))=@attach %!/INC`MSG=ERROR: Not an Attack Style!;@stop t(match(get(%#/D`COMBAT`BANNED`OFF),%q<off>))=@attach %!/INC`MSG=ERROR: You may not use that Offense!;th u(setq,atkname,after(after(%2,/),:));@attach %!/INC`SETSTATUS=%#,%#,get(u(cobj,agedb)/OFF`%q<off>`STATUS),LEVEL=%q<atklevel>,get(u(cobj,agedb)/OFF`%q<off>`ATTACK_TURNS),get(u(cobj,agedb)/OFF`%q<off>`DEFENSE_TURNS);@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS)={@attach %!/STATUS`[before(%i0,$)]`OFF`%q<off>`ACTIVATE=%#,%i0};@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK)={@attach %!/STATUS`[before(%i0,$)]`ATTACK_BEFORE_LAUNCH=%#,%i0}
 
@@ -3440,7 +3517,7 @@ Overwhelming
 
 @@ th u(addto,%0,D`COMBAT`HYPE,%1);@select/inline gte(get(%0/D`COMBAT`HYPE),get(%0/D`COMBAT`HYPE`MAXIMUM))=1,{&D`COMBAT`HYPE %0=get(%0/D`COMBAT`HYPE`MAXIMUM)};@select/inline not(%3)=1,{@attach %!/INC`ANNOUNCE=[ansi(hw,name(%0))] [if(gte(%1,0),gains,loses)] [ansi(118,abs(%1))] [ansi(118,Hype)] from [ansi(hw,%2)]!}
 
-&INC`COMBAT`ATTACK`MAIN`LAUNCH [u(cobj,age)]=th [u(setq,fullname,[if(strlen(%q<atkname>),'%q<atkname>' \([get(u(cobj,agedb)/OFF`%q<off>)] Level %q<atklevel>\),[get(u(cobj,agedb)/OFF`%q<off>)] Level %q<atklevel>)])];th u(setq,boss,strmatch(get(%#/D`COMBAT`BOSS),BOSS));@select/inline u(setr,dafter,add(get(%#/D`COMBAT`DRIVE),mul(u(setr,dcost,add(u(CUST,ATTACKS,%q<atklevel>`COST),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DRIVE_COST))))),-1)))=<-25,{@attach %!/INC`DRIVE=%#,mul(%q<dcost>,-1),ATTACK,,if(eq(%q<atklevel>,1),abs(u(cust,ATTACKS,1`COST))),1,,1;@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] tries to launch a [ansi(u(scalecolor,%q<atklevel>),u(u(cobj,agedb)/ATTACKS`%q<atklevel>`DESCRIPTION) [u(u(cobj,agedb)/OFF`%q<off>)])]%B[if(strlen(%q<atkname>),%q<atkname>,attack)] at [u(itemize,iter(u(sortname,%q<targets>),ansi(hw,name(%i0)),%B,\,|),|,and,\,)]! ... but can't summon the strength!;@select/inline gt(u(setr,overe,u(overexert,%#)),0)=1,{@attach %!/INC`DAMAGE=%#,floor(mul(get(%#/D`COMBAT`HEALTH),%q<overe>)),Exhaustion!}},{@dolist/inline/nobreak %q<targets>={@attach %!/INC`COMBAT`ATTACK`LAUNCH=%#,%i0,%q<extargeffs>,%q<fullname>};&D`COMCHECK`ATTACKED %#=%q<targets>;@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] launched a [ansi(u(scalecolor,%q<atklevel>),u(u(cobj,agedb)/ATTACKS`%q<atklevel>`DESCRIPTION) [u(u(cobj,agedb)/OFF`%q<off>)])]%B[if(strlen(%q<atkname>),%q<atkname>,attack)] at [u(itemize,iter(u(sortname,%q<targets>),ansi(hw,name(%i0)),%B,\,|),|,and,\,)]! [ansi(hg,abs(%q<dcost>))] Drive [if(strmatch(%q<dcost>,-*),gained,spent!)];@attach %!/INC`PRIVATE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] attacked you! Respond with [ansi(hw,+defend %n=<choice>)],%q<targets>;@attach %!/INC`DRIVE=%#,mul(%q<dcost>,-1),ATTACK,,add(if(eq(%q<atklevel>,1),abs(u(cust,ATTACKS,1`COST))),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DRIVE_COST`EXEMPT)))),1,,1;@select/inline gt(u(setr,overe,u(overexert,%#)),0)=1,{@attach %!/INC`DAMAGE=%#,floor(mul(get(%#/D`COMBAT`HEALTH),%q<overe>)),Exhaustion!};@select/inline u(setr,dot,round(u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DOT))),0))=>0,{@attach %!/INC`DAMAGE=%#,%q<dot>,Damage Over Time}};
+&INC`COMBAT`ATTACK`MAIN`LAUNCH [u(cobj,age)]=th [u(setq,fullname,[if(strlen(%q<atkname>),'%q<atkname>' \([get(u(cobj,agedb)/OFF`%q<off>)] Level %q<atklevel>\),[get(u(cobj,agedb)/OFF`%q<off>)] Level %q<atklevel>)])];th u(setq,boss,strmatch(get(%#/D`COMBAT`BOSS),BOSS));@select/inline u(setr,dafter,add(get(%#/D`COMBAT`DRIVE),mul(u(setr,dcost,add(u(CUST,ATTACKS,%q<atklevel>`COST),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DRIVE_COST))))),-1)))=<-25,{@attach %!/INC`DRIVE=%#,mul(%q<dcost>,-1),ATTACK,,if(eq(%q<atklevel>,1),abs(u(cust,ATTACKS,1`COST))),1,,1;@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] tries to launch a [ansi(u(scalecolor,%q<atklevel>),u(u(cobj,agedb)/ATTACKS`%q<atklevel>`DESCRIPTION) [u(u(cobj,agedb)/OFF`%q<off>)])]%B[if(strlen(%q<atkname>),%q<atkname>,attack)] at [u(itemize,iter(u(sortname,%q<targets>),ansi(hw,name(%i0)),%B,\,|),|,and,\,)]! ... but can't summon the strength!;@select/inline gt(u(setr,overe,u(overexert,%#)),0)=1,{@attach %!/INC`DAMAGE=%#,floor(mul(get(%#/D`COMBAT`HEALTH),%q<overe>)),Exhaustion!}},{@dolist/inline/nobreak %q<targets>={@attach %!/INC`COMBAT`ATTACK`LAUNCH=%#,%i0,%q<extargeffs>,%q<fullname>};&D`COMCHECK`ATTACKED %#=%q<targets>;@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] launched a [ansi(u(scalecolor,%q<atklevel>),u(u(cobj,agedb)/ATTACKS`%q<atklevel>`DESCRIPTION) [u(u(cobj,agedb)/OFF`%q<off>)])]%B[if(strlen(%q<atkname>),%q<atkname>,attack)] at [u(itemize,iter(u(sortname,%q<targets>),ansi(hw,name(%i0)),%B,\,|),|,and,\,)]! [ansi(hg,abs(%q<dcost>))] Drive [if(strmatch(%q<dcost>,-*),gained,spent)].;@attach %!/INC`PRIVATE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>)%B)][ansi(hw,%n)] attacked you! Respond with [ansi(hw,+defend %n=<choice>)],%q<targets>;@attach %!/INC`DRIVE=%#,mul(%q<dcost>,-1),ATTACK,,add(if(eq(%q<atklevel>,1),abs(u(cust,ATTACKS,1`COST))),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DRIVE_COST`EXEMPT)))),1,,1;@select/inline gt(u(setr,overe,u(overexert,%#)),0)=1,{@attach %!/INC`DAMAGE=%#,floor(mul(get(%#/D`COMBAT`HEALTH),%q<overe>)),Exhaustion!};@select/inline u(setr,dot,round(u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%#,%i0,ATTACK,DOT))),0))=>0,{@attach %!/INC`DAMAGE=%#,%q<dot>,Damage Over Time}};
 
 &INC`COMBAT`ATTACK`LAUNCH [u(cobj,age)]=th u(attrib_set,%1,u(setr,atkattr,D`COMBAT`Q`%0),%3);@dolist/inline edit(u(lattr,%#/D`COMBAT`STATS`*),D`COMBAT`STATS`,)={th u(attrib_set,%1,%q<atkattr>`STATS`%i0,get(%#/D`COMBAT`STATS`%i0));th u(attrib_set,%1,%q<atkattr>`STATS`%i0`MOD,u(calcstatmod,%#,%i0,ATTACK,%q<off>))};&%q<atkattr>`ATK %1=%q<atklevel>;&%q<atkattr>`OFF %1=%q<off>;&%q<atkattr>`ARCHETYPE %1=get(%0/D`COMBAT`ARCHETYPE);&%q<atkattr>`WEIGHT %1=get(%0/D`COMBAT`WEIGHT);&%q<atkattr>`TIMESTAMP %1=secs();@attach %!/INC`CPTREE=%#,D`COMBAT`STATUS,%1,%q<atkattr>`STATUS;@attach %!/INC`CPTREE=%#,D`COMBAT`ACTIVE,%1,%q<atkattr>`ACTIVE;@dolist/inline SELL HARDSELL PULL KEEPS RESTRAIN WEIGHT MODE OPPONENTS BOSSMODE={@cpattr %#/D`COMBAT`##=%1/%q<atkattr>`##};th u(attrib_set,%1,%q<atkattr>`DRIVESTATUS,u(drivestatus,%#));@attach %!/INC`CPTREE=%0,D`COMBAT`DRIVE,%1,%q<atkattr>`DRIVE
 
@@ -3464,7 +3541,7 @@ Overwhelming
 
 &GET`DRIVE [u(cobj,age)]=localize(if(cand(strlen(u(setr,dr,if(%2,u(strfirstof,get(%0/D`COMBAT`DRIVE`STATUS`ATTACK),get(%0/D`COMBAT`DRIVE`STATUS)),get(%0/D`COMBAT`DRIVE`STATUS)))),hasattr(u(cobj,agedb)/DRIVES`%q<dr>)),u(u(cobj,agedb)/DRIVES`%q<dr>[if(%1,`%1)])))
 
-&CALCSTATMOD [u(cobj,age)]=add(u(adj,u(GET`DRIVE,%0,%2`BONUS`STAT`%1,%4)),u(ladd,iter(get(%0/D`COMBAT`ACTIVE`STATUS`%2),u(getstatus,%0,%i0,%2,BONUS`STAT`%1))),mul(-1,add(u(adj,u(GET`DRIVE,%0,%2`PENALTY`STAT`%1)),u(ladd,iter(get(%0/D`COMBAT`ACTIVE`STATUS`%2),u(getstatus,%0,%i0,%2,PENALTY`STAT`%1))))))
+&CALCSTATMOD [u(cobj,age)]=add(u(adj,u(GET`DRIVE,%0,%2`BONUS`STAT`%1,%4)),u(ladd,iter(get(%0/D`COMBAT`ACTIVE`STATUS`%2),u(getstatus,%0,%i0,%2,BONUS`STAT`%1))),mul(-1,add(u(adj,u(GET`DRIVE,%0,%2`PENALTY`STAT`%1,%4)),u(ladd,iter(get(%0/D`COMBAT`ACTIVE`STATUS`%2),u(getstatus,%0,%i0,%2,PENALTY`STAT`%1))))))
 
 &CALCOFF [u(cobj,age)]=power(u(cust,ENTITY`0`STAT`%1,SCALE),fdiv(sub(%0,u(cust,ENTITY`0`STAT`%1,DIAL)),5))
 
@@ -3478,7 +3555,7 @@ Overwhelming
 
 &MEDEFSTAT [u(Cobj,age)]=get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)
 
-&INC`COMBAT`DEFEND`MAIN`CALCULATE [u(cobj,age)]=th u(setq,atklevel,get(%#/%q<atk>`ATK));@dolist/inline u(setr,atkeratkstat,get(%#/%q<atk>`ACTIVE`STATUS`ATTACK))={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_CALCULATE=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_ON_CALCULATE=%#,%i0};@dolist/inline BALANCE DAMAGEMOD ACCURACYMOD={@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`%i0};@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_HITCHECK=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_ON_HITCHECK=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`THRESHOLD;@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`ROLL;@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`THRESHOLD`%q<tmode>;th u(setq,dot,round(u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,DOT))),0));@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_PRE_REROLL=%#,%i0};@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_PRE_REROLL=%#,%i0};@select/inline not(%q<disablereroll>)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_REROLL=%#,%i0}};th u(setq,orighitmul,%q<hitmul>);@dolist/inline INCREASE DECREASE MODIFY FINAL={@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_%i1_HITMUL=%#,%i0}};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_REROLL=%#,%i0};@dolist/inline INCREASE DECREASE MODIFY FINAL={@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_%i1_HITMUL=%#,%i0}};@select/inline gte(%q<hitmul>,0)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_STRIKE=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_ON_STRIKE=%#,%i0}};@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`DAMAGE;th u(setq,htype,if(gt(%q<hitmul>,0.0),if(gte(%q<hitmul>,1.0),CRITICAL,if(gte(%q<hitmul>,0.7),SOLID,CLOSE)),MISS));@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_%q<htype>=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_ON_%q<htype>=%#,%i0};@select/inline t(%q<hitmul>)=1,{@dolist/inline INCREASE_DAMAGE DECREASE_DAMAGE INCREASE_DAMAGE_2 DECREASE_DAMAGE_2={@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_%i1=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`ATTACK_%i0};@dolist/inline INCREASE_DAMAGE DECREASE_DAMAGE INCREASE_DAMAGE_2 DECREASE_DAMAGE_2={@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_%i1=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`DEFENSE_%i0}};@dolist/inline DNORMALIZE NORMALIZE={@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`%i0};@select/inline gt(%q<damage>,0)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_POST_DAMAGE=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_POST_DAMAGE=%#,%i0}};@select/inline cor(gt(%q<hitmul>,0),%q<atkinflictoverride>)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_INFLICT_STATUS=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_INFLICT_STATUS=%#,%i0}};@select/inline strlen(u(setr,atkmode,get(%#/%q<atk>`MODE)))=>0,{@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`ATTACK_MODE`%q<atkmode>};@select/inline strlen(u(setr,defmode,get(%#/D`COMBAT`MODE)))=>0,{@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`DEFENSE_MODE`%q<defmode>};@select/inline gt(%q<damage>,0)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_NEGATE_DAMAGE=%#,%i0}};@select/inline gt(%q<damage>,0)=1,{@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_NEGATE_DAMAGE=%#,%i0}};@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_SPECIAL_DAMAGE=%#,%i0}
+&INC`COMBAT`DEFEND`MAIN`CALCULATE [u(cobj,age)]=th u(setq,atklevel,get(%#/%q<atk>`ATK));@dolist/inline u(setr,atkeratkstat,get(%#/%q<atk>`ACTIVE`STATUS`ATTACK))={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_CALCULATE=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_ON_CALCULATE=%#,%i0};@dolist/inline BALANCE DAMAGEMOD ACCURACYMOD={@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`%i0};@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_HITCHECK=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_ON_HITCHECK=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`THRESHOLD;@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`ROLL;@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`THRESHOLD`%q<tmode>;@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_PRE_REROLL=%#,%i0};@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_PRE_REROLL=%#,%i0};@select/inline not(%q<disablereroll>)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_REROLL=%#,%i0}};th u(setq,orighitmul,%q<hitmul>);@dolist/inline INCREASE DECREASE MODIFY FINAL={@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_%i1_HITMUL=%#,%i0}};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_REROLL=%#,%i0};@dolist/inline INCREASE DECREASE MODIFY FINAL={@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_%i1_HITMUL=%#,%i0}};@select/inline gt(%q<hitmul>,0)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_STRIKE=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_ON_STRIKE=%#,%i0}};@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`DAMAGE;th u(setq,htype,if(gt(%q<hitmul>,0.0),if(gte(%q<hitmul>,1.0),CRITICAL,if(gte(%q<hitmul>,0.7),SOLID,CLOSE)),MISS));@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_%q<htype>=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_ON_%q<htype>=%#,%i0};@select/inline t(%q<hitmul>)=1,{@dolist/inline INCREASE_DAMAGE DECREASE_DAMAGE INCREASE_DAMAGE_2 DECREASE_DAMAGE_2={@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_%i1=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`ATTACK_%i0};@dolist/inline INCREASE_DAMAGE DECREASE_DAMAGE INCREASE_DAMAGE_2 DECREASE_DAMAGE_2={@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_%i1=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`DEFENSE_%i0}};@dolist/inline DNORMALIZE NORMALIZE={@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`%i0};@select/inline gt(%q<damage>,0)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_POST_DAMAGE=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_POST_DAMAGE=%#,%i0}};@select/inline cor(gt(%q<hitmul>,0),%q<atkinflictoverride>)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_INFLICT_STATUS=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_INFLICT_STATUS=%#,%i0}};th u(setq,dot,round(u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,DOT))),0));@select/inline strlen(u(setr,atkmode,get(%#/%q<atk>`MODE)))=>0,{@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`ATTACK_MODE`%q<atkmode>};@select/inline strlen(u(setr,defmode,get(%#/D`COMBAT`MODE)))=>0,{@attach %!/INC`COMBAT`DEFEND`MAIN`CALCULATE`DEFENSE_MODE`%q<defmode>};@select/inline gt(%q<damage>,0)=1,{@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_NEGATE_DAMAGE=%#,%i0}};@select/inline gt(%q<damage>,0)=1,{@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_NEGATE_DAMAGE=%#,%i0}};@dolist/inline %q<atkeratkstat>={@attach %!/STATUS`[before(%i0,$)]`ATTACK_SPECIAL_DAMAGE=%#,%i0};@dolist/inline u(MEDEFSTAT)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_SPECIAL_DAMAGE=%#,%i0}
 
 &INC`COMBAT`DEFEND`MAIN`CALCULATE`ATTACK_INCREASE_DAMAGE [u(Cobj,age)]=
 &INC`COMBAT`DEFEND`MAIN`CALCULATE`ATTACK_INCREASE_DAMAGE_2 [u(Cobj,age)]=th u(setq,damage,mul(%q<damage>,add(1,u(ladd,%q<atkincdamagemul>))))
@@ -3531,7 +3608,7 @@ Overwhelming
 
 &INC`COMBAT`DEFEND`MAIN`CALCULATE`DAMAGE`MULTIPLIERS [u(cobj,age)]=
 
-&INC`COMBAT`DEFEND`MAIN`STRIKE [u(cobj,age)]=th u(setq,boss,strmatch(get(%#/D`COMBAT`MODE),BOSS));@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] [ansi(118,get(u(cobj,agedb)/DEF`%q<def>`ACTION))] against [ansi(hw,name(%q<atker>))]! [ansi(118,if(%q<hitmul>,if(gte(%q<hitmul>,1.0),A Critical Hit![u(setq,htype,CRITICAL)],if(gte(%q<hitmul>,0.7),A Solid Hit![u(setq,htype,SOLID)],A Close Call![u(setq,htype,CLOSE)])),It Missed![u(setq,htype,MISS)]))];@attach %!/INC`ANNOUNCE=[u(u(cobj,agedb)/DEF`%q<def>`%q<htype>,%q<atklevel>,ansi(hw,%n),ansi(hw,name(%q<atker>)),ansi(,u(u(cobj,agedb)/OFF`[get(%#/%q<atk>`OFF)]`DESCRIPTION,%q<atklevel>)))]%B[ansi(226,%q<damage>)] [ansi(hw,damage)]![if(%q<dot>,%B[ansi(hr,%q<dot>)] more from Damage over Time!)];@attach %!/INC`DAMAGE=%#,add(%q<damage>,%q<dot>),Normal Combat,,1;@select/inline gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=1,{@attach %!/INC`ANNOUNCE=[ansi(hr,%n has been defeated!)]};th u(setq,trgbons,iter(0 1 2 3,u(calcstatmod,%#,%i0,DEFENSE,%q<def>)));
+&INC`COMBAT`DEFEND`MAIN`STRIKE [u(cobj,age)]=th u(setq,boss,strmatch(get(%#/D`COMBAT`MODE),BOSS));@attach %!/INC`ANNOUNCE=[ansi(hw,%n)] [ansi(118,get(u(cobj,agedb)/DEF`%q<def>`ACTION))] against [ansi(hw,name(%q<atker>))]! [ansi(118,if(%q<hitmul>,if(gte(%q<hitmul>,1.0),A Critical Hit![u(setq,htype,CRITICAL)],if(gte(%q<hitmul>,0.7),A Solid Hit![u(setq,htype,SOLID)],A Close Call![u(setq,htype,CLOSE)])),It Missed![u(setq,htype,MISS)]))];@attach %!/INC`ANNOUNCE=[u(u(cobj,agedb)/DEF`%q<def>`%q<htype>,%q<atklevel>,ansi(hw,%n),ansi(hw,name(%q<atker>)),ansi(,u(u(cobj,agedb)/OFF`[get(%#/%q<atk>`OFF)]`DESCRIPTION,%q<atklevel>)))]%B[ansi(226,%q<damage>)] [ansi(hw,damage)]![if(%q<dot>,%B[ansi(hr,%q<dot>)] more from Damage over Time!)];@attach %!/INC`DAMAGE=%#,add(%q<damage>,%q<dot>),Normal Combat,,1;@select/inline gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=1,{@attach %!/INC`ANNOUNCE=[ansi(hr,%n has been defeated!)]};th u(setq,trgbons,iter(0 1 2 3,u(calcstatmod,%#,%i0,DEFENSE,%q<def>,1)));
 
 &INC`COMBAT`DEFEND`MAIN`ENDTURN [u(cobj,age)]=&D`COMBAT`HISTORY`LAST_DEF_CHOICE %#=%q<def>;th u(addto,%#,D`COMBAT`NUMBERS`TIMES_DEFENDED,1);@attach %!/INC`DRIVE=%#,u(setr,passivedrive,add(get(%#/D`COMBAT`DRIVE`GAIN),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,BONUS`DRIVE_GAIN))))),PASSIVE GAIN,,add(5,u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,BONUS`DRIVE_GAIN`EXEMPT)))),,,1;@attach %!/INC`HYPE=%#,u(setr,passivehype,add(get(%#/D`COMBAT`HYPE`GAIN),u(ladd,iter(get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE),u(getstatus,%#,%i0,DEFENSE,BONUS`HYPE_GAIN))))),PASSIVE GAIN,,,,,1;@attach %!/INC`EANNOUNCE=PASSIVE GAIN,ansi(h,%n) [if(strmatch(%q<passivedrive>,-*),lost,gained)] [ansi(hg,%q<passivedrive>)] Drive and [if(strmatch(%q<passivehype>,-*),lost,gained)] [ansi(hg,%q<passivehype>)] Hype!;th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_HITMUL,%q<hitmul>);th u(attrib_set,%#,D`COMBAT`HISTORY`LAST_SUFFERED_DAMAGE,%q<damage>);@select/inline t(%q<damage>)=1,{@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`TAGS`FIFO_DAMAGE)={@attach %!/STATUS`[before(##,$)]`ON_FIFO_DAMAGE=%#,##,%q<damage>;th u(attrib_set,%#,D`COMBAT`STATUS`##`FIFO_DAMAGE,linsert(get(%#/D`COMBAT`STATUS`##`FIFO_DAMAGE),-1,%q<damage>))}};@dolist/inline edit(lattr(%0/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_PRE_BONUS=%#,%i0};@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_END_TURN=%#,%i0};@dolist/inline get(%#/%q<atk>`ACTIVE`STATUS`ATTACK)={@attach %!/STATUS`[before(%i0,$)]`ATTACK_ON_DEFENSE_ENDTURN=%#,%i0};@attach %!/INC`COMBAT`DEFEND`MAIN`ENDTURN`STATUS=%#;@dolist/inline get(%#/D`COMBAT`ACTIVE`STATUS`DEFENSE)={@attach %!/STATUS`[before(%i0,$)]`DEFENSE_FINAL_ENDTURN=%#,%i0};@select/inline u(setr,ftb,cand(not(get(%#/D`COMBAT`NO_FIRST_BONUS)),eq(get(%#/D`COMBAT`NUMBERS`TIMES_DEFENDED),get(%#/D`COMBAT`OPPONENTS)),not(get(%#/D`COMBAT`NUMBERS`TIMES_ATTACKED))))=1,{@attach %!/INC`DRIVE=%#,mul(25,get(%#/D`COMBAT`OPPONENTS)),FIRST TURN BONUS,,mul(25,get(%#/D`COMBAT`OPPONENTS)),,1};&D`COMBAT`HYPE`USED %#=0;&D`COMBAT`SELL %#=0;&D`COMBAT`HARDSELL %#=0;@attach %!/WIPE=%#,D`COMBACK
 
@@ -3548,7 +3625,7 @@ th u(setq,colorstats,ansi(hr,0) [ansi(hg,1)] [ansi(hy,2)] [ansi(hc,3)]);
 &OVEREXERT [u(cobj,age)]=localize(u(setq,origdamage,mul(get(%0/D`COMBAT`DRIVE`EXHAUSTION_MULTIPLIER),u(cust,DRIVES,[get(%0/D`COMBAT`DRIVE`STATUS)]`DAMAGE)))[if(u(setr,maxcap,lmath(min,filterbool(#lambda/gt(\%0,0),iter(get(%0/D`COMBAT`ACTIVE`STATUS`ATTACK),u(getstatus,%0,%i0,ATTACK,OVEREXERT_MAX_PERCENTAGE))))),min(u(hitpercent,%0,%q<maxcap>,1),%q<origdamage>),%q<origdamage>)])
 
 @@ PUSH CODE
-&INC`COMBAT`PUSH`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat ready.;@stop gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=@attach %!/INC`MSG=ERROR: The defeated can do no such thing!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: No Push entered to activate.;@check strlen(u(setr,push,u(FIND_MULTI,PUSH,%0)))=@attach %!/INC`MSG=ERROR: Push not found!;@stop gt(words(%q<push>),1)=@attach %!/INC`MSG=ERROR: That matches Pushes: [iter(%q<push>,get(u(cobj,agedb)/PUSH`%i0),%b,\,%b)]. Please be more specific.;@select/inline words(u(setr,hypecost,get(u(cobj,agedb)/PUSH`%q<push>`CHOICES)),|)=>1,{@check strlen(%1)=@attach %!/INC`MSG=ERROR: No cost chosen!;@attach %!/INC`PARTIAL=%1,%q<hypecost>,|,hypecost};@check gte(u(setr,starthype,get(%#/D`COMBAT`HYPE)),%q<hypecost>)=@attach %!/INC`MSG=ERROR: Not enough Hype!;@attach [u(cobj,agedb)]/PUSH`%q<push>`ACTIVATE=%#,%2;th u(addto,%#,D`COMBAT`HYPE,mul(-1,%q<hypecost>));th u(setq,afterhype,get(%#/D`COMBAT`HYPE));@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>%B))][ansi(hw,%n)] uses a [ansi(118,Push)]!;@attach %!/INC`EPRIVATE=PUSH,You used [ansi(118,Push)]: [get(u(cobj,agedb)/PUSH`%q<push>)];th u(setq,testers,u(filter,TESTER,lplayers(%l)));@attach %!/INC`DEBUG=PUSH,%n used: [get(u(cobj,agedb)/PUSH`%q<push>)][if(%q<pushchoice>,%B\(%q<pushchoice>\))];@dolist/inline edit(lattr(%#/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`PUSH_ON_ACTIVATE=%#,%i0,%q<push>,%q<statid>};th u(addto,%#,D`COMBAT`HYPE`USED,%q<hypecost>)
+&INC`COMBAT`PUSH`MAIN [u(cobj,age)]=@check nattr(%#/D`COMBAT`**)=@attach %!/INC`MSG=ERROR: You are not combat ready.;@stop gte(get(%#/D`COMBAT`DAMAGE),get(%#/D`COMBAT`HEALTH))=@attach %!/INC`MSG=ERROR: The defeated can do no such thing!;@check strlen(%0)=@attach %!/INC`MSG=ERROR: No Push entered to activate.;@check strlen(u(setr,push,u(FIND_MULTI,PUSH,%0)))=@attach %!/INC`MSG=ERROR: Push not found!;@stop gt(words(%q<push>),1)=@attach %!/INC`MSG=ERROR: That matches Pushes: [iter(%q<push>,get(u(cobj,agedb)/PUSH`%i0),%b,\,%b)]. Please be more specific.;@select/inline words(u(setr,hypecost,get(u(cobj,agedb)/PUSH`%q<push>`CHOICES)),|)=>1,{@check strlen(%1)=@attach %!/INC`MSG=ERROR: No cost chosen!;@attach %!/INC`PARTIAL=%1,%q<hypecost>,|,hypecost};@check gte(u(setr,starthype,get(%#/D`COMBAT`HYPE)),%q<hypecost>)=@attach %!/INC`MSG=ERROR: Not enough Hype!;@attach [u(cobj,agedb)]/PUSH`%q<push>`ACTIVATE=%#,%2,%q<hypecost>;th u(addto,%#,D`COMBAT`HYPE,mul(-1,%q<hypecost>));th u(setq,afterhype,get(%#/D`COMBAT`HYPE));@attach %!/INC`ANNOUNCE=[if(gt(%q<boss>,1),ansi(hr,<BOSS-%q<boss>>%B))][ansi(hw,%n)] uses a [ansi(118,Push)]!;@attach %!/INC`EPRIVATE=PUSH,You used [ansi(118,Push)]: [get(u(cobj,agedb)/PUSH`%q<push>)];th u(setq,testers,u(filter,TESTER,lplayers(%l)));@attach %!/INC`DEBUG=PUSH,%n used: [get(u(cobj,agedb)/PUSH`%q<push>)][if(%q<pushchoice>,%B\(%q<pushchoice>\))];@dolist/inline edit(lattr(%#/D`COMBAT`STATUS`*),D`COMBAT`STATUS`,)={@attach %!/STATUS`[before(%i0,$)]`PUSH_ON_ACTIVATE=%#,%i0,%q<push>,%q<statid>};th u(addto,%#,D`COMBAT`HYPE`USED,%q<hypecost>)
 
 
 &INC`COMBAT`PUSH`LIST [u(cobj,age)]=@pemit %#=u(header,Available Pushes);@dolist/inline u(sortattr,u(lattr,u(cobj,agedb)/PUSH`*))={@pemit %#=u(separator,get(u(cobj,agedb)/%i0));@dolist/inline/delimit | [get(u(Cobj,agedb)/%i0`CHOICES)]={@pemit %#=[ansi(h,%i0 Hype:)]%B[get(u(cobj,agedb)/%i1`%i0)]}};@pemit %#=u(footer)
