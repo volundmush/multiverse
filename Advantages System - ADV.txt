@@ -44,7 +44,15 @@ th u(NEWCOBJ,MCM Advantages <ADV>,adv,,,,WIZARD SAFE !NO_COMMAND,INHERIT SIDEFX 
 
 &STARTUP [u(cobj,adv)]=@hook/override/inline +advantages=%!,CMD`DISPLAY;@hook/override/inline +disadvantages=%!,CMD`DISPLAY
 
-&HLP`ADVANTAGES [u(cobj,adv)]=Syntax: [ansi(h,+advantages <target>)]%R%RDisplays advantages information for <target>. This includes powers, skills, assets, and NPCs. If <target> is omitted, it will show your own advantages. Command can be shortened to +adv.%R%RTo show an individual advantage, use the following syntax:%R%RSyntax: +advantages/<type> <target>%R%RReplace <type> with one of: powers, skills, assets, or NPCs. For example, +advantages/npcs to view NPCs.%R%RTo be notified when someone views your advantages, use:%R%R&aadvantages me=1%R%RTo clear, use:%R%R&aadvantages me
+
+&CMD`SEARCH [u(cobj,adv)]=$^(?s)\+search(adv|flaws)(?\:/(\S+)?)?(?\: +(.+?))?(?\:/(.*))?(?\:=(.*))?$:@stop strlen(%2)=@attach %!/INC`MSG=ERROR: +search[lcstr(%1)] does not support switches.;@attach %!/INC`SEARCH`%1=%3,%4
+@set u(cobj,adv)/CMD`SEARCH=regexp
+
+&INC`SEARCH`ADV [u(cobj,adv)]=@check strlen(%0)=@attach %!/INC`MSG=ERROR: No search category entered! Choices are: Minor, Significant, Defining, or All.;@attach %!/INC`PARTIAL=%0,MINOR|SIGNIFICANT|DEFINING,|,choice;@check strlen(%1)=@attach %!/INC`MSG=ERROR: Nothing entered to search for!;@check words(u(setr,results,u(sortname,lsearch(all,eplayer,\[cand(u(isapproved,##),u(FUN`SEARCHADV,##,D`ADV`%q<choice>,%1))\]))))=@attach %!/INC`MSG=No results found.;@attach %!/INC`MSG=Characters Found: [words(%q<results>)] - [iter(%q<results>,u(pueblize,u(setr,name,u(getmoniker,%i0)),+adv %q<name>),%b,\,%b)]
+
+&FUN`SEARCHADV [u(cobj,adv)]=regmatchi(get(%0/%1),\\b%2.*\\:)
+
+&HLP`ADVANTAGES [u(cobj,adv)]=Syntax: [ansi(h,+advantages <target>)]%R%RDisplays advantages information for <target>. This includes powers, skills, assets, and NPCs. If <target> is omitted, it will show your own advantages. Command can be shortened to +adv.%R%RTo show an individual advantage, use the following syntax:%R%RSyntax: +advantages/<type> <target>%R%RReplace <type> with one of: powers, skills, assets, or NPCs. For example, +advantages/npcs to view NPCs.%R%RYou can SEARCH for who has a particular advantage by using: [ansi(h,+searchadv <type>/<name>)] - Such as +searchadv Significant/Wealth%R%RTo be notified when someone views your advantages, use:%R%R&aadvantages me=1%R%RTo clear, use:%R%R&aadvantages me
 +help/add Character/+advantages=[u(cobj,adv)]/HLP`ADVANTAGES
 
 &HLP`FLAWS [u(cobj,adv)]=[ansi(h,+flaws <target>)]%R%RShows the flaws information for <target>, i.e. +flaws Richie would show the flaw information for Richie.%R+flaws without any parameters will display your own flaw listing.
