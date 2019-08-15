@@ -3124,7 +3124,6 @@ Overwhelming
 &STATUS`SIG_EXECUTION`SIGNATURE [u(cobj,age)]=@select/inline words(get(%0/D`COMBAT`ACTIVE`STATUS`SIG_EXECUTION_INFLICT))=0,{@attach %!/INC`SETSTATUS=%0,%0,SIG_EXECUTION_INFLICT,,1,0;@attach %!/INC`EANNOUNCE=EXECUTION,ansi(h,%n) radiates a fierce killing intent!;th u(addto,%0,D`COMBAT`STATUS`%1`ACTIVATED,1)},{@attach %!/INC`EPRIVATE=EXECUTION,You are already prepared to strike a mortal blow!}
 
 &STATUS`SIG_EXECUTION_INFLICT [u(cobj,age)]=Execution
-&STATUS`SIG_EXECUTION_INFLICT`ATTACK_ON_CALCULATE [u(cobj,age)]=@select/inline t(match(get(%0/D`COMBAT`HISTORY`SIG_EXECUTION),%q<atker>))=0,{@attach %!/INC`SETSTATUS=%0,%q<atker>,SIG_EXECUTION_DOT,DAMAGE=%q<damage>|INCREMENT=[get(%0/D`COMBAT`OPPONENTS)],0,mul(3,get(%0/D`COMBAT`OPPONENTS));@attach %!/INC`EANNOUNCE=EXECUTION,ansi(h,%n) suffers a deadly injury! Cure cannot help %o! Beware bleeding out...;th u(attrib_set,%0,D`COMBAT`HISTORY`SIG_EXECUTION,setunion(get(%0/D`COMBAT`HISTORY`SIG_EXECUTION),%q<atker>))},1,{}
 &STATUS`SIG_EXECUTION_INFLICT`ATTACK_INFLICT_STATUS [u(cobj,age)]=@select/inline t(match(get(%0/D`COMBAT`HISTORY`SIG_EXECUTION),%q<atker>))=0,{@attach %!/INC`SETSTATUS=%0,%q<atker>,SIG_EXECUTION_DOT,DAMAGE=%q<damage>|INCREMENT=[get(%0/D`COMBAT`OPPONENTS)],0,mul(3,get(%0/D`COMBAT`OPPONENTS));@attach %!/INC`EANNOUNCE=EXECUTION,ansi(h,%n) suffers a deadly injury! Cure cannot help %o! Beware bleeding out...;th u(attrib_set,%0,D`COMBAT`HISTORY`SIG_EXECUTION,setunion(get(%0/D`COMBAT`HISTORY`SIG_EXECUTION),%q<atker>))},1,{@attach %!/INC`EANNOUNCE=EXECUTION,ansi(h,%n) will not take another horrific wound so easily just yet!}
 &STATUS`SIG_EXECUTION_INFLICT`ATTACK_NEGATE_DAMAGE [u(Cobj,age)]=th u(setq,damage,0)
 
@@ -3132,7 +3131,7 @@ Overwhelming
 &STATUS`SIG_EXECUTION_DOT`TAGS [u(Cobj,age)]=DISPLAY
 &STATUS`SIG_EXECUTION_DOT`TYPE [u(cobj,age)]
 &STATUS`SIG_EXECUTION_DOT`DESCRIPTION [u(cobj,age)]=Suffer an Overwhelming amount of damage every defense round... (Incurable!)
-&STATUS`SIG_EXECUTION_DOT`DEFENSE`DOT [u(cobj,age)]=if(eq(mod(default(%0/D`COMBAT`STATUS`%1`INCREMENT,0),get(%0/D`COMBAT`OPPONENTS`REMAINING)),0),bound(round(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),switch(div(default(%0/D`COMBAT`STATUS`%1`INCREMENT,0),get(%0/D`COMBAT`OPPONENTS`REMAINING)),1,0.725,2,0.3625,3,0.3625,0.3625),add(1,u(scatter,10))),0),0),0)
+&STATUS`SIG_EXECUTION_DOT`DEFENSE`DOT [u(cobj,age)]=if(eq(mod(default(%0/D`COMBAT`STATUS`%1`INCREMENT,0),default(%0/D`COMBAT`OPPONENTS`REMAINING,1)),0),bound(round(mul(get(%0/D`COMBAT`STATUS`%1`DAMAGE),switch(div(default(%0/D`COMBAT`STATUS`%1`INCREMENT,0),default(%0/D`COMBAT`OPPONENTS`REMAINING,1)),1,0.725,2,0.3625,3,0.3625,0.3625),add(1,u(scatter,10))),0),0),0)
 &STATUS`SIG_EXECUTION_DOT`ON_KILL_STATUS [u(cobj,age)]=th u(attrib_set,%0,D`COMBAT`HISTORY`SIG_EXECUTION,setdiff(get(%0/D`COMBAT`HISTORY`SIG_EXECUTION),get(%0/D`COMBAT`STATUS`%1`SOURCE)))
 
 
@@ -3251,7 +3250,7 @@ Overwhelming
 &STATUS`SIG_ARMORSLAYER`SIGNATURE [u(cobj,age)]=@select/inline lt(get(%0/D`COMBAT`STATUS`%1`ACTIVATED),mul(get(%0/D`COMBAT`OPPONENTS),8))=1,{@attach %!/INC`SETSTATUS=%0,%0,SIG_ARMORSLAYER_ACTIVATED,FROM=%1,1,0;@attach %!/INC`EANNOUNCE=ARMOR SLAYER,ansi(h,%n) is a menace to any defense! Beware!;th u(addto,%0,D`COMBAT`STATUS`%1`ACTIVATED,1)},0,{@attach %!/INC`EPRIVATE=ARMOR SLAYER,Your well of reserve strength is dry!}
 
 &STATUS`SIG_ARMORSLAYER_ACTIVATED [u(Cobj,age)]=Armor Slayer
-&STATUS`SIG_ARMORSLAYER_ACTIVATED`ATTACK_SPECIAL_DAMAGE [u(cobj,age)]=th u(setq,armorslayer,add(1,%q<armorslayer>));@select/inline lte(%q<armorslayer>,%q<atklevel>)=1,{th u(setq,damage,add(%q<damage>,20))},0,{@attach %!/INC`EANNOUNCE=ARMOR SLAYER,The blow lacked the power to pierce that much armor. (Excess uses Refunded.);th u(addto,%q<atker>,D`COMBAT`STATUS`[get(%0/D`COMBAT`STATUS`%1`FROM)]`ACTIVATED,-1)}
+&STATUS`SIG_ARMORSLAYER_ACTIVATED`ATTACK_SPECIAL_DAMAGE [u(cobj,age)]=th u(setq,armorslayer,add(1,%q<armorslayer>));@select/inline lte(%q<armorslayer>,%q<atklevel>)=1,{th u(setq,damage,add(%q<damage>,20));@attach %!/INC`EANNOUNCE=ARMOR SLAYER,The blow cleaved through the [u(numth,%q<armorslayer>)] armor layer!},0,{@attach %!/INC`EANNOUNCE=ARMOR SLAYER,The blow lacked the power to pierce that much armor. (Excess uses Refunded.);th u(addto,%q<atker>,D`COMBAT`STATUS`[get(%0/D`COMBAT`STATUS`%1`FROM)]`ACTIVATED,-1)}
 
 
 &STATUS`SIG_MIRACLE [u(Cobj,age)]=Miracle
