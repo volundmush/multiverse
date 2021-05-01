@@ -28,11 +28,7 @@ th u(NEWCOBJ,MCM Advantages <ADV>,adv,,,,WIZARD SAFE !NO_COMMAND,INHERIT SIDEFX 
 
 &FUN`SEARCHADV [u(cobj,adv)]=regmatchi(get(%0/%1),\\b%2.*\\:)
 
-&INC`ADD [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to set!;&D`ADV`%q<version>`%q<field> %q<t1>=u(setr,results,strcat(get(%q<t1>/D`ADV`%q<field>),%2));@attach %!/INC`MSG=%q<field> for %q<t1name> now has additional text. Total size: [strlen(%q<results>)].[if(gte(strlen(%q<results>),7900),%b[ansi(hr,Please check for overflow!)])];th u(attrib_set,%q<t1>,D`ADV`VERSION,%q<version>)
-
-&INC`ADD`ADV [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to set!;&D`ADV`%q<field> %q<t1>=u(setr,results,strcat(get(%q<t1>/D`ADV`%q<field>),%2));@attach %!/INC`MSG=%q<field> for %q<t1name> now has additional text. Total size: [strlen(%q<results>)].[if(gte(strlen(%q<results>),7900),%b[ansi(hr,Please check for overflow!)])]
-
-&INC`ADD`FLAWS [u(cobj,adv)]=@attach %!/INC`ADD`ADV=Flaws,%1,%2
+&INC`ADD [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to set!;&D`ADV`%q<version>`%q<field> %q<t1>=u(setr,results,strcat(get(%q<t1>/D`ADV`%q<version>`%q<field>),%2));@attach %!/INC`MSG=%q<field> for %q<t1name> now has additional text. Total size: [strlen(%q<results>)].[if(gte(strlen(%q<results>),7900),%b[ansi(hr,Please check for overflow!)])];th u(attrib_set,%q<t1>,D`ADV`VERSION,%q<version>)
 
 &INC`CLEAR [u(cobj,adv)]=@attach %!/INC`START;@attach %!/WIPE=%q<t1>,D`ADV`%q<version>`%q<field>;@attach %!/INC`MSG=Wiped %q<t1name>'s %q<field>!
 
@@ -40,11 +36,7 @@ th u(NEWCOBJ,MCM Advantages <ADV>,adv,,,,WIZARD SAFE !NO_COMMAND,INHERIT SIDEFX 
 
 &INC`CLEAR`FLAWS [u(cobj,adv)]=@attach %!/INC`CLEAR`ADV=Flaws,%1,%2
 
-&INC`EDIT [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to edit!;@check strmatch(%2,*|*)=@attach %!/INC`MSG=EDIT pattern must be in form of <search>|<replace>.;&D`ADV`%q<version>`%q<field> %q<t1>=edit(get(%q<t1>/D`ADV`%q<version>%q<field>),before(%2,|),after(%2,|));@attach %!/INC`MSG=Edited %q<t1name>'s %q<field>. Hopefully. Better double check!
-
-&INC`EDIT`ADV [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to edit!;@check strmatch(%2,*|*)=@attach %!/INC`MSG=EDIT pattern must be in form of <search>|<replace>.;&D`ADV`%q<field> %q<t1>=edit(get(%q<t1>/D`ADV`%q<field>),before(%2,|),after(%2,|));@attach %!/INC`MSG=Edited %q<t1name>'s %q<field>. Hopefully. Better double check!
-
-&INC`EDIT`FLAWS [u(cobj,adv)]=@attach %!/INC`EDIT`ADV=Flaws,%1,%2
+&INC`EDIT [u(cobj,adv)]=@attach %!/INC`START;@check strlen(%2)=@attach %!/INC`MSG=ERROR: Nothing entered to edit!;@check strmatch(%2,*|*)=@attach %!/INC`MSG=EDIT pattern must be in form of <search>|<replace>.;&D`ADV`%q<version>`%q<field> %q<t1>=edit(get(%q<t1>/D`ADV`%q<version>`%q<field>),before(%2,|),after(%2,|));@attach %!/INC`MSG=Edited %q<t1name>'s %q<field>. Hopefully. Better double check!
 
 &INC`LIST [u(cobj,adv)]=@pemit %#=u(if(%3,header,subheader),[ansi(hw,[capstr(%0)]: %q<t1name>)]);th u(setq,get,u(FORMATADV,switch(1,t(match(Powers|Skills|Assets|NPCs,%0)),get(%q<t1>/ADVANTAGES`%0),default(%q<t1>/D`ADV`%0,switch(%0,Flaws,%q<t1>/Flaws,%q<t1>/ADVANTAGES`%0),))));@select/inline %q<switch>=GET,{th u(setq,get,decompose(%q<get>))};@pemit %#=%q<get>
 
